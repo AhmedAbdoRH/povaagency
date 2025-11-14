@@ -6,10 +6,10 @@ export default {
       colors: {
         primary: '#000000',    // أسود حالك
         secondary: '#ffffff',   // أبيض نقي
-        accent: '#d99323',     // ذهبي لامع
-        'accent-light': '#e0a745', // ذهبي أفتح
-        header: '#1b3459', // لون الهيدر المطلوب توحيده
-        'gold-dark': '#b8860b', // أصفر داكن للنصوص
+        accent: '#ee5239',     // برتقالي مائل للأحمر
+        'accent-light': '#ee5239', // برتقالي مائل للأحمر
+        header: '#182441', // لون الهيدر المطلوب توحيده
+        'gold-dark': '#ee5239', // برتقالي مائل للأحمر
       },
       fontFamily: {
         cairo: ['Cairo', 'sans-serif'],

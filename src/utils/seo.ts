@@ -95,7 +95,7 @@ export const generateProductStructuredData = (product: any) => {
     "image": product.image_url,
     "brand": {
       "@type": "Brand",
-      "name": "Designs4U"
+      "name": "POVA"
     },
     "offers": {
       "@type": "Offer",
@@ -111,10 +111,10 @@ export const generateOrganizationStructuredData = (storeSettings: any) => {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": storeSettings?.store_name || "Designs4U",
-    "description": storeSettings?.store_description || "موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز",
-    "url": "https://designs4u.com",
-    "logo": storeSettings?.logo_url || "/favicon.png",
+    "name": storeSettings?.store_name || "POVA",
+    "description": storeSettings?.store_description || "شركة تسويق إلكتروني متكاملة تقدم خدمات تحليل البيانات، تصميم الهوية البصرية، كتابة المحتوى الإبداعي، التصوير الفوتوغرافي، الموشن جرافيك، إدارة الحملات الإعلانية وإدارة وسائل التواصل الاجتماعي",
+    "url": "https://pova.com",
+    "logo": storeSettings?.logo_url || "/‏‏logo.png",
     "address": [
       {
         "@type": "PostalAddress",

@@ -215,7 +215,7 @@ const Cart: React.FC = () => {
                       .map(item => `${item.title} - ${item.quantity} × ${item.price} ر.س`)
                       .join('\n');
                     window.open(
-                      `https://wa.me/201006464349?text=${encodeURIComponent(
+                      `https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(
                         `الطلبية:\n${message}\n\nالمجموع: ${cartTotal} ر.س`
                       )}`,
                       '_blank'

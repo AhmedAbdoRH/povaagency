@@ -77,7 +77,7 @@ export default function ServiceDetails() {
     const serviceUrl = window.location.href;
     const message = `استفسار عن الخدمة: ${service.title}
 رابط الخدمة: ${serviceUrl}`;
-    window.open(`https://wa.me/201006464349?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // التقليب التلقائي للصور في الخدمة الرئيسية فقط
@@ -160,8 +160,8 @@ export default function ServiceDetails() {
     };
   }, [currentImage]);
 
-  // تحديد صورة الخدمة المصغرة بشكل صحيح (الأولوية: image_url ثم لقطة الشاشة الافتراضية)
-  const defaultScreenshot = '/screenshot.jpg'; // تأكد من توفر هذه الصورة في المجلد العام
+  // تحديد صورة الخدمة المصغرة بشكل صحيح (الأولوية: image_url ثم اللوجو الافتراضي)
+  const defaultScreenshot = '/‏‏logo.png'; // اللوجو الافتراضي
   const ogImage =
     service?.image_url && service.image_url.trim() !== ''
       ? service.image_url
@@ -291,7 +291,7 @@ export default function ServiceDetails() {
                       </button>
                       {/* زر مشاركة رابط الخدمة مباشرة على واتساب */}
                       <a
-                        href={`https://wa.me/201006464349?text=${encodeURIComponent(`شاهد هذه الخدمة: ${service.title}\n${window.location.href}`)}`}
+                        href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`شاهد هذه الخدمة: ${service.title}\n${window.location.href}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 bg-[#128C7E] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"

@@ -11,7 +11,7 @@ interface StructuredDataProps {
 
 export default function StructuredData({ type, data, services, categories, breadcrumbs }: StructuredDataProps) {
   const generateStructuredData = () => {
-    const baseUrl = 'https://designs4u.com';
+    const baseUrl = 'https://pova.com';
     
     switch (type) {
       case 'organization':
@@ -19,11 +19,11 @@ export default function StructuredData({ type, data, services, categories, bread
         return {
           "@context": "https://schema.org",
           "@type": "Organization",
-          "name": storeSettings?.store_name || "Designs4U",
-          "description": storeSettings?.store_description || "موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز",
+          "name": storeSettings?.store_name || "POVA",
+          "description": storeSettings?.store_description || "شركة تسويق إلكتروني متكاملة تقدم خدمات تحليل البيانات، تصميم الهوية البصرية، كتابة المحتوى الإبداعي، التصوير الفوتوغرافي، الموشن جرافيك، إدارة الحملات الإعلانية وإدارة وسائل التواصل الاجتماعي",
           "url": baseUrl,
-          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/logo.png`,
-          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/logo-social.png`,
+          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/‏‏logo.png`,
+          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/‏‏logo.png`,
           "address": [
             {
               "@type": "PostalAddress",
@@ -56,7 +56,7 @@ export default function StructuredData({ type, data, services, categories, bread
           ].filter(Boolean),
           "hasOfferCatalog": {
             "@type": "OfferCatalog",
-            "name": "مفروشات وأثاث منزلي",
+            "name": "خدمات التسويق الرقمي",
             "itemListElement": services?.map((service, index) => ({
               "@type": "Offer",
               "itemOffered": {
@@ -84,7 +84,7 @@ export default function StructuredData({ type, data, services, categories, bread
           "url": `${baseUrl}/product/${service.id}`,
           "brand": {
             "@type": "Brand",
-            "name": "Designs4U"
+            "name": "POVA"
           },
           "category": service.category?.name || "مفروشات",
           "offers": {
@@ -94,7 +94,7 @@ export default function StructuredData({ type, data, services, categories, bread
             "availability": "https://schema.org/InStock",
             "seller": {
               "@type": "Organization",
-              "name": "Designs4U"
+              "name": "POVA"
             }
           },
           "aggregateRating": {
@@ -110,7 +110,7 @@ export default function StructuredData({ type, data, services, categories, bread
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           "name": category.name,
-          "description": category.description || `منتجات ${category.name} من Designs4U`,
+          "description": category.description || `خدمات ${category.name} من POVA`,
           "url": `${baseUrl}/category/${category.id}`,
           "mainEntity": {
             "@type": "ItemList",

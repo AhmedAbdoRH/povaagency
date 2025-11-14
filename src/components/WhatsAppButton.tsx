@@ -3,9 +3,8 @@ import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 
 export default function WhatsAppButton() {
-  const phoneNumber = '+201006464349';
-  const message = 'مرحباً! أريد الاستفسار عن خدمات الطباعة والتطريز';
-  const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+  const message = 'مرحباً! أريد الاستفسار عن خدماتكم';
+  const whatsappUrl = `https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`;
 
   return (
     <motion.a

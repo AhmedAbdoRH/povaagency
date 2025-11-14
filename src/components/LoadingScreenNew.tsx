@@ -90,7 +90,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           {logoUrl ? (
             <div className="relative">
               <motion.img
-                src={logoUrl.includes('supabase.co') ? '/favicon.png' : logoUrl}
+                src={logoUrl.includes('supabase.co') ? '/‏‏logo.png' : logoUrl}
                 alt="Logo"
                 className="w-32 h-32 object-contain"
                 animate={{
@@ -107,7 +107,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
                   ease: "easeInOut"
                 }}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/favicon.png';
+                  (e.target as HTMLImageElement).src = '/‏‏logo.png';
                 }}
               />
               {/* Rotating ring */}
@@ -150,8 +150,8 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               <motion.div
                 className="absolute inset-4 border-2 border-transparent rounded-full"
                 style={{
-                  borderLeftColor: '#d99323',
-                  borderBottomColor: 'rgba(217, 147, 35, 0.5)',
+                  borderLeftColor: '#ee5239',
+                  borderBottomColor: 'rgba(238, 82, 57, 0.5)',
                 }}
                 animate={{ rotate: -360 }}
                 transition={{
@@ -162,7 +162,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               />
               {/* Center dot */}
               <motion.div
-                className="absolute top-1/2 left-1/2 w-3 h-3 -mt-1.5 -ml-1.5 rounded-full bg-gradient-to-r from-[#c7a17a] to-[#d99323]"
+                className="absolute top-1/2 left-1/2 w-3 h-3 -mt-1.5 -ml-1.5 rounded-full bg-gradient-to-r from-[#c7a17a] to-[#ee5239]"
                 animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.7, 1, 0.7]
@@ -185,7 +185,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           transition={{ delay: 0.5, duration: 0.6 }}
         >
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#c7a17a] via-[#d99323] to-[#e0a745]"
+            className="h-full rounded-full bg-gradient-to-r from-[#c7a17a] via-[#ee5239] to-[#ee5239]"
             style={{
               boxShadow: '0 0 15px rgba(199, 161, 122, 0.6)',
             }}

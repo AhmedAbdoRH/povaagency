@@ -159,8 +159,8 @@ function App() {
       const root = document.documentElement;
       root.style.setProperty('--color-primary', primary);
       root.style.setProperty('--color-secondary', secondary);
-      root.style.setProperty('--color-accent', '#d99323'); // Keep or adjust as needed
-      root.style.setProperty('--color-accent-light', '#e0a745'); // Keep or adjust
+      root.style.setProperty('--color-accent', '#ee5239'); // برتقالي مائل للأحمر
+      root.style.setProperty('--color-accent-light', '#ee5239'); // برتقالي مائل للأحمر
       root.style.setProperty('--font-family', fontFamily);
 
       if (backgroundGradient && backgroundGradient.trim() !== '') {
@@ -194,7 +194,7 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'Designs4U',
           store_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
-          logo_url: '/logo.png',
+          logo_url: '/‏‏logo.png',
           meta_title: 'Designs4U - خدمات الطباعة والتطريز',
           meta_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
           theme_settings: {
@@ -216,7 +216,7 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'Designs4U',
           store_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
-          logo_url: '/logo.png',
+          logo_url: '/‏‏logo.png',
           meta_title: 'Designs4U - خدمات الطباعة والتطريز',
           meta_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
           theme_settings: {
@@ -235,7 +235,7 @@ function App() {
         id: '00000000-0000-0000-0000-000000000001',
         store_name: 'Designs4U',
         store_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
-        logo_url: '/logo.png',
+        logo_url: '/‏‏logo.png',
         meta_title: 'Designs4U - خدمات الطباعة والتطريز',
         meta_description: 'موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز',
         theme_settings: {
@@ -300,7 +300,7 @@ function App() {
   if (loading) {
     return (
       <LoadingScreen
-        logoUrl={storeSettings?.logo_url || '/logo.png'} // Provide a default logo
+        logoUrl={storeSettings?.logo_url || '/‏‏logo.png'} // Provide a default logo
       />
     );
   }
@@ -311,48 +311,48 @@ function App() {
         <Helmet>
           {(() => {
             const rawTitle = (storeSettings as any)?.meta_title || (storeSettings as any)?.store_name || '';
-            const fallbackTitle = 'Designs4U | خدمات الطباعة والتطريز وشروحات برامج التطريز';
+            const fallbackTitle = 'POVA | شركة تسويق متكاملة لتصميم الهوية وإنتاج المحتوى والإعلانات';
             const normalizedTitle = /السماح\s*للمفروشات/i.test(rawTitle) ? fallbackTitle : (rawTitle || fallbackTitle);
             return (
               <title>{normalizedTitle}</title>
             );
           })()}
-          <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'Designs4U - موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز. نقدم أفضل خدمات الطباعة على الأقمشة والملابس والتطريز اليدوي والآلي.'} />
-          <meta name="keywords" content={storeSettings?.keywords ? storeSettings.keywords.join(', ') : 'Designs4U, طباعة, تطريز, خدمات طباعة, خدمات تطريز, شروحات برامج التطريز, طباعة على القماش, طباعة على الملابس, تطريز يدوي, تطريز آلي, مصر'} />
-          <meta name="author" content="Designs4U" />
+          <meta name="description" content={storeSettings?.meta_description || storeSettings?.store_description || 'POVA شركة تسويق إلكتروني متكاملة تقدم خدمات تحليل البيانات، تصميم الهوية البصرية، كتابة المحتوى الإبداعي، التصوير الفوتوغرافي، الموشن جرافيك، إدارة الحملات الإعلانية وإدارة وسائل التواصل الاجتماعي لنجاح علامتك التجارية.'} />
+          <meta name="keywords" content={storeSettings?.keywords ? storeSettings.keywords.join(', ') : 'POVA, شركة تسويق, تصميم هوية بصرية, كتابة محتوى, تصوير منتجات, موشن جرافيك, حملات إعلانية, إدارة سوشيال ميديا, تحليل بيانات, مونتاج فيديو, تسويق رقمي'} />
+          <meta name="author" content="POVA" />
           <meta name="robots" content="index, follow" />
           <meta name="language" content="Arabic" />
           <meta name="revisit-after" content="7 days" />
           
           {/* Open Graph / Facebook */}
           <meta property="og:type" content="website" />
-          <meta property="og:url" content="https://designs4u.com/" />
-          <meta property="og:title" content={(storeSettings as any)?.meta_title && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.meta_title) ? (storeSettings as any)?.meta_title : ((storeSettings as any)?.store_name && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.store_name) ? (storeSettings as any)?.store_name : 'Designs4U | خدمات الطباعة والتطريز وشروحات برامج التطريز')} />
-          <meta property="og:description" content={storeSettings?.meta_description || storeSettings?.store_description || 'Designs4U - موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز. نقدم أفضل خدمات الطباعة على الأقمشة والملابس والتطريز اليدوي والآلي.'} />
-          <meta property="og:image" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
-          <meta property="og:image:secure_url" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
+          <meta property="og:url" content="https://pova.com/" />
+          <meta property="og:title" content={(storeSettings as any)?.meta_title && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.meta_title) ? (storeSettings as any)?.meta_title : ((storeSettings as any)?.store_name && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.store_name) ? (storeSettings as any)?.store_name : 'POVA | شريك نجاحك في التسويق الرقمي')} />
+          <meta property="og:description" content={storeSettings?.meta_description || storeSettings?.store_description || 'نحوّل أفكارك إلى علامة تجارية قوية عبر تحليل البيانات، الإبداع في التصميم، وصناعة محتوى مؤثر يجذب جمهورك.'} />
+          <meta property="og:image" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
+          <meta property="og:image:secure_url" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:image:alt" content="Designs4U - خدمات الطباعة والتطريز" />
+          <meta property="og:image:alt" content="POVA - شركة تسويق متكاملة" />
           <meta property="og:image:type" content="image/png" />
-          <meta property="og:site_name" content="Designs4U" />
+          <meta property="og:site_name" content="POVA" />
           <meta property="og:locale" content="ar_EG" />
           <meta property="og:updated_time" content={new Date().toISOString()} />
           
           {/* Twitter */}
           <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:url" content="https://designs4u.com/" />
-          <meta property="twitter:title" content={(storeSettings as any)?.meta_title && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.meta_title) ? (storeSettings as any)?.meta_title : ((storeSettings as any)?.store_name && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.store_name) ? (storeSettings as any)?.store_name : 'Designs4U | خدمات الطباعة والتطريز وشروحات برامج التطريز')} />
-          <meta property="twitter:description" content={storeSettings?.meta_description || storeSettings?.store_description || 'Designs4U - موقع متخصص في تصميم وتنفيذ خدمات الطباعة والتطريز وشروحات برامج التطريز. نقدم أفضل خدمات الطباعة على الأقمشة والملابس والتطريز اليدوي والآلي.'} />
-          <meta property="twitter:image" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
-          <meta property="twitter:image:alt" content="Designs4U - خدمات الطباعة والتطريز" />
-          <meta name="twitter:site" content="@designs4u" />
-          <meta name="twitter:creator" content="@designs4u" />
+          <meta name="twitter:url" content="https://pova.com/" />
+          <meta name="twitter:title" content={(storeSettings as any)?.meta_title && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.meta_title) ? (storeSettings as any)?.meta_title : ((storeSettings as any)?.store_name && !/السماح\s*للمفروشات/i.test((storeSettings as any)?.store_name) ? (storeSettings as any)?.store_name : 'POVA | شريك نجاحك في التسويق الرقمي')} />
+          <meta name="twitter:description" content={storeSettings?.meta_description || storeSettings?.store_description || 'نصمم، نحلل، نبدع — لنجاح مشروعك التجاري عبر حلول تسويقية متكاملة.'} />
+          <meta name="twitter:image" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
+          <meta name="twitter:image:alt" content="POVA - شركة تسويق متكاملة" />
+          <meta name="twitter:site" content="@pova" />
+          <meta name="twitter:creator" content="@pova" />
           
           {/* WhatsApp and Social Media */}
-          <meta property="og:image:url" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
-          <meta name="image" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
-          <meta name="thumbnail" content={storeSettings?.og_image_url || 'https://designs4u.com/logo-social.png'} />
+          <meta property="og:image:url" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
+          <meta name="image" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
+          <meta name="thumbnail" content={storeSettings?.og_image_url || 'https://pova.com/‏‏logo.png'} />
           
           {/* Additional SEO Meta Tags */}
           <meta name="geo.region" content="EG" />
@@ -361,7 +361,7 @@ function App() {
           <meta name="ICBM" content="30.0444, 31.2357" />
           
           {/* Canonical URL */}
-          <link rel="canonical" href="https://designs4u.com/" />
+          <link rel="canonical" href="https://pova.com/" />
           
           {/* Favicon */}
           {storeSettings?.favicon_url && (

@@ -126,7 +126,7 @@ export default function SEOOptimizedHero({ storeSettings }: SEOOptimizedHeroProp
             </a>
             
             <a
-              href="https://wa.me/201006464349"
+              href="https://wa.me/message/IUSOLSYPTTE6G1"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-green-600/20 hover:bg-green-600/30 px-6 py-3 rounded-lg border border-green-500/30 transition-all duration-300"

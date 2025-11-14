@@ -19,7 +19,7 @@ interface ProductCardProps {
 }
 
 // Define the light gold color using the hex code from the Hero component
-const lightGold = '#FFD700'; // This is standard gold color
+const lightGold = '#ee5239'; // برتقالي مائل للأحمر
 
 export default function ProductCard({ title, description, imageUrl, price, salePrice, id, gallery = [] }: ProductCardProps) {
   // Convert single image to array for consistent handling
@@ -63,7 +63,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     e.preventDefault();
     const productUrl = `${window.location.origin}/product/${id}`;
     const message = `استفسار عن المنتج: ${title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201006464349?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -184,7 +184,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
               className={`flex items-center justify-center p-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ${
                 isAdded 
                   ? 'bg-green-500 text-white' 
-                  : 'bg-gradient-to-r from-[#345e8f] to-[#1b3459] text-white ring-1 ring-black/10'
+                  : 'bg-gradient-to-r from-[#345e8f] to-[#182441] text-white ring-1 ring-black/10'
               } ${isAdding ? 'opacity-75' : ''} min-w-[44px] min-h-[44px]`}
               title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
             >
@@ -199,7 +199,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
             
             <button
               onClick={handleContactClick}
-              className={`bg-gradient-to-r from-[#d1a123] to-[#b8860b] text-white font-bold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 ring-1 ring-black/10 min-h-[44px]`}
+              className={`bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white font-bold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 ring-1 ring-black/10 min-h-[44px]`}
             >
               <MessageCircle className="h-6 w-6" />
               <span className="text-base">اطلب الآن</span>

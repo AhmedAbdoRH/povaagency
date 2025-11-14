@@ -3,9 +3,9 @@ import ServiceCard from './ServiceCard';
 import { supabase } from '../lib/supabase';
 import type { Service, Category } from '../types/database';
 
-const lightGold = '#FFD700';
+const lightGold = '#ee5239';
 const brownDark = '#3d2c1d';
-const accentColor = '#d99323'; // New accent color for selected categories
+const accentColor = '#ee5239'; // برتقالي مائل للأحمر
 
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);

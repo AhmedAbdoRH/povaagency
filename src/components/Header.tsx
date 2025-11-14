@@ -260,7 +260,7 @@ export default function Header({ storeSettings }: HeaderProps) {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 backdrop-blur-md border-b border-white/10" style={{ backgroundColor: '#1b3459', transform: 'skewX(-2deg)' }}>
+      <header className="fixed top-0 w-full z-50 backdrop-blur-md border-b border-white/10" style={{ backgroundColor: '#182441', transform: 'skewX(-2deg)' }}>
         <div className="container mx-auto px-4 py-2 flex items-center justify-between" style={{ transform: 'skewX(2deg)' }}>
           <div className="flex items-center gap-4">
             {/* Mobile menu button */}
@@ -274,15 +274,15 @@ export default function Header({ storeSettings }: HeaderProps) {
             
             <Link to="/" className="flex-shrink-0">
               <img 
-                src={storeSettings?.logo_url || '/logo.png'}
+                src={storeSettings?.logo_url || '/‏‏logo.png'}
                 alt={storeSettings?.store_name || 'Designs4U'} 
                 className="h-16 md:h-20 w-auto object-contain"
                 onError={(e) => {
-                  // Fallback to favicon if logo.png fails to load
+                  // Fallback to logo if logo.png fails to load
                   const target = e.target as HTMLImageElement;
-                  target.src = '/favicon.png';
+                  target.src = '/‏‏logo.png';
                   target.onerror = (e) => {
-                    // Final fallback to SVG if favicon also fails
+                    // Final fallback to SVG if logo also fails
                     const finalTarget = e.target as HTMLImageElement;
                     finalTarget.src = '/logo.svg';
                     finalTarget.onerror = null;
@@ -491,14 +491,14 @@ export default function Header({ storeSettings }: HeaderProps) {
                         e.stopPropagation();
                         toggleCart(!isCartOpen);
                       }}
-                      className="relative p-2 text-white hover:text-[#FFD700] transition-colors"
+                      className="relative p-2 text-white hover:text-[#ee5239] transition-colors"
                       aria-label="عرض السلة"
                       aria-expanded={isCartOpen}
                     >
                       <div className="relative">
                         <ShoppingCart className="h-6 w-6" />
                         {itemCount > 0 && (
-                          <span className="absolute -top-2 -right-2 bg-[#FFD700] text-black text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1 border-2 border-black/10 shadow-sm">
+                          <span className="absolute -top-2 -right-2 bg-[#ee5239] text-white text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1 border-2 border-black/10 shadow-sm">
                             {itemCount > 9 ? '9+' : itemCount}
                           </span>
                         )}
@@ -538,7 +538,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                               <div className="flex-1 text-right">
                                 <h4 className="text-white text-sm font-medium line-clamp-1">{item.title}</h4>
                                 <div className="flex items-center justify-between mt-1">
-                                  <span className="text-[#FFD700] font-bold">{item.price} ج</span>
+                                  <span className="text-[#ee5239] font-bold">{item.price} ج</span>
                                   <div className="flex items-center gap-2">
                                     <button 
                                       onClick={(e) => {
@@ -585,7 +585,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                           <div className="flex justify-between items-center mb-4">
                             <span className="text-white/70">المجموع:</span>
                             <div className="text-right">
-                              <div className="text-[#FFD700] font-bold text-lg">
+                              <div className="text-[#ee5239] font-bold text-lg">
                                 {(() => {
                                   try {
                                     const numericValue = parseFloat(cartTotal);
@@ -612,7 +612,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                               sendOrderViaWhatsApp();
                               setIsCartHovered(false);
                             }}
-                            className="w-full bg-[#FFD700] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
+                            className="w-full bg-[#ee5239] hover:bg-[#d63d2a] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
                           >
                             <ShoppingCart className="h-5 w-5" />
                             اكمال الطلب

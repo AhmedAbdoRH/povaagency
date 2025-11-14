@@ -78,7 +78,7 @@ export default function ProductDetails() {
     if (!service) return;
     const productUrl = window.location.href;
     const message = `استفسار عن المنتج: ${service.title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/201006464349?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // Get all images for the main product carousel
@@ -184,7 +184,7 @@ export default function ProductDetails() {
                         href={service.dst_file_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
                         title="تحميل الملف بصيغة .dst"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">

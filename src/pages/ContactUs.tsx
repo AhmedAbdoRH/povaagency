@@ -50,7 +50,7 @@ export default function ContactUs() {
                     <div>
                       <h3 className="text-xl font-semibold text-white">واتساب</h3>
                       <a 
-                        href="https://wa.me/201006464349" 
+                        href="https://wa.me/message/IUSOLSYPTTE6G1" 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-green-400 text-lg hover:text-green-300 transition-colors"

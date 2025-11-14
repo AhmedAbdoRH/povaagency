@@ -223,7 +223,7 @@ export default function Services() {
             }}
               className={`p-4 rounded-xl transition-all duration-300 ${
                 !selectedCategory
-                  ? 'bg-blue-500 text-white font-bold shadow-md'
+                  ? 'bg-[#ee5239] text-white font-bold shadow-md'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
               }`}
             variants={{
@@ -252,7 +252,7 @@ export default function Services() {
               }}
             >
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-yellow-400">✨</span> أحدث العروض
+                <span className="text-[#ee5239]">✨</span> أحدث العروض
               </h3>
             </motion.button>
           )}
@@ -296,7 +296,7 @@ export default function Services() {
                 onClick={() => handleCategoryClick(category.id)}
                 className={`p-4 rounded-xl transition-all duration-300 ${
                   category.id === selectedCategory
-                    ? 'bg-blue-500 text-white font-bold shadow-md'
+                    ? 'bg-[#ee5239] text-white font-bold shadow-md'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
                 }`}
                 variants={{
@@ -324,7 +324,7 @@ export default function Services() {
                 onClick={() => handleSubcategoryClick(null)}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
                   selectedSubcategory === null
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl'
+                    ? 'bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white shadow-xl'
                     : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 hover:shadow-lg'
                 }`}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -346,7 +346,7 @@ export default function Services() {
                       onClick={() => handleSubcategoryClick(subcategory.id)}
                       className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
                         selectedSubcategory === subcategory.id
-                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl'
+                          ? 'bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white shadow-xl'
                           : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 hover:shadow-lg'
                       }`}
                       initial={{ opacity: 0, scale: 0.8 }}
