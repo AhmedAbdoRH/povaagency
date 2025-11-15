@@ -52,6 +52,22 @@ ON CONFLICT (id) DO UPDATE SET
     allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 -- =====================================================
+-- 7. إنشاء Bucket للخدمات (Services)
+-- =====================================================
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'services',
+    'services',
+    true,
+    10485760, -- 10MB
+    ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE SET
+    public = EXCLUDED.public,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+-- =====================================================
 -- 4. إنشاء Bucket للملفات القابلة للتحميل (Downloads)
 -- =====================================================
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

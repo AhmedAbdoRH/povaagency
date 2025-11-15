@@ -103,6 +103,39 @@ CREATE POLICY "Authenticated users can delete banners"
     USING (bucket_id = 'banners' AND owner IS NOT NULL AND owner = auth.uid()::text);
 
 -- =====================================================
+-- سياسات Bucket الخدمات (services)
+-- =====================================================
+
+-- السماح للجميع بقراءة صور الخدمات
+DROP POLICY IF EXISTS "Public can view service images" ON storage.objects;
+CREATE POLICY "Public can view service images"
+    ON storage.objects FOR SELECT
+    TO public
+    USING (bucket_id = 'services');
+
+-- السماح للمستخدمين المصادق عليهم برفع صور الخدمات
+DROP POLICY IF EXISTS "Authenticated users can upload service images" ON storage.objects;
+CREATE POLICY "Authenticated users can upload service images"
+    ON storage.objects FOR INSERT
+    TO authenticated
+    WITH CHECK (bucket_id = 'services');
+
+-- السماح للمستخدمين المصادق عليهم بتحديث صور الخدمات
+DROP POLICY IF EXISTS "Authenticated users can update service images" ON storage.objects;
+CREATE POLICY "Authenticated users can update service images"
+    ON storage.objects FOR UPDATE
+    TO authenticated
+    USING (bucket_id = 'services' AND owner = auth.uid())
+    WITH CHECK (bucket_id = 'services' AND owner = auth.uid());
+
+-- السماح للمستخدمين المصادق عليهم بحذف صور الخدمات
+DROP POLICY IF EXISTS "Authenticated users can delete service images" ON storage.objects;
+CREATE POLICY "Authenticated users can delete service images"
+    ON storage.objects FOR DELETE
+    TO authenticated
+    USING (bucket_id = 'services' AND owner = auth.uid());
+
+-- =====================================================
 -- سياسات Bucket التحميلات (downloads)
 -- =====================================================
 

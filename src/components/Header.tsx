@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, Search, X, ShoppingCart, Trash2, ChevronUp, Menu, X as Close } from 'lucide-react';
+import { ChevronDown, Search, X, ChevronUp, Menu, X as Close } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Category, StoreSettings, Service } from '../types/database';
-import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,44 +16,14 @@ export default function Header({ storeSettings }: HeaderProps) {
   const [searchResults, setSearchResults] = useState<Service[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [isCartHovered, setIsCartHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showCartPreview, setShowCartPreview] = useState(false);
-  const cartPreviewTimer = useRef<NodeJS.Timeout | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcatsByCategory, setSubcatsByCategory] = useState<Record<string, { id: string; name: string }[]>>({});
-  const [loadingCategories, setLoadingCategories] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const cartRef = useRef<HTMLLIElement>(null);
-  const cartButtonRef = useRef<HTMLButtonElement>(null);
-  const cartDropdownRef = useRef<HTMLDivElement>(null);
-  const { 
-    toggleCart, 
-    itemCount, 
-    cartItems, 
-    removeFromCart, 
-    updateQuantity, 
-    isCartOpen,
-    cartTotal,
-    sendOrderViaWhatsApp,
-    isAutoShowing
-  } = useCart();
-  
-  // Toggle mobile search and focus the input when opened
-  const toggleMobileSearch = () => {
-    setIsMobileSearchOpen(!isMobileSearchOpen);
-    if (!isMobileSearchOpen && searchInputRef.current) {
-      // Small delay to ensure the input is visible before focusing
-      setTimeout(() => searchInputRef.current?.focus(), 100);
-    } else {
-      setSearchQuery('');
-      setSearchResults([]);
-    }
-  };
-
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
 
   const handleSearch = async (query: string) => {
@@ -170,28 +139,6 @@ export default function Header({ storeSettings }: HeaderProps) {
     fetchCategories();
   }, []);
 
-  // Handle cart preview timeout
-  useEffect(() => {
-    if (showCartPreview) {
-      // Clear any existing timer
-      if (cartPreviewTimer.current) {
-        clearTimeout(cartPreviewTimer.current);
-      }
-      
-      // Set new timer to hide cart preview after 2 seconds
-      cartPreviewTimer.current = setTimeout(() => {
-        setShowCartPreview(false);
-      }, 2000);
-    }
-    
-    // Cleanup timer on unmount
-    return () => {
-      if (cartPreviewTimer.current) {
-        clearTimeout(cartPreviewTimer.current);
-      }
-    };
-  }, [showCartPreview]);
-
   // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
@@ -301,10 +248,6 @@ export default function Header({ storeSettings }: HeaderProps) {
                 onChange={(e) => handleSearch(e.target.value)}
                 onFocus={() => {
                   setIsSearchFocused(true);
-                  // Close cart when search input is focused
-                  if (isCartOpen) {
-                    toggleCart(false);
-                  }
                 }}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                 placeholder="ابحث عن خدمة..."
@@ -370,10 +313,6 @@ export default function Header({ storeSettings }: HeaderProps) {
               onClick={() => {
                 const wasOpen = isMobileSearchOpen;
                 setIsMobileSearchOpen(!wasOpen);
-                // Close cart if it's open
-                if (isCartOpen) {
-                  toggleCart(false);
-                }
                 // If we're opening the search, focus will be handled by the effect
                 // If we're closing it, blur any active element
                 if (wasOpen && document.activeElement) {
@@ -483,144 +422,6 @@ export default function Header({ storeSettings }: HeaderProps) {
                   <a href="#contact" className="text-white hover:text-header transition-colors duration-300">
                     تواصل معنا
                   </a>
-                </li>
-                <li className="relative" ref={cartRef}>
-                  <div className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCart(!isCartOpen);
-                      }}
-                      className="relative p-2 text-white hover:text-[#ee5239] transition-colors"
-                      aria-label="عرض السلة"
-                      aria-expanded={isCartOpen}
-                    >
-                      <div className="relative">
-                        <ShoppingCart className="h-6 w-6" />
-                        {itemCount > 0 && (
-                          <span className="absolute -top-2 -right-2 bg-[#ee5239] text-white text-xs font-bold rounded-full h-5 min-w-[20px] flex items-center justify-center px-1 border-2 border-black/10 shadow-sm">
-                            {itemCount > 9 ? '9+' : itemCount}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                    
-                    {/* Cart Preview Dropdown */}
-                    {isCartOpen && (
-                      <div 
-                        className="fixed left-1/2 transform -translate-x-1/2 mt-2 w-[90vw] max-w-2xl max-h-[calc(100vh-8rem)] bg-black/95 backdrop-blur-md rounded-lg shadow-xl border border-white/10 z-50 p-4 overflow-y-auto"
-                        style={{
-                          top: 'calc(var(--header-height, 5rem) + 1rem)'
-                        }}
-                      >
-                        <div className="flex justify-between items-center mb-3 pb-2 border-b border-white/10">
-                          <h3 className="text-white font-bold text-lg">
-                            سلة التسوق
-                          </h3>
-                          <span className="text-sm text-white/60">
-                            {itemCount} عنصر
-                          </span>
-                        </div>
-                        <div className="max-h-96 overflow-y-auto pr-2">
-                          {cartItems.map((item) => (
-                            <div key={item.id} className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0">
-                              <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white/5">
-                                <img 
-                                  src={item.imageUrl} 
-                                  alt={item.title}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = '/placeholder-service.jpg';
-                                  }}
-                                />
-                              </div>
-                              <div className="flex-1 text-right">
-                                <h4 className="text-white text-sm font-medium line-clamp-1">{item.title}</h4>
-                                <div className="flex items-center justify-between mt-1">
-                                  <span className="text-[#ee5239] font-bold">{item.price} ج</span>
-                                  <div className="flex items-center gap-2">
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (item.quantity > 1) {
-                                          updateQuantity(item.id, item.quantity - 1);
-                                        } else {
-                                          removeFromCart(item.id);
-                                          toast.success('تمت إزالة الخدمة من السلة');
-                                        }
-                                      }}
-                                      className="w-6 h-6 flex items-center justify-center bg-white/10 rounded hover:bg-white/20 transition-colors"
-                                    >
-                                      <span className="text-white text-lg">-</span>
-                                    </button>
-                                    <span className="text-white w-6 text-center">{item.quantity}</span>
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        updateQuantity(item.id, item.quantity + 1);
-                                      }}
-                                      className="w-6 h-6 flex items-center justify-center bg-white/10 rounded hover:bg-white/20 transition-colors"
-                                    >
-                                      <span className="text-white text-lg">+</span>
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeFromCart(item.id);
-                                  toast.success('تمت إزالة الخدمة من السلة');
-                                }}
-                                className="text-white/50 hover:text-red-500 transition-colors p-1"
-                                aria-label="إزالة من السلة"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-white/10">
-                          <div className="flex justify-between items-center mb-4">
-                            <span className="text-white/70">المجموع:</span>
-                            <div className="text-right">
-                              <div className="text-[#ee5239] font-bold text-lg">
-                                {(() => {
-                                  try {
-                                    const numericValue = parseFloat(cartTotal);
-                                    if (isNaN(numericValue)) {
-                                      console.error('Invalid cart total value:', cartTotal);
-                                      return '٠٫٠٠ ج.م';
-                                    }
-                                    return new Intl.NumberFormat('ar-EG', { 
-                                      style: 'decimal',
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2
-                                    }).format(numericValue) + ' ج';
-                                  } catch (error) {
-                                    console.error('Error formatting cart total:', error);
-                                    return '٠٫٠٠ ج.م';
-                                  }
-                                })()}
-                              </div>
-                            </div>
-                          </div>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              sendOrderViaWhatsApp();
-                              setIsCartHovered(false);
-                            }}
-                            className="w-full bg-[#ee5239] hover:bg-[#d63d2a] text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
-                          >
-                            <ShoppingCart className="h-5 w-5" />
-                            اكمال الطلب
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </li>
               </ul>
               </nav>
@@ -784,6 +585,15 @@ export default function Header({ storeSettings }: HeaderProps) {
                     ) : (
                       <div className="px-5 py-4 text-white/50 text-base text-center">لا توجد أقسام متاحة</div>
                     )}
+                  </li>
+                  
+                  <li className="mt-6 bg-white/2 rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.05)]">
+                    <a href="#contact" 
+                      className="block px-5 py-4 text-lg text-white hover:bg-white/10 rounded-lg transition-colors font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      تواصل معنا
+                    </a>
                   </li>
                 </ul>
               </nav>

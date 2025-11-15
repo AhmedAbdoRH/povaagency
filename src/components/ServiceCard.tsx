@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Sparkles, ShoppingCart, Check } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
+import { MessageCircle, Sparkles } from 'lucide-react';
 import type { ProductSize } from '../types/database';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -35,7 +34,6 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     return [...new Set([...mainImages, ...additionalImages])]; // Remove duplicates
   }, [images, gallery]);
 
-  const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -64,30 +62,6 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
     const productUrl = `${window.location.origin}/product/${id}`;
     const message = `استفسار عن المنتج: ${title}\nرابط المنتج: ${productUrl}`;
     window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    setIsAdding(true);
-    
-    const cartPrice = displaySalePrice || displayPrice || 0;
-    
-    addToCart({
-      id,
-      title,
-      price: cartPrice.toString(),
-      numericPrice: parseFloat(cartPrice.toString()),
-      imageUrl,
-    });
-    
-    setIsAdded(true);
-    
-    setTimeout(() => {
-      setIsAdding(false);
-      setTimeout(() => setIsAdded(false), 2000);
-    }, 1000);
   };
 
   return (
@@ -178,25 +152,6 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
           </div>
           
           <div className="flex gap-2">
-            <button
-              onClick={handleAddToCart}
-              disabled={isAdding || isAdded}
-              className={`flex items-center justify-center p-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ${
-                isAdded 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-gradient-to-r from-[#345e8f] to-[#182441] text-white ring-1 ring-black/10'
-              } ${isAdding ? 'opacity-75' : ''} min-w-[44px] min-h-[44px]`}
-              title={isAdded ? 'تمت الإضافة' : 'أضف إلى السلة'}
-            >
-              {isAdding ? (
-                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : isAdded ? (
-                <Check className="h-6 w-6" />
-              ) : (
-                <ShoppingCart className="h-6 w-6" />
-              )}
-            </button>
-            
             <button
               onClick={handleContactClick}
               className={`bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white font-bold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 ring-1 ring-black/10 min-h-[44px]`}
