@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service } from '../types/database';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, MessageSquare } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 function usePrevious<T>(value: T): T | undefined {
@@ -281,25 +281,38 @@ export default function ServiceDetails() {
                     <div className="text-2xl font-bold text-accent mb-6">
                       {service.price ? `${service.price} ج` : 'مجاناً'}
                     </div>
-                    <div className="flex gap-4">
-                      <button
-                        onClick={handleContact}
-                        className="flex-1 bg-[#25D366] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
-                      >
-                        <MessageCircle className="h-5 w-5" />
-                        تواصل معنا للطلب
-                      </button>
-                      {/* زر مشاركة رابط الخدمة مباشرة على واتساب */}
+                    <div className="flex flex-col gap-4">
+                      {/* زر احمر احترافي لطلب الخدمة عبر واتساب */}
                       <a
-                        href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`شاهد هذه الخدمة: ${service.title}\n${window.location.href}`)}`}
+                        href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`أريد طلب الخدمة: ${service.title}\n${window.location.href}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 bg-[#128C7E] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                         style={{ textDecoration: 'none' }}
                       >
-                        <MessageCircle className="h-5 w-5" />
-                        مشاركة الخدمة على واتساب
+                        <MessageSquare className="h-6 w-6" />
+                        <span className="text-lg">اطلب الخدمة عبر واتساب</span>
                       </a>
+                      <div className="flex gap-4">
+                        <button
+                          onClick={handleContact}
+                          className="flex-1 bg-[#25D366] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          تواصل معنا للطلب
+                        </button>
+                        {/* زر مشاركة رابط الخدمة مباشرة على واتساب */}
+                        <a
+                          href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`شاهد هذه الخدمة: ${service.title}\n${window.location.href}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 bg-[#128C7E] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          مشاركة الخدمة على واتساب
+                        </a>
+                      </div>
                       {/* نص توضيحي للمشاركة */}
                       <p className="text-xs text-secondary mt-2 text-center w-full">يمكنك مشاركة رابط الخدمة مع أصدقائك على واتساب وسيظهر لهم صورة الخدمة تلقائيًا</p>
                     </div>

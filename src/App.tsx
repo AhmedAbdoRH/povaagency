@@ -20,7 +20,6 @@ import ProductDetails from './pages/ProductDetails';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import DownloadPage from './pages/DownloadPage';
-import LoadingScreen from './components/LoadingScreen';
 import StructuredData from './components/StructuredData';
 import Hero from './components/Hero';
 import DesignRequest from './pages/DesignRequest';
@@ -64,9 +63,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
-  const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [mainContentLoaded, setMainContentLoaded] = useState(false);
   const [services, setServices] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -132,16 +129,6 @@ function App() {
         }
       }
 
-      // Wait for at least 2 seconds OR until settings are fetched, whichever is longer
-      // This part is primarily for the initial LoadingScreen, not PrivateRoute
-      const timer = setTimeout(() => {
-        if (isMounted) setLoading(false);
-      }, 2000); // Minimum 2 seconds for initial loading screen
-
-      return () => {
-        isMounted = false;
-        clearTimeout(timer);
-      };
     }
     initApp();
     return () => { isMounted = false; };
@@ -297,14 +284,6 @@ function App() {
     );
   };
 
-  if (loading) {
-    return (
-      <LoadingScreen
-        logoUrl={storeSettings?.logo_url || '/‏‏logo.png'} // Provide a default logo
-      />
-    );
-  }
-
   return (
     <ThemeProvider>
       <CartProvider>
@@ -430,7 +409,6 @@ function App() {
                 <StaggeredHome
                   storeSettings={storeSettings}
                   banners={banners}
-                  setMainContentLoaded={setMainContentLoaded}
                 />
               </Layout>
             } />
@@ -444,16 +422,10 @@ function App() {
 function StaggeredHome({
   storeSettings,
   banners, // This prop is received but not directly used in this simplified version
-  setMainContentLoaded,
 }: {
   storeSettings: StoreSettings | null;
   banners: Banner[];
-  setMainContentLoaded: (v: boolean) => void;
 }) {
-  useEffect(() => {
-    setMainContentLoaded(true); // Signal that content related to StaggeredHome is ready
-  }, [setMainContentLoaded]);
-
   return (
     <>
       {/* Services component is part of the staggered load */}

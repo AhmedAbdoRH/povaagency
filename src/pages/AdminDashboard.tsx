@@ -67,11 +67,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [newService, setNewService] = useState({
     title: '',
     description: '',
-    image_url: '',
-    category_id: '',
-    gallery: [] as string[],
-    is_featured: false,
-    // is_best_seller: false, // أزيل
+    image_url: '',
+    category_id: '',
+    gallery: [] as string[],
+    // is_best_seller: false, // أزيل
     // price: 0, // أزيل
     // sale_price: null as number | null, // أزيل
     // dst_file_url: null as string | null, // أزيل
@@ -502,12 +501,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       // تبسيط الكائن المرسل
         const serviceToAdd: Partial<Service> = {
             title: newService.title,
-            description: newService.description,
-            image_url: newService.image_url,
-            category_id: selectedCategory,
-            // subcategory_id: selectedSubcategory || null, // أزيل
-            is_featured: newService.is_featured || false,
-            // is_best_seller: newService.is_best_seller || false, // أزيل
+            description: newService.description,
+            image_url: newService.image_url,
+            category_id: selectedCategory,
+            // subcategory_id: selectedSubcategory || null, // أزيل
+            // is_best_seller: newService.is_best_seller || false, // أزيل
             // price: newService.price, // أزيل
             // sale_price: newService.sale_price, // أزيل
             gallery: newService.gallery,
@@ -517,15 +515,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
         if (error) throw error;
 
-        // Reset form
-        setNewService({
-            title: '',
-            description: '',
-            image_url: '',
-            category_id: '',
-            gallery: [],
-            is_featured: false,
-            // is_best_seller: false, // أزيل
+        // Reset form
+        setNewService({
+            title: '',
+            description: '',
+            image_url: '',
+            category_id: '',
+            gallery: [],
+            // is_best_seller: false, // أزيل
             // price: 0, // أزيل
             // sale_price: null, // أزيل
         });
@@ -547,14 +544,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     setEditingService(service.id);
 
     // تبسيط الـ state
-    setNewService({
-      title: service.title,
-      description: service.description || '',
-      image_url: service.image_url || '',
-      category_id: service.category_id || '',
-      gallery: Array.isArray(service.gallery) ? service.gallery : [],
-      is_featured: service.is_featured || false,
-      // is_best_seller: service.is_best_seller || false, // أزيل
+    setNewService({
+      title: service.title,
+      description: service.description || '',
+      image_url: service.image_url || '',
+      category_id: service.category_id || '',
+      gallery: Array.isArray(service.gallery) ? service.gallery : [],
+      // is_best_seller: service.is_best_seller || false, // أزيل
       // price: service.price || 0, // أزيل
       // sale_price: service.sale_price || null, // أزيل
       // dst_file_url: service.dst_file_url || '', // أزيل
@@ -582,11 +578,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       const serviceToUpdate: Partial<Service> = {
         title: newService.title,
         description: newService.description,
-        image_url: newService.image_url,
-        category_id: selectedCategory,
-        // subcategory_id: selectedSubcategory || null, // أزيل
-        is_featured: newService.is_featured || false,
-        // is_best_seller: newService.is_best_seller || false, // أزيل
+        image_url: newService.image_url,
+        category_id: selectedCategory,
+        // subcategory_id: selectedSubcategory || null, // أزيل
+        // is_best_seller: newService.is_best_seller || false, // أزيل
         // price: newService.price, // أزيل
         // sale_price: newService.sale_price, // أزيل
         gallery: newService.gallery,
@@ -600,14 +595,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         .eq('id', editingService);
       if (error) throw error;
 
-      setNewService({ 
-        title: '', 
-        description: '', 
-        image_url: '', 
-        category_id: '', 
-        gallery: [],
-        is_featured: false,
-        // is_best_seller: false, // أزيل
+      setNewService({ 
+        title: '', 
+        description: '', 
+        image_url: '', 
+        category_id: '', 
+        gallery: [],
+        // is_best_seller: false, // أزيل
         // price: 0, // أزيل
         // sale_price: null, // أزيل
       });
@@ -627,14 +621,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   const handleCancelEdit = () => {
     setEditingService(null);
-    setNewService({ 
-      title: '', 
-      description: '', 
-      image_url: '', 
-      category_id: '', 
-      gallery: [],
-      is_featured: false,
-      // is_best_seller: false, // أزيل
+    setNewService({ 
+      title: '', 
+      description: '', 
+      image_url: '', 
+      category_id: '', 
+      gallery: [],
+      // is_best_seller: false, // أزيل
       // price: 0, // أزيل
       // sale_price: null, // أزيل
     });
@@ -1105,13 +1098,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
                         {/* أزلنا حقول ملفات DST/EMB */}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="flex items-center gap-2 p-2 bg-gray-700/50 rounded-md">
-                                <input type="checkbox" id="is_featured" checked={newService.is_featured || false} onChange={(e) => setNewService({ ...newService, is_featured: e.target.checked })} className="h-4 w-4 accent-[#ee5239]"/>
-                                <label htmlFor="is_featured" className="text-white">أحدث العروض</label>
-                            </div>
-                            {/* أزلنا "الأكثر مبيعاً" */}
-                        </div>
 
                         <div>
                           <label className="block text-sm font-medium text-gray-300 mb-1">صور إضافية للمنتج <span className="text-gray-400">(اختياري)</span></label>

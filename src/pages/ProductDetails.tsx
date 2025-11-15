@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service, ProductSize } from '../types/database';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, MessageSquare } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import ProductImageSlider from '../components/ProductImageSlider';
@@ -178,36 +178,48 @@ export default function ProductDetails() {
                       )}
                     </div>
                   ) : null}
-                  <div className="flex gap-4 items-center">
-                    {service.dst_file_url && (
-                      <a
-                        href={service.dst_file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
-                        title="تحميل الملف بصيغة .dst"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
-                        </svg>
-                        تحميل الملف بصيغة .dst
-                      </a>
-                    )}
-                    {service.emb_file_url && (
-                      <a
-                        href={service.emb_file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
-                        title="تحميل الملف بصيغة .emb"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
-                        </svg>
-                        تحميل الملف بصيغة .emb
-                      </a>
-                    )}
-
+                  <div className="flex flex-col gap-4">
+                    {/* زر احمر احترافي لطلب المنتج عبر واتساب */}
+                    <a
+                      href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`أريد طلب المنتج: ${service.title}\n${window.location.href}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <MessageSquare className="h-6 w-6" />
+                      <span className="text-lg">اطلب الخدمة عبر واتساب</span>
+                    </a>
+                    <div className="flex gap-4 items-center flex-wrap">
+                      {service.dst_file_url && (
+                        <a
+                          href={service.dst_file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+                          title="تحميل الملف بصيغة .dst"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
+                          </svg>
+                          تحميل الملف بصيغة .dst
+                        </a>
+                      )}
+                      {service.emb_file_url && (
+                        <a
+                          href={service.emb_file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+                          title="تحميل الملف بصيغة .emb"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75" />
+                          </svg>
+                          تحميل الملف بصيغة .emb
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

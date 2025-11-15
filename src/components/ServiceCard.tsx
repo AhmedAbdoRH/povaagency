@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageCircle, Sparkles } from 'lucide-react';
+import { MessageCircle, Sparkles, ArrowRight } from 'lucide-react';
 import type { ProductSize } from '../types/database';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -144,11 +144,7 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
                   <span className={`font-bold text-2xl sm:text-3xl text-gold-dark`}>ج</span>
                 </div>
               </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className={`font-bold text-2xl sm:text-3xl text-gold-dark`}>مجاناً</span>
-              </div>
-            )}
+            ) : null}
           </div>
           
           <div className="flex gap-2">
@@ -156,8 +152,8 @@ export default function ProductCard({ title, description, imageUrl, price, saleP
               onClick={handleContactClick}
               className={`bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white font-bold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 ring-1 ring-black/10 min-h-[44px]`}
             >
-              <MessageCircle className="h-6 w-6" />
-              <span className="text-base">اطلب الآن</span>
+              <ArrowRight className="h-6 w-6" />
+              <span className="text-base">اعرف المزيد</span>
             </button>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import ImageSlider from './ImageSlider'; // Import the new ImageSlider component
 
 export default function Hero() {
   return (
@@ -15,7 +14,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            تطريز تقليدي × متجر حديث
+            تسويق رقمي × إبداع احترافي
           </motion.span>
         </motion.div>
         
@@ -23,8 +22,8 @@ export default function Hero() {
           {/* النص والزرين */}
           <motion.div
             className="hero-content"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <motion.h2
@@ -33,7 +32,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              تصميمات تطريز وطباعة تجمع روح الحِرفة وأناقة العصر
+              حلول تسويقية متكاملة تجمع بين الإبداع والاستراتيجية
             </motion.h2>
             
             <motion.p
@@ -42,7 +41,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              حمّل ملفات التطريز الجاهزة، تسوّق منتجات مطبوعة ومطرزة بعناية، أو اطلب تصميمًا خاصًا يُحاك على قياس هويتك.
+              استكشف خدماتنا المتنوعة في تصميم الهوية البصرية، إنتاج المحتوى، التصوير الفوتوغرافي، الموشن جرافيك، وإدارة الحملات الإعلانية لبناء علامتك التجارية.
             </motion.p>
             
             <div className="hero-buttons">
@@ -55,28 +54,16 @@ export default function Hero() {
                 }} 
                 className="btn btn-primary"
               >
-                استكشف الآن
+                استكشف خدماتنا
               </button>
               <Link 
                 to="/design-request" 
                 className="btn btn-ghost"
               >
-                اطلب تصميمك
+                اطلب استشارة مجانية
               </Link>
             </div>
 
-          </motion.div>
-
-          {/* الشبكة البصرية */}
-          <motion.div
-            className="hero-frame"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <div className="hero-preview">
-              <ImageSlider /> {/* Use the ImageSlider component here */}
-            </div>
           </motion.div>
         </div>
       </div>

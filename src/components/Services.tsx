@@ -8,12 +8,11 @@ export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | 'featured' | 'best_sellers' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | 'best_sellers' | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [openCategoryId, setOpenCategoryId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasFeaturedProducts, setHasFeaturedProducts] = useState(false);
   const [hasBestSellerProducts, setHasBestSellerProducts] = useState(false);
 
   useEffect(() => {
@@ -67,11 +66,9 @@ export default function Services() {
       if (error) throw error;
       setServices(data || []);
 
-      // Check if we have any featured or best seller products
-      const hasFeatured = data?.some(service => service.is_featured) || false;
+      // Check if we have any best seller products
       const hasBestSellers = data?.some(service => service.is_best_seller) || false;
       
-      setHasFeaturedProducts(hasFeatured);
       setHasBestSellerProducts(hasBestSellers);
     } catch (err: any) {
       console.error('Error fetching services:', err);
@@ -112,10 +109,8 @@ export default function Services() {
     let filtered = services;
     
     // Filter by category first
-    if (selectedCategory && selectedCategory !== 'featured' && selectedCategory !== 'best_sellers') {
+    if (selectedCategory && selectedCategory !== 'best_sellers') {
       filtered = filtered.filter(service => service.category_id === selectedCategory);
-    } else if (selectedCategory === 'featured') {
-      filtered = filtered.filter(service => service.is_featured === true);
     } else if (selectedCategory === 'best_sellers') {
       filtered = filtered.filter(service => service.is_best_seller === true);
     }
@@ -234,28 +229,6 @@ export default function Services() {
             جميع الخدمات
           </motion.button>
 
-              {/* Featured Services Category */}
-          {hasFeaturedProducts && (
-            <motion.button
-              onClick={() => {
-                setSelectedCategory('featured');
-                setSelectedSubcategory(null);
-              }}
-              className={`p-4 rounded-xl transition-all duration-300 ${
-                selectedCategory === 'featured'
-                  ? 'bg-amber-500 text-white font-bold shadow-md'
-                  : 'bg-amber-100 text-amber-700 hover:bg-amber-200 hover:shadow-md'
-              }`}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 },
-              }}
-            >
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-[#ee5239]">✨</span> أحدث العروض
-              </h3>
-            </motion.button>
-          )}
 
           {/* Best Services Category */}
           {hasBestSellerProducts && (
