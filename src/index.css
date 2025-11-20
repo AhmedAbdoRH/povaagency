@@ -5,347 +5,74 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #ffffff;    /* أبيض نقي */
-  --color-secondary: #2a2a2a;  /* رصاصي غامق */
-  --color-accent: #4a5568;     /* رصاصي متوسط */
-  --color-accent-light: #718096; /* رصاصي فاتح */
-  --background-color: #f7fafc;  /* أبيض فاتح جداً */
-  --background-gradient: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  --color-primary: #000000;
+  /* أسود - الخلفية الرئيسية */
+  --color-secondary: #1a1a1a;
+  /* رصاصي غامق - للكروت والعناصر الفرعية */
+  --color-accent: #ee5239;
+  /* برتقالي محمر - للتميز */
+  --color-accent-light: #ff6b52;
+  /* درجة أفتح من الأكسنت */
+  --color-header: #1a1a1a;
+  /* نفس لون السكندري للهيدر */
+  --background-color: #000000;
   --font-family: 'Cairo', sans-serif;
 }
 
 html {
   direction: rtl;
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-family, 'Cairo', sans-serif);
-  background: var(--background-gradient, linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%));
-  color: var(--color-secondary, #2a2a2a);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  /* النص الأساسي أبيض */
+  overflow-x: hidden;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Facebook Button Styles */
-/* From Uiverse.io by mahtabmurad24 */ 
-button.facebook-button {
-  font-family: inherit;
-  font-size: 18px;
-  background: linear-gradient(to bottom, #0d36b3 0%, #0063ad 100%);
-  color: white;
-  padding: 0.8em 1.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 25px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s;
-  width: 15em;
-  height: 2.5em;
+/* Custom Animations */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-button.facebook-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 4s linear infinite;
 }
 
-button.facebook-button:active {
-  transform: scale(0.95);
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-button.facebook-button span {
-  display: block;
-  margin-left: 0;
-  transition: all 0.3s;
+::-webkit-scrollbar-track {
+  background: #000000;
 }
 
-button.facebook-button svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
-  transition: all 0.3s;
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
 }
 
-button.facebook-button .svg-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
-  margin-right: 1.5em;
-  transition: all 0.3s;
-}
-
-button.facebook-button:hover svg {
-  transform: rotate(90deg);
-}
-
-/* Hero Section Styles */
-.hero-section {
-  background:
-    radial-gradient(1200px 400px at 80% -10%, rgba(238, 82, 57, 0.15), transparent 60%),
-    radial-gradient(900px 500px at 10% 120%, rgba(182, 59, 74, 0.12), transparent 55%),
-    linear-gradient(180deg, #2a4365 0%, #1a365d 100%);
-  padding: 20px 0 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 50px 50px, 30px 30px;
-  pointer-events: none;
-}
-
-.hero-inner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-.hero-content {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.hero-badge {
-  background: rgba(238, 82, 57, 0.9);
-  border: 1px solid rgba(238, 82, 57, 0.5);
-  color: #ffffff;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 13px;
-  display: inline-block;
-  margin-bottom: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(238, 82, 57, 0.3);
-}
-
-.hero-title {
-  font-size: clamp(26px, 5vw, 44px);
-  margin: 0.2em 0;
-  font-weight: 800;
-  line-height: 1.25;
-  color: #ffffff;
-  margin-bottom: 20px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-
-.hero-description {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
-  max-width: 100%;
-  line-height: 1.6;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn {
-  padding: 12px 18px;
-  border-radius: 14px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s ease;
-  font-size: 16px;
-}
-
-.btn-primary {
+::-webkit-scrollbar-thumb:hover {
   background: #ee5239;
-  border: 1px solid #ee5239;
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(238, 82, 57, 0.4);
-}
-
-.btn-primary:hover {
-  background: #d63d2a;
-  border-color: #d63d2a;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(238, 82, 57, 0.5);
-}
-
-.btn-ghost {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  backdrop-filter: blur(10px);
-}
-
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
-}
-
-.hero-frame {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px dashed rgba(238, 82, 57, 0.6);
-  border-radius: 18px;
-  padding: 10px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-.hero-preview {
-  /* Removed grid properties as ImageSlider will handle its own layout */
-  /* display: grid; */
-  /* grid-template-columns: repeat(3, 1fr); */
-  /* gap: 8px; */
-  width: 100%; /* Ensure it takes full width */
-  aspect-ratio: 4/3; /* Set aspect ratio to 4:3 */
-  overflow: hidden; /* Hide overflowing parts of the image */
-  border-radius: 18px; /* Match hero-frame border-radius */
-}
-
-.image-slider-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.image-slider-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Cover the container while maintaining aspect ratio */
-  transition: opacity 1s ease-in-out; /* Smooth transition for image changes */
-}
-
-.hero-ph {
-  aspect-ratio: 1/1;
-  border-radius: 12px;
-  border: 1px solid rgba(238, 82, 57, 0.3);
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  padding: 8px;
-}
-
-.hero-ph:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(238, 82, 57, 0.3);
-  border-color: #ee5239;
-}
-
-.hero-ph svg {
-  width: 70%;
-  height: 70%;
-  opacity: 0.75;
-  transition: all 0.3s ease;
-}
-
-.hero-ph:hover svg {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* Responsive Design */
-@media (max-width: 900px) {
-  .hero-inner {
-    min-height: 50vh;
-  }
-  
-  .hero-content {
-    padding: 0 20px;
-    text-align: center;
-  }
-  
-  .hero-preview {
-    max-width: 400px; /* Adjust max-width for smaller screens */
-    margin: 0 auto;
-  }
-  
-  .hero-frame {
-    padding: 8px;
-    max-width: 420px; /* Adjust max-width for smaller screens */
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-section {
-    padding: 30px 0 50px;
-  }
-  
-  .hero-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  .hero-content {
-    order: 2; /* Move content below the shapes */
-  }
-  
-  .hero-frame {
-    order: 1; /* Move shapes above the content */
-    margin-bottom: 20px;
-    border-radius: 16px;
-    padding: 6px;
-    max-width: 300px; /* Adjust max-width for mobile screens */
-  }
-  
-  .hero-preview {
-    /* grid-template-columns: repeat(3, 1fr); */
-    /* gap: 6px; */
-    max-width: 280px; /* Adjust max-width for mobile screens */
-  }
-  
-  .hero-ph {
-    border-radius: 10px;
-  }
-  
-  .hero-buttons {
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  .btn {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
 }

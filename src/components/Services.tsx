@@ -24,7 +24,7 @@ export default function Services() {
   const fetchCategories = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 ثواني timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const { data, error } = await supabase
         .from('categories')
@@ -47,11 +47,9 @@ export default function Services() {
       setIsLoading(true);
       setError(null);
 
-      // محاولة الاتصال بقاعدة البيانات مع timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 ثواني timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      // Fetch all services with their categories and subcategories
       const { data, error } = await supabase
         .from('services')
         .select(`
@@ -66,9 +64,7 @@ export default function Services() {
       if (error) throw error;
       setServices(data || []);
 
-      // Check if we have any best seller products
       const hasBestSellers = data?.some(service => service.is_best_seller) || false;
-      
       setHasBestSellerProducts(hasBestSellers);
     } catch (err: any) {
       console.error('Error fetching services:', err);
@@ -82,7 +78,7 @@ export default function Services() {
   const fetchSubcategories = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 ثواني timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const { data, error } = await supabase
         .from('subcategories')
@@ -107,25 +103,23 @@ export default function Services() {
 
   const filteredServices = useCallback((): Service[] => {
     let filtered = services;
-    
-    // Filter by category first
+
     if (selectedCategory && selectedCategory !== 'best_sellers') {
       filtered = filtered.filter(service => service.category_id === selectedCategory);
     } else if (selectedCategory === 'best_sellers') {
       filtered = filtered.filter(service => service.is_best_seller === true);
     }
-    
-    // Then filter by subcategory if selected
+
     if (selectedSubcategory) {
       filtered = filtered.filter(service => service.subcategory_id === selectedSubcategory);
     }
-    
+
     return filtered;
   }, [selectedCategory, selectedSubcategory, services]);
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setSelectedSubcategory(null); // Reset subcategory selection
+    setSelectedSubcategory(null);
     setOpenCategoryId(prev => (prev === categoryId ? null : categoryId));
   };
 
@@ -135,8 +129,9 @@ export default function Services() {
 
   if (isLoading) {
     return (
-      <div className="py-16" style={{backgroundColor: '#f7fafc'}}>
-        <div className="container mx-auto px-4 text-center text-gray-600">
+      <div className="py-16 bg-primary">
+        <div className="container mx-auto px-4 text-center">
+          <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -144,8 +139,8 @@ export default function Services() {
 
   if (error) {
     return (
-      <div className="py-16" style={{backgroundColor: '#f7fafc'}}>
-        <div className="container mx-auto px-4 text-center text-red-600">
+      <div className="py-16 bg-primary">
+        <div className="container mx-auto px-4 text-center text-red-500">
           حدث خطأ أثناء تحميل الخدمات: {error}
         </div>
       </div>
@@ -153,10 +148,10 @@ export default function Services() {
   }
 
   return (
-    <section className="pt-8 pb-16" style={{backgroundColor: '#f7fafc'}} id="products-section">
-      
+    <section className="pt-8 pb-16 bg-primary" id="products-section">
+
       <motion.div
-        className="container mx-auto px-4 bg-gray-100/70 backdrop-blur-xl rounded-2xl p-8 border border-gray-200/50 shadow-2xl shadow-gray-300/40"
+        className="container mx-auto px-4"
         initial="hidden"
         animate="visible"
         variants={{
@@ -164,7 +159,7 @@ export default function Services() {
           visible: { opacity: 1, y: 0, transition: { duration: 0.8, delayChildren: 0.3, staggerChildren: 0.2 } },
         }}
       >
-        {/* العنوان المحسن للSEO */}
+        {/* Header */}
         <motion.div
           className="text-center mb-12"
           variants={{
@@ -173,37 +168,38 @@ export default function Services() {
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">
+          <h2 className="text-3xl font-bold mb-4 text-white">
             {selectedSubcategory ? (
               <>
-                {subcategories.find(sc => sc.id === selectedSubcategory)?.name} - 
+                {subcategories.find(sc => sc.id === selectedSubcategory)?.name} -
                 {categories.find(c => c.id === selectedCategory)?.name}
               </>
             ) : selectedCategory ? (
               categories.find(c => c.id === selectedCategory)?.name || ''
             ) : (
-              ''
+              'خدماتنا المميزة'
             )}
           </h2>
-          
-          {/* SEO-optimized description */}
-          <div className="max-w-3xl mx-auto text-gray-600 text-lg leading-relaxed">
+
+          <div className="max-w-3xl mx-auto text-gray-400 text-lg leading-relaxed">
             {selectedSubcategory ? (
               <p>
-                اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name}</strong> 
+                اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name}</strong>
                 في قسم <strong>{categories.find(c => c.id === selectedCategory)?.name}</strong>.
               </p>
             ) : selectedCategory ? (
               <p>
                 تصفح مجموعة متنوعة من <strong>{categories.find(c => c.id === selectedCategory)?.name}</strong>.
               </p>
-            ) : null}
+            ) : (
+              <p>نقدم لك أفضل الحلول الرقمية والإبداعية لتنمية أعمالك</p>
+            )}
           </div>
         </motion.div>
 
-        {/* Special Categories */}
+        {/* Categories */}
         <motion.div
-          className="flex flex-wrap gap-4 justify-center -mt-4 mb-4"
+          className="flex flex-wrap gap-4 justify-center mb-8"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -216,10 +212,9 @@ export default function Services() {
               setSelectedSubcategory(null);
               setOpenCategoryId(null);
             }}
-              className={`p-4 rounded-xl transition-all duration-300 ${
-                !selectedCategory
-                  ? 'bg-[#ee5239] text-white font-bold shadow-md'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
+            className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold ${!selectedCategory
+                ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
               }`}
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -229,7 +224,6 @@ export default function Services() {
             جميع الخدمات
           </motion.button>
 
-
           {/* Best Services Category */}
           {hasBestSellerProducts && (
             <motion.button
@@ -237,47 +231,34 @@ export default function Services() {
                 setSelectedCategory('best_sellers');
                 setSelectedSubcategory(null);
               }}
-              className={`p-4 rounded-xl transition-all duration-300 ${
-                selectedCategory === 'best_sellers'
-                  ? 'bg-rose-500 text-white font-bold shadow-md'
-                  : 'bg-rose-100 text-rose-700 hover:bg-rose-200 hover:shadow-md'
-              }`}
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold flex items-center gap-2 ${selectedCategory === 'best_sellers'
+                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
+                  : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
+                }`}
               variants={{
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <span className="text-red-400">🔥</span> الأكثر مبيعاً
-              </h3>
+              <span>🔥</span> الأكثر مبيعاً
             </motion.button>
           )}
-        </motion.div>
 
-        {/* Regular Categories */}
-        <motion.div
-          className="flex flex-wrap gap-4 justify-center mb-8"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-          }}
-        >
           <AnimatePresence>
             {categories.map((category) => (
               <motion.button
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
-                className={`p-4 rounded-xl transition-all duration-300 ${
-                  category.id === selectedCategory
-                    ? 'bg-[#ee5239] text-white font-bold shadow-md'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
-                }`}
+                className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold ${category.id === selectedCategory
+                    ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                    : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
+                  }`}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0 },
                 }}
               >
-                <h3 className="text-lg font-semibold">{category.name}</h3>
+                {category.name}
               </motion.button>
             ))}
           </AnimatePresence>
@@ -286,30 +267,24 @@ export default function Services() {
         {/* Subcategories Section */}
         {openCategoryId && (
           <motion.div
-            className="mb-6"
+            className="mb-12"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex flex-wrap gap-3 justify-center">
-              {/* زر الكل */}
               <motion.button
                 onClick={() => handleSubcategoryClick(null)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
-                  selectedSubcategory === null
-                    ? 'bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white shadow-xl'
-                    : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 hover:shadow-lg'
-                }`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.2 }}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedSubcategory === null
+                    ? 'bg-white text-primary'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                  }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 الكل
               </motion.button>
-              
-              {/* الأقسام الفرعية */}
+
               <AnimatePresence>
                 {subcategories
                   .filter(sc => sc.category_id === openCategoryId)
@@ -317,11 +292,10 @@ export default function Services() {
                     <motion.button
                       key={subcategory.id}
                       onClick={() => handleSubcategoryClick(subcategory.id)}
-                      className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
-                        selectedSubcategory === subcategory.id
-                          ? 'bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white shadow-xl'
-                          : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400 hover:shadow-lg'
-                      }`}
+                      className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedSubcategory === subcategory.id
+                          ? 'bg-white text-primary'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                        }`}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
@@ -334,14 +308,12 @@ export default function Services() {
                   ))}
               </AnimatePresence>
             </div>
-            
-
           </motion.div>
         )}
 
         {/* Services Grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -375,10 +347,10 @@ export default function Services() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="col-span-full text-center text-gray-500 text-xl"
+                className="col-span-full text-center text-gray-500 text-xl py-12"
                 transition={{ duration: 0.5 }}
               >
-                لا توجد خدمات في هذه الفئة.
+                لا توجد خدمات في هذه الفئة حالياً.
               </motion.div>
             )}
           </AnimatePresence>

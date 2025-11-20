@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Service } from '../types/database';
-import { MessageCircle, MessageSquare } from 'lucide-react';
+import { MessageCircle, MessageSquare, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function usePrevious<T>(value: T): T | undefined {
   const ref = useRef<T>();
@@ -21,16 +22,8 @@ export default function ServiceDetails() {
   const [error, setError] = useState<string | null>(null);
   const [suggested, setSuggested] = useState<Service[]>([]);
 
-  // New state to control fade-out of previous image
-  const [prevOpacity, setPrevOpacity] = useState(1);
-
-  // إضافة حالتين للتحكم في انتقال الصور
-  const [currentTransform, setCurrentTransform] = useState('translateX(0)');
-  const [prevTransform, setPrevTransform] = useState('translateX(0)');
-
-  // استخدم مؤشر منفصل للصورة السابقة
-  const [prevImageIndexState, setPrevImageIndexState] = useState<number | null>(null);
-  // تحكم في حالة الانتقال (لضمان عدم تكرار الترانزيشن أو تعارضها)
+  // Image slider state
+  const [currentImage, setCurrentImage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
@@ -62,7 +55,6 @@ export default function ServiceDetails() {
     }
   };
 
-  // جلب خدمات أخرى (بدون شرط القسم)
   const fetchSuggested = async () => {
     const { data } = await supabase
       .from('services')
@@ -75,24 +67,20 @@ export default function ServiceDetails() {
   const handleContact = () => {
     if (!service) return;
     const serviceUrl = window.location.href;
-    const message = `استفسار عن الخدمة: ${service.title}
-رابط الخدمة: ${serviceUrl}`;
+    const message = `استفسار عن الخدمة: ${service.title}\nرابط الخدمة: ${serviceUrl}`;
     window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  // التقليب التلقائي للصور في الخدمة الرئيسية فقط
   const images: string[] = [
     service?.image_url || '',
     ...(Array.isArray(service?.gallery) ? service.gallery : [])
   ].filter(Boolean);
 
-  const [currentImage, setCurrentImage] = useState(0);
-
   useEffect(() => {
     if (images.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
-    }, 4500); // فترة 5000 ملي ثانية (5 ثوانٍ)
+    }, 5000);
     return () => clearInterval(interval);
   }, [images.length]);
 
@@ -100,97 +88,28 @@ export default function ServiceDetails() {
     setCurrentImage(0);
   }, [service?.id]);
 
-  // استخدام usePrevious لحفظ مؤشر الصورة السابقة
-  const previousImageIndex = usePrevious(currentImage);
-
-  // Extracted background styles for reuse
-  const backgroundStyles = {
-    background: '#2a2a2a',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
-  };
-
-  // تعديل تأثير الانتقال ليكون أبطأ: زيادة مدة الانتقال إلى 3500ms، مع تأخير 1000ms عند بدء التحريك
-  useEffect(() => {
-    // ابدأ بتحريك الصورة الجديدة من اليسار
-    setCurrentTransform('translateX(-100%)');
-    // الصورة السابقة تبدأ من موقعها الحالي
-    setPrevTransform('translateX(0)');
-    const timer = setTimeout(() => {
-      // تحول الصورة الجديدة إلى موقعها النهائي
-      setCurrentTransform('translateX(0)');
-      // تنزلق الصورة السابقة للخارج إلى اليمين
-      setPrevTransform('translateX(100%)');
-    }, 1000); // تأخير 1000ms
-    return () => clearTimeout(timer);
-  }, [currentImage]);
-
-  // عند تغيير الصورة، احفظ المؤشر السابق قبل التغيير
-  useEffect(() => {
-    setPrevImageIndexState(currentImage);
-  }, [currentImage]);
-
-  // انتقال الصور: الصورة الجديدة تبدأ من اليمين وتدخل، والصورة السابقة تخرج لليسار
-  useEffect(() => {
-    // إعدادات الانتقال
-    const DURATION = 1800; // مدة الانتقال الفعلي (ms)
-    const DELAY = 0; // لا حاجة لتأخير إضافي
-
-    // ابدأ الانتقال فقط إذا لم يكن هناك انتقال جارٍ
-    setIsTransitioning(true);
-    setCurrentTransform('translateX(100%)'); // الصورة الجديدة تبدأ خارج الشاشة يميناً
-    setPrevTransform('translateX(0)');      // الصورة السابقة في مكانها
-
-    // استخدم requestAnimationFrame لضمان تطبيق الترانزيشن بعد إعادة الرسم
-    let raf = requestAnimationFrame(() => {
-      setCurrentTransform('translateX(0)');     // الصورة الجديدة تدخل مكانها
-      setPrevTransform('translateX(-100%)');    // الصورة السابقة تخرج يساراً
-    });
-
-    // بعد انتهاء الانتقال، احذف الصورة السابقة من العرض
-    const cleanup = setTimeout(() => {
-      setPrevImageIndexState(null);
-      setIsTransitioning(false);
-    }, DURATION);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(cleanup);
-    };
-  }, [currentImage]);
-
-  // تحديد صورة الخدمة المصغرة بشكل صحيح (الأولوية: image_url ثم اللوجو الافتراضي)
-  const defaultScreenshot = '/‏‏logo.png'; // اللوجو الافتراضي
   const ogImage =
     service?.image_url && service.image_url.trim() !== ''
       ? service.image_url
-      : defaultScreenshot;
+      : '/logo.png';
 
   if (isLoading) {
-    // Added pt-24 here as well for consistency with the main view
     return (
-      <div
-        className="min-h-screen flex items-center justify-center pt-24"
-        style={backgroundStyles}
-      >
-        <div className="text-xl text-secondary">جاري التحميل...</div>
+      <div className="min-h-screen flex items-center justify-center bg-black pt-24">
+        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (error || !service) {
-    // Added pt-24 here as well for consistency with the main view
     return (
-      <div
-        className="min-h-screen flex flex-col items-center justify-center gap-4 pt-24"
-        style={backgroundStyles}
-      >
-        <div className="text-xl text-secondary">{error || 'الخدمة غير موجودة'}</div>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-black pt-24 text-center px-4">
+        <div className="text-2xl text-white font-bold">{error || 'الخدمة غير موجودة'}</div>
         <button
           onClick={() => navigate('/')}
-          className="bg-secondary text-primary px-6 py-2 rounded-lg hover:bg-opacity-90"
+          className="bg-accent text-white px-8 py-3 rounded-xl hover:bg-accent/80 transition-all flex items-center gap-2"
         >
+          <ArrowRight className="w-5 h-5" />
           العودة للرئيسية
         </button>
       </div>
@@ -199,188 +118,175 @@ export default function ServiceDetails() {
 
   return (
     <>
-      {/* وسوم Open Graph لعرض صورة الخدمة عند مشاركة الرابط (واتساب وغيره) */}
       <Helmet>
-        <meta property="og:title" content={service?.title || ''} />
-        <meta property="og:description" content={service?.description || ''} />
+        <title>{`${service.title} | POVA Agency`}</title>
+        <meta name="description" content={service.description || ''} />
+        <meta property="og:title" content={service.title} />
+        <meta property="og:description" content={service.description || ''} />
         <meta property="og:image" content={ogImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
         <meta property="og:type" content="website" />
-        {/* دعم تويتر أيضاً */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={service?.title || ''} />
-        <meta name="twitter:description" content={service?.description || ''} />
+        <meta name="twitter:title" content={service.title} />
+        <meta name="twitter:description" content={service.description || ''} />
         <meta name="twitter:image" content={ogImage} />
       </Helmet>
-      <div className="min-h-screen flex flex-col pt-24" style={backgroundStyles}>
-        {/* This div centers the service card and grows */}
-        <div className="flex items-center justify-center flex-grow py-8">
-          <div className="container mx-auto px-4 max-w-4xl lg:max-w-5xl">
-            <div className="rounded-lg shadow-lg overflow-hidden glass">
-              <div className="md:flex">
-                <div className="md:w-1/2">
-                  <div className="w-full aspect-[4/3] bg-gray-200 relative rounded-t-lg md:rounded-none md:rounded-s-lg overflow-hidden">
-                    {prevImageIndexState !== null && prevImageIndexState !== currentImage && (
-                      <img
-                        src={images[prevImageIndexState]}
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{
-                          transform: prevTransform,
-                          zIndex: 10,
-                          transition: isTransitioning
-                            ? 'transform 1800ms cubic-bezier(.4,0,.2,1)'
-                            : 'none',
-                          willChange: 'transform',
-                        }}
-                        draggable={false}
-                      />
-                    )}
-                    <img
-                      src={images[currentImage] || ''}
-                      alt={service.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      style={{
-                        transform: currentTransform,
-                        zIndex: 5,
-                        transition: isTransitioning
-                          ? 'transform 1800ms cubic-bezier(.4,0,.2,1)'
-                          : 'none',
-                        willChange: 'transform',
-                      }}
-                      draggable={false}
+
+      <div className="min-h-screen bg-black pt-32 pb-20">
+        <div className="container mx-auto px-4">
+
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-gray-400 text-sm mb-8">
+            <button onClick={() => navigate('/')} className="hover:text-white transition-colors">الرئيسية</button>
+            <span>/</span>
+            <span className="text-accent">{service.title}</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+            {/* Image Gallery */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] bg-[#1a1a1a] border border-white/10 shadow-2xl">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImage}
+                  src={images[currentImage] || '/placeholder-service.jpg'}
+                  alt={service.title}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </AnimatePresence>
+
+              {/* Indicators */}
+              {images.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {images.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImage(idx)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${currentImage === idx ? 'w-6 bg-accent' : 'w-1.5 bg-white/50 hover:bg-white'
+                        }`}
                     />
-                    {images.length > 1 && (
-                      <>
-                        {/* مؤشرات الصور */}
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                          {images.map((img, idx) => (
-                            <button
-                              key={img + idx}
-                              className={`w-2 h-2 rounded-full border-none transition-colors ease-in-out duration-500 ${
-                                currentImage === idx ? 'bg-white' : 'bg-white/30'
-                              }`}
-                              onClick={() => setCurrentImage(idx)}
-                              aria-label={`عرض الصورة رقم ${idx + 1}`}
-                              type="button"
-                            />
-                          ))}
-                        </div>
-                      </>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex flex-col justify-center">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight"
+              >
+                {service.title}
+              </motion.h1>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-gray-300 text-lg leading-relaxed mb-8 whitespace-pre-line"
+              >
+                {service.description}
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/10 mb-8"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-gray-400">السعر</span>
+                  <div className="text-right">
+                    {service.sale_price ? (
+                      <div className="flex flex-col items-end">
+                        <span className="text-3xl font-bold text-accent">{service.sale_price} ج.م</span>
+                        {service.price && (
+                          <span className="text-sm text-gray-500 line-through">{service.price} ج.م</span>
+                        )}
+                      </div>
+                    ) : service.price ? (
+                      <span className="text-3xl font-bold text-white">{service.price} ج.م</span>
+                    ) : (
+                      <span className="text-xl font-bold text-gray-400">السعر عند الطلب</span>
                     )}
                   </div>
                 </div>
-                <div className="md:w-1/2 p-8">
-                  <h1 className="text-3xl font-bold mb-4 text-secondary">{service.title}</h1>
-                  <p className="text-white mb-6 text-lg leading-relaxed">
-                    {service.description}
-                  </p>
-                  <div className="border-t border-gray-700 pt-6 mb-6">
-                    <div className="text-2xl font-bold text-accent mb-6">
-                      {service.price ? `${service.price} ج` : 'مجاناً'}
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      {/* زر احمر احترافي لطلب الخدمة عبر واتساب */}
-                      <a
-                        href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`أريد طلب الخدمة: ${service.title}\n${window.location.href}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <MessageSquare className="h-6 w-6" />
-                        <span className="text-lg">اطلب الخدمة عبر واتساب</span>
-                      </a>
-                      <div className="flex gap-4">
-                        <button
-                          onClick={handleContact}
-                          className="flex-1 bg-[#25D366] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
-                        >
-                          <MessageCircle className="h-5 w-5" />
-                          تواصل معنا للطلب
-                        </button>
-                        {/* زر مشاركة رابط الخدمة مباشرة على واتساب */}
-                        <a
-                          href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`شاهد هذه الخدمة: ${service.title}\n${window.location.href}`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#128C7E] text-white py-3 px-6 rounded-lg font-bold hover:bg-opacity-90 flex items-center justify-center gap-2"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          <MessageCircle className="h-5 w-5" />
-                          مشاركة الخدمة على واتساب
-                        </a>
-                      </div>
-                      {/* نص توضيحي للمشاركة */}
-                      <p className="text-xs text-secondary mt-2 text-center w-full">يمكنك مشاركة رابط الخدمة مع أصدقائك على واتساب وسيظهر لهم صورة الخدمة تلقائيًا</p>
-                    </div>
+
+                <div className="space-y-3">
+                  <a
+                    href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`أريد طلب الخدمة: ${service.title}\n${window.location.href}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-3 shadow-lg shadow-accent/20"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    اطلب الخدمة الآن
+                  </a>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleContact}
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 border border-white/10"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      استفسار
+                    </button>
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(`شاهد هذه الخدمة المميزة من POVA Agency: ${service.title}\n${window.location.href}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 border border-white/10"
+                    >
+                      <ArrowRight className="w-5 h-5 -rotate-45" />
+                      مشاركة
+                    </a>
                   </div>
                 </div>
+              </motion.div>
+
+              <div className="flex items-center gap-2 text-sm text-green-400 bg-green-400/10 p-3 rounded-lg w-fit">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>ضمان جودة العمل والتسليم في الموعد</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* الخدمات المقترحة */}
-        {suggested.length > 0 && (
-          <div className="container mx-auto px-4 max-w-4xl lg:max-w-5xl mb-8">
-            <h2 className="text-xl font-bold text-secondary mb-4">متوفر لدينا ايضا</h2>
-            <div
-              className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar"
-              style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-              {suggested.map((item) => {
-                // فقط أول صورة (بدون تقليب تلقائي)
-                const images: string[] = [
-                  item.image_url || '',
-                  ...(Array.isArray(item.gallery) ? item.gallery : [])
-                ].filter(Boolean);
-                const imageUrl = images[0] || '';
-
-                return (
-                  <div
+          {/* Suggested Services */}
+          {suggested.length > 0 && (
+            <div className="border-t border-white/10 pt-16">
+              <h2 className="text-3xl font-bold text-white mb-8 text-center">خدمات قد تهمك أيضاً</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {suggested.map((item) => (
+                  <motion.div
                     key={item.id}
-                    className="
-                      min-w-[160px] max-w-[180px]
-                      md:min-w-[220px] md:max-w-[260px]
-                      bg-white/10 rounded-lg shadow p-2 flex-shrink-0 cursor-pointer hover:scale-105 transition
-                    "
+                    whileHover={{ y: -5 }}
+                    className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-white/5 cursor-pointer group"
                     onClick={() => navigate(`/service/${item.id}`)}
                   >
-                    <img
-                      src={imageUrl}
-                      alt={item.title}
-                      className="w-full h-24 md:h-40 object-cover rounded"
-                    />
-                    <div className="mt-2 text-sm md:text-base font-bold text-secondary truncate">{item.title}</div>
-                    <div className="text-xs md:text-sm text-accent">{item.price ? `${item.price} ج` : 'مجاناً'}</div>
-                  </div>
-                );
-              })}
+                    <div className="aspect-video overflow-hidden relative">
+                      <img
+                        src={item.image_url || '/placeholder-service.jpg'}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="bg-accent text-white px-4 py-2 rounded-full text-sm font-bold">عرض التفاصيل</span>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-white font-bold mb-2 truncate">{item.title}</h3>
+                      <div className="text-accent font-bold text-sm">
+                        {item.price ? `${item.price} ج.م` : 'السعر عند الطلب'}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-            {/* إضافة ستايل لإخفاء الشريط وتفعيل التمرير التلقائي */}
-            <style>{`
-              .hide-scrollbar {
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-              }
-              .hide-scrollbar::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-          </div>
-        )}
-
-        {/* This div contains the "Back to Home" button and is placed below the centered content */}
-        <div className="flex justify-center pb-8">
-          <button
-            onClick={() => navigate('/')}
-            className="text-secondary hover:text-accent px-4 py-2 rounded-lg border border-secondary hover:border-accent" // Added border for better visibility
-          >
-            ← العودة للرئيسية
-          </button>
+          )}
         </div>
       </div>
     </>

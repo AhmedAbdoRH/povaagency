@@ -1,17 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Banner } from '../types/database';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BannerSliderProps {
   banners: Banner[];
 }
 
-const SLIDE_INTERVAL = 4000;
+const SLIDE_INTERVAL = 5000;
 
 export default function BannerSlider({ banners }: BannerSliderProps) {
-  const [fadeIn, setFadeIn] = useState(false);
-  useEffect(() => {
-    setTimeout(() => setFadeIn(true), 50);
-  }, []);
   const [current, setCurrent] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -28,67 +25,84 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
 
   return (
     <div
-      className={`relative w-full h-[200px] md:h-[350px] lg:h-[500px] flex items-center justify-center overflow-hidden rounded-none mt-32 md:mt-32 fade-in-banner${fadeIn ? ' fade-in-active' : ''}`}
-      style={{ marginTop: 'var(--header-height, 4.9rem)' }}
+      className="relative w-full h-[300px] md:h-[500px] lg:h-[600px] flex items-center justify-center overflow-hidden mt-20"
     >
-      {/* تأثير Fade-in للبانر عند أول تحميل */}
-      <style>{`
-        .fade-in-banner {
-          opacity: 0;
-          transform: translateY(40px);
-          transition: opacity 0.9s cubic-bezier(.4,0,.2,1), transform 0.9s cubic-bezier(.4,0,.2,1);
-        }
-        .fade-in-banner.fade-in-active {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      `}</style>
-      {banners.map((banner, idx) => (
-        <div
-          key={banner.id}
-          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ${idx === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1 }}
+          className="absolute inset-0 w-full h-full"
         >
-          {banner.type === 'image' && banner.image_url ? (
-            <img
-              src={banner.image_url}
-              alt={banner.title || 'Banner'}
-              className="w-full h-full min-h-full object-cover object-center"
-              style={{ borderRadius: 0 }}
-            />
+          {banners[current].type === 'image' && banners[current].image_url ? (
+            <>
+              <img
+                src={banners[current].image_url}
+                alt={banners[current].title || 'Banner'}
+                className="w-full h-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+            </>
           ) : (
-            <div className="w-full h-full min-h-full flex flex-col justify-center items-center bg-white/5 backdrop-blur-xl p-8 sm:p-12 border border-white/10 shadow-2xl">
-              {banner.title && (
-  <h1
-  className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-2 text-center text-white"
-  style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.03em', lineHeight: '1.2', marginBottom: '1rem' }}
->
-  {banner.title}
-</h1>
-)}
-{banner.description && (
-  <p
-    className="text-lg sm:text-xl mb-4 text-center text-gray-300"
-    style={{ fontFamily: `'Cairo', 'Tajawal', 'Amiri', 'Arial', 'sans-serif'`, letterSpacing: '0.02em', lineHeight: '1.7', marginTop: '0', marginBottom: '1.2rem' }}
-  >
-    {banner.description}
-  </p>
-) }
+            <div className="w-full h-full flex flex-col justify-center items-center bg-[#1a1a1a] relative overflow-hidden">
+              <div className="absolute inset-0 bg-accent/5 blur-3xl"></div>
+              <div className="relative z-10 p-8 text-center max-w-4xl">
+                {banners[current].title && (
+                  <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight">
+                    {banners[current].title}
+                  </h1>
+                )}
+                {banners[current].description && (
+                  <p className="text-lg md:text-2xl text-gray-300 leading-relaxed">
+                    {banners[current].description}
+                  </p>
+                )}
+              </div>
             </div>
           )}
-        </div>
-      ))}
-      {/* المؤشرات */}
+
+          {/* Text Overlay for Image Banners */}
+          {(banners[current].type === 'image' && banners[current].image_url) && (banners[current].title || banners[current].description) && (
+            <div className="absolute inset-0 flex flex-col justify-end pb-20 md:pb-32 px-4 md:px-20 z-20">
+              <div className="max-w-4xl">
+                {banners[current].title && (
+                  <motion.h1
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.8 }}
+                    className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-white drop-shadow-lg"
+                  >
+                    {banners[current].title}
+                  </motion.h1>
+                )}
+                {banners[current].description && (
+                  <motion.p
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                    className="text-lg md:text-xl text-gray-200 drop-shadow-md max-w-2xl"
+                  >
+                    {banners[current].description}
+                  </motion.p>
+                )}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Indicators */}
       {banners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-0.5 z-20">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-30">
           {banners.map((_, idx) => (
             <button
               key={idx}
-              className={`w-1.5 h-1.5 rounded-full transition-colors border border-white/15
-                ${current === idx ? 'bg-white/20' : 'bg-white/10'}
-              `}
               onClick={() => setCurrent(idx)}
-              aria-label={`انتقل إلى البانر رقم ${idx + 1}`}
-              style={{ minWidth: 6, minHeight: 6 }}
+              className={`h-1.5 rounded-full transition-all duration-500 ${current === idx ? 'w-8 bg-accent' : 'w-2 bg-white/30 hover:bg-white/50'
+                }`}
+              aria-label={`Go to slide ${idx + 1}`}
             />
           ))}
         </div>
