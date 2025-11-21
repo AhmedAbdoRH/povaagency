@@ -116,7 +116,7 @@ export default function Products() {
 
   if (isLoading) {
     return (
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-white text-gray-900">
         <div className="container mx-auto px-4 text-center text-gray-800">
           جاري تحميل الخدمات...
         </div>
@@ -126,7 +126,7 @@ export default function Products() {
 
   if (error) {
     return (
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-white text-gray-900">
         <div className="container mx-auto px-4 text-center text-red-600">
           حدث خطأ أثناء تحميل الخدمات: {error}
         </div>
@@ -135,9 +135,9 @@ export default function Products() {
   }
 
   return (
-    <section className="py-16 bg-white" id="services">
+    <section className="py-16 bg-white text-gray-900" id="services">
       <motion.div
-        className="container mx-auto px-4 bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl shadow-black/40"
+        className="container mx-auto px-4 bg-white/90 rounded-2xl p-8 border border-gray-100 shadow-2xl shadow-black/10"
         initial="hidden"
         animate="visible"
         variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.11 } } }}

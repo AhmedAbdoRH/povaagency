@@ -24,6 +24,14 @@ import Hero from './components/Hero';
 import DesignRequest from './pages/DesignRequest';
 import Features from './components/Features';
 import Stats from './components/Stats';
+import WhySocialMarketing from './components/WhySocialMarketing';
+import VisualStorytellingReasons from './components/VisualStorytellingReasons';
+import VisionMission from './components/VisionMission';
+import CompanyValues from './components/CompanyValues';
+import DigitalMarketingBenefits from './components/DigitalMarketingBenefits';
+import BrandDifferentiation from './components/BrandDifferentiation';
+import ServiceExpertiseList from './components/ServiceExpertiseList';
+import MarketingCoreServices from './components/MarketingCoreServices';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 
@@ -90,7 +98,8 @@ function App() {
 
   const fetchStoreSettings = async () => {
     try {
-      const { data, error } = await supabase.from('store_settings').select('*').limit(1).maybeSingle();
+      const { data } = await supabase.from('store_settings').select('*').limit(1).maybeSingle();
+
       if (data) {
         setStoreSettings(data);
       } else {
@@ -146,7 +155,7 @@ function App() {
           <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
           <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
         </Helmet>
-        <StructuredData type="organization" data={storeSettings} services={services} categories={categories} />
+        <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
         <Router>
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -175,7 +184,15 @@ function StaggeredHome() {
   return (
     <>
       <Features />
+      <WhySocialMarketing />
+      <BrandDifferentiation />
+      <VisualStorytellingReasons />
+      <ServiceExpertiseList />
+      <MarketingCoreServices />
       <Stats />
+      <VisionMission />
+      <CompanyValues />
+      <DigitalMarketingBenefits />
       <Services />
     </>
   );
