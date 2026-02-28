@@ -110,7 +110,7 @@ export default function ServiceCard({ title, description, imageUrl, price, saleP
         </div>
 
         <div className="p-6 relative">
-          <h3 className="text-xl font-bold mb-2 text-white flex items-center gap-2 group-hover:text-accent transition-colors duration-300">
+          <h3 className="text-xl font-bold mb-2 text-white flex items-center gap-2 group-hover:text-accent transition-colors duration-300 text-wrap-balance leading-[1.4]">
             {title}
             <Sparkles className="h-4 w-4 text-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </h3>

@@ -25,7 +25,7 @@ export default function VisionMission() {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-14">
           <p className="text-accent font-semibold mb-3">من نحن</p>
-          <h2 className="text-3xl md:text-4xl font-bold">رؤية واضحة ورسالة ملهمة</h2>
+          <h2 className="text-3xl md:text-4xl font-bold leading-[1.3] text-wrap-balance">رؤية واضحة ورسالة ملهمة</h2>
           <p className="text-gray-600 mt-4 text-lg">
             نؤمن أن كل علامة تجارية تملك قصة تستحق أن تُروى، ونرسم لها مشهداً مميزاً يجمع بين الخيال والنتائج الملموسة.
           </p>
@@ -43,7 +43,7 @@ export default function VisionMission() {
                 <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent">
                   <card.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold">{card.title}</h3>
+                <h3 className="text-2xl font-bold text-wrap-balance leading-[1.4]">{card.title}</h3>
               </div>
               <div className="space-y-4 text-gray-700 leading-relaxed">
                 {card.content.map((paragraph, idx) => (

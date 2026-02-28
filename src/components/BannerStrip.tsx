@@ -8,9 +8,9 @@ interface BannerStripProps {
 
 export default function BannerStrip({ banners }: BannerStripProps) {
   // Filter only strip banners that are active and positioned below main
-  const stripBanners = banners.filter(banner => 
-    banner.type === 'strip' && 
-    banner.is_active && 
+  const stripBanners = banners.filter(banner =>
+    banner.type === 'strip' &&
+    banner.is_active &&
     banner.title?.trim() &&
     (banner as any).strip_position === 'below_main'
   );
@@ -31,8 +31,8 @@ export default function BannerStrip({ banners }: BannerStripProps) {
           }}
         >
           <div className="container mx-auto">
-            <motion.h2 
-              className="text-lg md:text-xl font-normal"
+            <motion.h2
+              className="text-lg md:text-xl font-medium text-wrap-balance leading-tight"
               animate={{
                 scale: [1, 1.02, 1],
                 opacity: [0.9, 1, 0.9]
@@ -46,7 +46,7 @@ export default function BannerStrip({ banners }: BannerStripProps) {
               {banner.title}
             </motion.h2>
             {banner.description && (
-              <motion.p 
+              <motion.p
                 className="text-sm md:text-base mt-1 opacity-90"
                 animate={{
                   scale: [1, 1.01, 1],

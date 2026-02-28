@@ -49,7 +49,7 @@ export default function CompanyValues() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
           <p className="text-accent font-semibold mb-3">قيمنا</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">القيم التي تشكل هوية بوفا</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-[1.3] text-wrap-balance">القيم التي تشكل هوية بوفا</h2>
           <p className="text-gray-600 max-w-3xl mx-auto text-lg">
             ثقافتنا تبنى على مبادئ واضحة تدفعنا للإبداع، وتمنح عملاءنا الثقة بأننا الشريك الأكثر التزاماً وابتكاراً.
           </p>
@@ -64,7 +64,7 @@ export default function CompanyValues() {
               <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center mb-5">
                 <value.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900">{value.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 text-wrap-balance leading-[1.4]">{value.title}</h3>
               <p className="text-gray-600 leading-relaxed">{value.description}</p>
             </div>
           ))}

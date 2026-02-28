@@ -30,7 +30,7 @@ export default function BrandDifferentiation() {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <p className="text-white/80 mb-2">أربعة خدمات رئيسية توفرها بوفا خصيصاً لشركتك</p>
-          <h2 className="text-3xl md:text-4xl font-bold">كيف يمكن لـ بوفا تميز علامتك التجارية؟</h2>
+          <h2 className="text-3xl md:text-4xl font-bold leading-[1.3] text-wrap-balance">كيف يمكن لـ بوفا تميز علامتك التجارية؟</h2>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -46,7 +46,7 @@ export default function BrandDifferentiation() {
               <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-5">
                 <item.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-wrap-balance leading-[1.4]">{item.title}</h3>
               <p className="text-white/85 leading-relaxed">{item.description}</p>
             </motion.div>
           ))}

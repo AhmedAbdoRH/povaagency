@@ -34,14 +34,14 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
         {/* Logo Container with Glass/Metallic Shine Effect */}
         <div className="relative inline-block">
           <img
-            src={logoUrl && !logoUrl.includes('supabase.co') ? logoUrl : '/‏‏logo.png'}
+            src={logoUrl && !logoUrl.includes('supabase.co') ? logoUrl : '/agency-logo.png'}
             alt="Logo"
             className="w-40 h-40 md:w-48 md:h-48 object-contain relative z-10"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '/‏‏logo.png';
+              (e.target as HTMLImageElement).src = '/agency-logo.png';
             }}
           />
-          
+
           {/* Metallic/Glass Shine Overlay */}
           <motion.div
             className="absolute inset-0 z-20 pointer-events-none"
@@ -59,7 +59,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               ease: "easeInOut"
             }}
           />
-          
+
           {/* Secondary Shine Effect */}
           <motion.div
             className="absolute inset-0 z-20 pointer-events-none"
@@ -77,7 +77,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               ease: "easeInOut"
             }}
           />
-          
+
           {/* Subtle Glow Effect */}
           <motion.div
             className="absolute inset-0 z-0"
@@ -96,7 +96,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           />
         </div>
       </div>
-      
+
       {/* CSS for additional shine effects */}
       <style>{`
         @keyframes metallic-shine {

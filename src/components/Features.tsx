@@ -37,7 +37,7 @@ export default function Features() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-6"
+                        className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-6 text-wrap-balance leading-[1.2]"
                     >
                         لماذا تختار POVA؟
                     </motion.h2>
@@ -69,7 +69,7 @@ export default function Features() {
                                 <feature.icon className="w-8 h-8 text-accent group-hover:text-white transition-colors duration-500" />
                             </div>
 
-                            <h3 className="text-2xl font-bold text-white mb-4 relative z-10">{feature.title}</h3>
+                            <h3 className="text-2xl font-bold text-white mb-4 relative z-10 text-wrap-balance leading-[1.3]">{feature.title}</h3>
                             <p className="text-gray-400 leading-relaxed relative z-10 group-hover:text-gray-300 transition-colors">
                                 {feature.description}
                             </p>

@@ -28,7 +28,7 @@ export default function Stats() {
                             className="p-4"
                         >
                             <h3 className="text-4xl md:text-5xl font-bold text-white mb-2 font-cairo">{stat.value}</h3>
-                            <p className="text-accent text-lg font-medium">{stat.label}</p>
+                            <p className="text-accent text-lg font-medium text-wrap-balance">{stat.label}</p>
                         </motion.div>
                     ))}
                 </div>

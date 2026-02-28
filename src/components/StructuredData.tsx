@@ -12,7 +12,7 @@ interface StructuredDataProps {
 export default function StructuredData({ type, data, services, categories, breadcrumbs }: StructuredDataProps) {
   const generateStructuredData = () => {
     const baseUrl = 'https://pova.com';
-    
+
     switch (type) {
       case 'organization':
         const storeSettings = data as StoreSettings;
@@ -22,8 +22,8 @@ export default function StructuredData({ type, data, services, categories, bread
           "name": storeSettings?.store_name || "POVA",
           "description": storeSettings?.store_description || "شركة تسويق إلكتروني متكاملة تقدم خدمات تحليل البيانات، تصميم الهوية البصرية، كتابة المحتوى الإبداعي، التصوير الفوتوغرافي، الموشن جرافيك، إدارة الحملات الإعلانية وإدارة وسائل التواصل الاجتماعي",
           "url": baseUrl,
-          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/‏‏logo.png`,
-          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/‏‏logo.png`,
+          "logo": storeSettings?.logo_url ? `${baseUrl}${storeSettings.logo_url}` : `${baseUrl}/agency-logo.png`,
+          "image": storeSettings?.og_image_url ? `${baseUrl}${storeSettings.og_image_url}` : `${baseUrl}/agency-logo.png`,
           "address": [
             {
               "@type": "PostalAddress",

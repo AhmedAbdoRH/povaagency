@@ -41,10 +41,10 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[1.2] mb-8 max-w-5xl tracking-tight"
+            className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[1.1] mb-8 max-w-5xl tracking-tight text-wrap-balance"
           >
             نحول أفكارك إلى <br />
-            <span className="relative inline-block mt-2">
+            <span className="relative inline-block mt-4 pb-2">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-accent via-white to-accent bg-300% animate-gradient">
                 علامة تجارية استثنائية
               </span>

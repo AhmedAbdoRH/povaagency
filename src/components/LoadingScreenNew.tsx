@@ -90,7 +90,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           {logoUrl ? (
             <div className="relative">
               <motion.img
-                src={logoUrl.includes('supabase.co') ? '/‏‏logo.png' : logoUrl}
+                src={logoUrl.includes('supabase.co') ? '/agency-logo.png' : logoUrl}
                 alt="Logo"
                 className="w-32 h-32 object-contain"
                 animate={{
@@ -107,7 +107,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
                   ease: "easeInOut"
                 }}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/‏‏logo.png';
+                  (e.target as HTMLImageElement).src = '/agency-logo.png';
                 }}
               />
               {/* Rotating ring */}

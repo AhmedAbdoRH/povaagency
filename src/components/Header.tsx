@@ -209,7 +209,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                 />
               ) : (
                 <img
-                  src="/‏‏logo.png"
+                  src="/agency-logo.png"
                   alt="POVA Agency Logo"
                   className="h-12 md:h-16 w-auto object-contain"
                 />

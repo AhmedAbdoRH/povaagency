@@ -76,3 +76,33 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #ee5239;
 }
+
+/* Typography Enhancements */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  line-height: 1.35;
+  letter-spacing: -0.01em; /* Slight tightening for modern premium look */
+}
+
+p {
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85); /* Slightly softer white for better readability */
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #a1a1a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Utilities */
+.heading-balanced {
+  text-wrap: balance;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.leading-balanced {
+  line-height: 1.4 !important;
+}

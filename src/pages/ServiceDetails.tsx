@@ -177,7 +177,7 @@ export default function ServiceDetails() {
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight"
+                className="text-4xl md:text-5xl font-bold text-white mb-6 leading-[1.2] text-wrap-balance"
               >
                 {service.title}
               </motion.h1>
@@ -257,7 +257,7 @@ export default function ServiceDetails() {
           {/* Suggested Services */}
           {suggested.length > 0 && (
             <div className="border-t border-white/10 pt-16">
-              <h2 className="text-3xl font-bold text-white mb-8 text-center">خدمات قد تهمك أيضاً</h2>
+              <h2 className="text-3xl font-bold text-white mb-8 text-center text-wrap-balance leading-[1.3]">خدمات قد تهمك أيضاً</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {suggested.map((item) => (
                   <motion.div

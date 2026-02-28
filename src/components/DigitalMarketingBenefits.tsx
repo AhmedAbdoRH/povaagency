@@ -35,7 +35,7 @@ export default function DigitalMarketingBenefits() {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <p className="text-accent font-semibold mb-3">التسويق الرقمي</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">ما الاستفادة التي ستحصل عليها شركتك من التسويق الإلكتروني؟</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-[1.3] text-wrap-balance">ما الاستفادة التي ستحصل عليها شركتك من التسويق الإلكتروني؟</h2>
           <p className="text-white/70 text-lg">
             نربطك بالعملاء المناسبين ونقدم لك أدوات دقيقة لقياس النجاح وتحسين الأداء باستمرار.
           </p>
@@ -54,7 +54,7 @@ export default function DigitalMarketingBenefits() {
               <div className="w-12 h-12 rounded-2xl bg-accent/20 text-accent flex items-center justify-center mb-5">
                 <benefit.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-wrap-balance leading-[1.4]">{benefit.title}</h3>
               <p className="text-white/80 leading-relaxed">{benefit.description}</p>
             </motion.div>
           ))}

@@ -36,7 +36,7 @@ export default function WhySocialMarketing() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <p className="text-sm uppercase tracking-[0.3em] text-white/70 mb-3">التسويق عبر المنصات الاجتماعية</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-snug">
+          <h2 className="text-3xl md:text-4xl font-bold leading-[1.3] text-wrap-balance">
             ما الذي يجعل التسويق عبر منصات التواصل الاجتماعي ضرورياً لعلامتك التجارية؟
           </h2>
         </div>
@@ -54,7 +54,7 @@ export default function WhySocialMarketing() {
               <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
                 <item.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-wrap-balance leading-[1.4]">{item.title}</h3>
               <p className="text-white/80 leading-relaxed">{item.description}</p>
             </motion.div>
           ))}

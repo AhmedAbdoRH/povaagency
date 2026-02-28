@@ -89,10 +89,9 @@ export default function Services() {
 
       if (error) throw error;
       const mapped: Subcategory[] = (data || []).map((sc: any) => ({
-        id: sc.id,
-        name: sc.name_ar ?? '',
-        description: sc.description_ar ?? null,
-        category_id: sc.category_id,
+        ...sc,
+        name_ar: sc.name_ar ?? '',
+        description_ar: sc.description_ar ?? null,
       }));
       setSubcategories(mapped);
     } catch (err) {
@@ -168,10 +167,10 @@ export default function Services() {
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-white">
+          <h2 className="text-3xl font-bold mb-4 text-white text-wrap-balance leading-[1.3]">
             {selectedSubcategory ? (
               <>
-                {subcategories.find(sc => sc.id === selectedSubcategory)?.name} -
+                {subcategories.find(sc => sc.id === selectedSubcategory)?.name_ar} -
                 {categories.find(c => c.id === selectedCategory)?.name}
               </>
             ) : selectedCategory ? (
@@ -184,7 +183,7 @@ export default function Services() {
           <div className="max-w-3xl mx-auto text-gray-400 text-lg leading-relaxed">
             {selectedSubcategory ? (
               <p>
-                اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name}</strong>
+                اكتشف مجموعة واسعة من <strong>{subcategories.find(sc => sc.id === selectedSubcategory)?.name_ar}</strong>
                 في قسم <strong>{categories.find(c => c.id === selectedCategory)?.name}</strong>.
               </p>
             ) : selectedCategory ? (
@@ -213,8 +212,8 @@ export default function Services() {
               setOpenCategoryId(null);
             }}
             className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold ${!selectedCategory
-                ? 'bg-accent text-white shadow-lg shadow-accent/30'
-                : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
+              ? 'bg-accent text-white shadow-lg shadow-accent/30'
+              : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
               }`}
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -232,8 +231,8 @@ export default function Services() {
                 setSelectedSubcategory(null);
               }}
               className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold flex items-center gap-2 ${selectedCategory === 'best_sellers'
-                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
-                  : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
+                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg'
+                : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
                 }`}
               variants={{
                 hidden: { opacity: 0, y: 20 },
@@ -250,8 +249,8 @@ export default function Services() {
                 key={category.id}
                 onClick={() => handleCategoryClick(category.id)}
                 className={`px-6 py-3 rounded-xl transition-all duration-300 font-bold ${category.id === selectedCategory
-                    ? 'bg-accent text-white shadow-lg shadow-accent/30'
-                    : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
+                  ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                  : 'bg-secondary/10 text-gray-300 hover:bg-secondary/20 hover:text-white'
                   }`}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
@@ -276,8 +275,8 @@ export default function Services() {
               <motion.button
                 onClick={() => handleSubcategoryClick(null)}
                 className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedSubcategory === null
-                    ? 'bg-white text-primary'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                  ? 'bg-white text-primary'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                   }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -293,8 +292,8 @@ export default function Services() {
                       key={subcategory.id}
                       onClick={() => handleSubcategoryClick(subcategory.id)}
                       className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedSubcategory === subcategory.id
-                          ? 'bg-white text-primary'
-                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white text-primary'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                         }`}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -303,7 +302,7 @@ export default function Services() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      {subcategory.name}
+                      {subcategory.name_ar}
                     </motion.button>
                   ))}
               </AnimatePresence>

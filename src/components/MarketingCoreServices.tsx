@@ -6,73 +6,73 @@ const coreServices = [
     title: 'استراتيجية التسويق',
     description: 'صياغة استراتيجيات شاملة لتوجيه نمو علامتك التجارية واختراق السوق.',
     icon: Target,
-    bgGradient: 'from-blue-500/10 to-transparent',
+    bgGradient: 'from-blue-500/20 to-transparent',
     iconColor: 'text-blue-400',
-    hoverBorder: 'hover:border-blue-500/50'
+    borderColor: 'border-blue-500/30'
   },
   {
     title: 'صناعة المحتوى',
     description: 'تطوير محتوى جذاب ومناسب بأشكال مختلفة لجذب جمهورك والاحتفاظ به.',
     icon: Sparkles,
-    bgGradient: 'from-purple-500/10 to-transparent',
+    bgGradient: 'from-purple-500/20 to-transparent',
     iconColor: 'text-purple-400',
-    hoverBorder: 'hover:border-purple-500/50'
+    borderColor: 'border-purple-500/30'
   },
   {
     title: 'تصوير الفيديو',
     description: 'إنتاج فيديو احترافي للإعلانات التجارية والمحتوى الترويجي ومقاطع فيديو الشركات.',
     icon: Video,
-    bgGradient: 'from-orange-500/10 to-transparent',
+    bgGradient: 'from-orange-500/20 to-transparent',
     iconColor: 'text-orange-400',
-    hoverBorder: 'hover:border-orange-500/50'
+    borderColor: 'border-orange-500/30'
   },
   {
     title: 'الإنتاج الإعلامي',
     description: 'خدمات شاملة تشمل تطوير المفهوم، التصوير، وما بعد الإنتاج لمختلف المنصات.',
     icon: Film,
-    bgGradient: 'from-indigo-500/10 to-transparent',
+    bgGradient: 'from-indigo-500/20 to-transparent',
     iconColor: 'text-indigo-400',
-    hoverBorder: 'hover:border-indigo-500/50'
+    borderColor: 'border-indigo-500/30'
   },
   {
     title: 'بناء الهوية التجارية',
     description: 'تطوير هويات فريدة للعلامة التجارية يتردد صداها مع جمهورك وتبرز في السوق.',
     icon: Palette,
-    bgGradient: 'from-emerald-500/10 to-transparent',
+    bgGradient: 'from-emerald-500/20 to-transparent',
     iconColor: 'text-emerald-400',
-    hoverBorder: 'hover:border-emerald-500/50'
+    borderColor: 'border-emerald-500/30'
   },
   {
     title: 'تصميم المواقع',
     description: 'تصميم وتطوير مواقع إلكترونية حديثة، متجاوبة، وسهلة الاستخدام تحقق النتائج.',
     icon: Globe,
-    bgGradient: 'from-sky-500/10 to-transparent',
+    bgGradient: 'from-sky-500/20 to-transparent',
     iconColor: 'text-sky-400',
-    hoverBorder: 'hover:border-sky-500/50'
+    borderColor: 'border-sky-500/30'
   },
   {
     title: 'حملات السوشيال ميديا',
     description: 'إدارة وتحسين تواجدك على وسائل التواصل الاجتماعي للتفاعل مع جمهورك وبناء مجتمعك.',
     icon: Megaphone,
-    bgGradient: 'from-rose-500/10 to-transparent',
+    bgGradient: 'from-rose-500/20 to-transparent',
     iconColor: 'text-rose-400',
-    hoverBorder: 'hover:border-rose-500/50'
+    borderColor: 'border-rose-500/30'
   },
   {
     title: 'تصميم المنشورات',
     description: 'إنشاء تصميمات جرافيك جذابة وفعالة لمنشورات وسائل التواصل الاجتماعي.',
     icon: Image,
-    bgGradient: 'from-fuchsia-500/10 to-transparent',
+    bgGradient: 'from-fuchsia-500/20 to-transparent',
     iconColor: 'text-fuchsia-400',
-    hoverBorder: 'hover:border-fuchsia-500/50'
+    borderColor: 'border-fuchsia-500/30'
   },
   {
     title: 'التصوير الفوتوغرافي',
     description: 'خدمات تصوير احترافية عالية الجودة للمنتجات، الأحداث، وملفات تعريف الشركات.',
     icon: Camera,
-    bgGradient: 'from-amber-500/10 to-transparent',
+    bgGradient: 'from-amber-500/20 to-transparent',
     iconColor: 'text-amber-400',
-    hoverBorder: 'hover:border-amber-500/50'
+    borderColor: 'border-amber-500/30'
   },
 ];
 
@@ -99,7 +99,7 @@ export default function MarketingCoreServices() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500"
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-[1.2] bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500 text-wrap-balance"
           >
             حلول متكاملة لنجاحك الرقمي
           </motion.h2>
@@ -122,36 +122,39 @@ export default function MarketingCoreServices() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 100 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className={`group relative bg-[#111] border border-white/5 rounded-3xl p-8 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl hover:shadow-2xl ${service.hoverBorder}`}
+              whileHover={{ y: -12, scale: 1.05, transition: { duration: 0.3 } }}
+              className={`group relative bg-[#0d0d0d] border ${service.borderColor} rounded-3xl p-8 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-2xl hover:bg-[#151515]`}
             >
-              {/* Card Hover Background Gradient */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${service.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+              {/* Background Gradient - Now ALWAYS visible */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${service.bgGradient} opacity-100 transition-opacity duration-500`} />
 
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex justify-between items-start mb-6">
-                  <div className={`w-16 h-16 rounded-2xl bg-black/50 flex items-center justify-center shadow-inner border border-white/5 ${service.iconColor} group-hover:scale-110 transition-transform duration-500 ease-out backdrop-blur-lg`}>
-                    <service.icon className="w-8 h-8" strokeWidth={1.5} />
+                  {/* Icon - Always scaled up slightly and glowing */}
+                  <div className={`w-16 h-16 rounded-2xl bg-black/60 flex items-center justify-center shadow-2xl border border-white/10 ${service.iconColor} scale-110 group-hover:scale-125 transition-transform duration-500 ease-out backdrop-blur-lg`}>
+                    <service.icon className="w-8 h-8 drop-shadow-[0_0_8px_currentColor]" strokeWidth={1.5} />
                   </div>
-                  <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 transition-all duration-300 delay-100 bg-white/5">
-                    <svg className={`w-4 h-4 ${service.iconColor} rotate-180`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {/* Arrow - Always visible */}
+                  <div className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center opacity-100 group-hover:bg-white group-hover:border-white transition-all duration-300 bg-white/5">
+                    <svg className={`w-4 h-4 ${service.iconColor} group-hover:text-black rotate-180 transition-colors`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all duration-300">
+                {/* Title - Always Gradient */}
+                <h3 className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 group-hover:to-white transition-all duration-300 !leading-[1.4] text-wrap-balance">
                   {service.title}
                 </h3>
 
-                <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300 flex-grow">
+                {/* Description - Always slightly brighter */}
+                <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors duration-300 flex-grow">
                   {service.description}
                 </p>
-
               </div>
 
-              {/* Decorative Background Icon */}
-              <service.icon className={`absolute -bottom-8 -left-8 w-40 h-40 opacity-0 group-hover:opacity-5 transform group-hover:rotate-12 transition-all duration-700 ease-in-out pointer-events-none ${service.iconColor}`} />
+              {/* Decorative Background Icon - Always visible at low opacity */}
+              <service.icon className={`absolute -bottom-8 -left-8 w-44 h-44 opacity-10 transform rotate-12 group-hover:rotate-45 group-hover:scale-125 transition-all duration-1000 ease-in-out pointer-events-none ${service.iconColor}`} />
             </motion.div>
           ))}
         </div>

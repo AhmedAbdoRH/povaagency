@@ -107,7 +107,7 @@ function App() {
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'POVA Agency',
           store_description: 'وكالة تسويق رقمي متكاملة',
-          logo_url: '/logo.png',
+          logo_url: '/agency-logo.png',
           meta_title: 'POVA | وكالة تسويق رقمي',
           meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
           theme_settings: {

@@ -47,7 +47,7 @@ export default function VisualStorytellingReasons() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-14">
           <p className="text-accent font-semibold mb-3">التصوير الفوتوغرافي | إنتاج الفيديو | الموشن جرافيك</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">6 أسباب تفسر لماذا يحتاج مشروعك للمحتوى الإبداعي</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-[1.3] text-wrap-balance">6 أسباب تفسر لماذا يحتاج مشروعك للمحتوى الإبداعي</h2>
           <p className="text-white/70 text-lg">نحوّل أفكارك إلى تجارب مرئية تبني ثقة، وتخلق فرقاً حقيقياً في رحلة العميل.</p>
         </div>
 
@@ -66,7 +66,7 @@ export default function VisualStorytellingReasons() {
                 <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center text-white">
                   <reason.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold">{reason.title}</h3>
+                <h3 className="text-2xl font-bold text-wrap-balance leading-[1.4]">{reason.title}</h3>
               </div>
               <p className="text-white/80 leading-relaxed">{reason.description}</p>
             </motion.div>
