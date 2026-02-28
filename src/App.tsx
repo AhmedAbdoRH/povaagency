@@ -30,7 +30,6 @@ import VisionMission from './components/VisionMission';
 import CompanyValues from './components/CompanyValues';
 import DigitalMarketingBenefits from './components/DigitalMarketingBenefits';
 import BrandDifferentiation from './components/BrandDifferentiation';
-import ServiceExpertiseList from './components/ServiceExpertiseList';
 import MarketingCoreServices from './components/MarketingCoreServices';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
@@ -187,7 +186,6 @@ function StaggeredHome() {
       <WhySocialMarketing />
       <BrandDifferentiation />
       <VisualStorytellingReasons />
-      <ServiceExpertiseList />
       <MarketingCoreServices />
       <Stats />
       <VisionMission />

@@ -27,30 +27,50 @@ const features = [
 
 export default function Features() {
     return (
-        <section className="py-20 bg-secondary">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">لماذا تختار POVA؟</h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+        <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="text-center mb-20">
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-6"
+                    >
+                        لماذا تختار POVA؟
+                    </motion.h2>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="text-gray-400 max-w-2xl mx-auto text-xl"
+                    >
                         نحن لا نقدم مجرد خدمات، بل نقدم حلولاً متكاملة تصنع الفارق.
-                    </p>
+                    </motion.p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((feature, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="bg-gray-50 p-8 rounded-2xl hover:shadow-xl transition-shadow duration-300 border border-gray-100 group"
+                            transition={{ duration: 0.6, delay: index * 0.1, type: "spring", stiffness: 100 }}
+                            whileHover={{ y: -10 }}
+                            className="bg-white/5 p-8 rounded-3xl hover:bg-white/10 transition-colors duration-500 border border-white/5 hover:border-white/20 group relative overflow-hidden backdrop-blur-md"
                         >
-                            <div className="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors duration-300">
-                                <feature.icon className="w-7 h-7 text-accent group-hover:text-white transition-colors duration-300" />
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+
+                            <div className="w-16 h-16 bg-[#151515] border border-white/10 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl relative z-10">
+                                <feature.icon className="w-8 h-8 text-accent group-hover:text-white transition-colors duration-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-primary mb-3">{feature.title}</h3>
-                            <p className="text-gray-600 leading-relaxed">
+
+                            <h3 className="text-2xl font-bold text-white mb-4 relative z-10">{feature.title}</h3>
+                            <p className="text-gray-400 leading-relaxed relative z-10 group-hover:text-gray-300 transition-colors">
                                 {feature.description}
                             </p>
                         </motion.div>
