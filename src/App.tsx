@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import { CartProvider } from './contexts/CartContext';
@@ -12,13 +12,16 @@ import Testimonials from './components/Testimonials';
 import WhatsAppButton from './components/WhatsAppButton';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import PageDetails from './pages/PageDetails';
+import SpecializationDetails from './pages/SpecializationDetails';
+import ClientDetails from './pages/ClientDetails';
 import ServiceDetails from './pages/ServiceDetails';
-import CategoryProducts from './pages/CategoryProducts';
-import SubcategoryProducts from './pages/SubcategoryProducts';
-import ProductDetails from './pages/ProductDetails';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import DownloadPage from './pages/DownloadPage';
+import Profile from './pages/Profile';
+import Orders from './pages/Orders';
+import Wishlist from './pages/Wishlist';
 import StructuredData from './components/StructuredData';
 import Hero from './components/Hero';
 import DesignRequest from './pages/DesignRequest';
@@ -70,13 +73,12 @@ function App() {
       await fetchStoreSettings();
 
       const { data: bannersData } = await supabase.from('banners').select('*').order('created_at', { ascending: false });
-      const { data: servicesData } = await supabase.from('services').select('*').limit(10).order('created_at', { ascending: false });
-      const { data: categoriesData } = await supabase.from('categories').select('*').order('name');
+      // Fetch pages instead of categories for structured data if needed
+      const { data: pagesData } = await supabase.from('pages').select('*').order('name');
 
       if (isMounted) {
         setBanners(bannersData || []);
-        setServices(servicesData || []);
-        setCategories(categoriesData || []);
+        setCategories(pagesData || []);
       }
     }
     initApp();
@@ -87,7 +89,6 @@ function App() {
     if (storeSettings) {
       const theme = (storeSettings as any).theme_settings || {};
       const root = document.documentElement;
-      // Ensure defaults match dark theme if not set
       root.style.setProperty('--color-primary', theme.primaryColor || '#000000');
       root.style.setProperty('--color-secondary', theme.secondaryColor || '#1a1a1a');
       root.style.setProperty('--color-accent', '#ee5239');
@@ -102,7 +103,6 @@ function App() {
       if (data) {
         setStoreSettings(data);
       } else {
-        // Default settings for POVA
         setStoreSettings({
           id: '00000000-0000-0000-0000-000000000001',
           store_name: 'POVA Agency',
@@ -130,17 +130,34 @@ function App() {
   }
 
   const Layout = ({ children, banners: layoutBanners }: LayoutProps) => {
-    const mainBanners = layoutBanners.filter(banner => banner.type === 'image' && banner.is_active);
+    const location = useLocation();
+    
+    // Determine banners for current page
+    const isHome = location.pathname === '/';
+    
+    // Extract page ID from path /page/:id
+    const pageMatch = location.pathname.match(/^\/page\/([a-zA-Z0-9-]+)$/);
+    const currentPageId = pageMatch ? pageMatch[1] : null;
+
+    const currentBanners = layoutBanners.filter(banner => {
+       if (!banner.is_active || banner.type !== 'image') return false;
+       if (isHome) return false; // No banners on home page
+       if (currentPageId) return banner.page_id === currentPageId; // Specific page banners
+       return false;
+    });
+
     const stripBanners = layoutBanners.filter(banner => banner.type === 'strip' && banner.is_active);
 
     return (
       <div className="min-h-screen font-cairo bg-primary text-white">
         <Header storeSettings={storeSettings} />
-        {window.location.pathname === '/' && mainBanners.length > 0 && <BannerSlider banners={mainBanners} />}
-        {window.location.pathname === '/' && stripBanners.length > 0 && <BannerStrip banners={stripBanners} />}
-        {window.location.pathname === '/' && <Hero />}
+        {currentBanners.length > 0 && <BannerSlider banners={currentBanners} />}
+        {/* BannerStrip removed from Home as per request */}
+        
+        {isHome && <Hero />}
+        {isHome && <MarketingCoreServices />}
         <main>{children}</main>
-        {window.location.pathname === '/' && <Testimonials />}
+        {/* {isHome && <Testimonials />} */}
         <Footer storeSettings={storeSettings} />
         <WhatsAppButton />
       </div>
@@ -159,19 +176,30 @@ function App() {
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
-            <Route path="/service/:id" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
-            <Route path="/product/:id" element={<Layout banners={banners}><ProductDetails /></Layout>} />
-            <Route path="/category/:categoryId" element={<Layout banners={banners}><CategoryProducts /></Layout>} />
-            <Route path="/subcategory/:subcategoryId" element={<Layout banners={banners}><SubcategoryProducts /></Layout>} />
+            
+            {/* New Routes */}
+            <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
+            <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
+            <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
+            <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
+            
+            {/* Standard Pages */}
             <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
+            <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
             <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
             <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
-            <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
+            <Route path="/profile" element={<Layout banners={banners}><Profile /></Layout>} />
+            <Route path="/orders" element={<Layout banners={banners}><Orders /></Layout>} />
+            <Route path="/wishlist" element={<Layout banners={banners}><Wishlist /></Layout>} />
+            
             <Route path="/" element={
               <Layout banners={banners}>
                 <StaggeredHome />
               </Layout>
             } />
+            
+            {/* Catch all redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </CartProvider>
@@ -186,7 +214,6 @@ function StaggeredHome() {
       <WhySocialMarketing />
       <BrandDifferentiation />
       <VisualStorytellingReasons />
-      <MarketingCoreServices />
       <Stats />
       <VisionMission />
       <CompanyValues />

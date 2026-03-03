@@ -15,7 +15,7 @@ function usePrevious<T>(value: T): T | undefined {
 }
 
 export default function ServiceDetails() {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
   const navigate = useNavigate();
   const [service, setService] = useState<Service | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,22 +27,33 @@ export default function ServiceDetails() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchService(id);
+    const identifier = id || slug;
+    if (identifier) {
+      fetchService(identifier);
       fetchSuggested();
     }
-  }, [id]);
+  }, [id, slug]);
 
-  const fetchService = async (serviceId: string) => {
+  const fetchService = async (identifier: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('services')
-        .select('*')
-        .eq('id', serviceId)
-        .single();
+      // Try to fetch by ID first, then by title slug
+      let query = supabase.from('services').select('*');
+      
+      // Check if identifier looks like a UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identifier);
+      
+      if (isUUID) {
+        query = query.eq('id', identifier);
+      } else {
+        // Convert slug back to title format
+        const title = identifier.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        query = query.eq('title', title);
+      }
+
+      const { data, error: fetchError } = await query.single();
 
       if (fetchError) throw fetchError;
       if (!data) throw new Error('الخدمة غير موجودة');
