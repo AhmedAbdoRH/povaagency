@@ -65,8 +65,8 @@ const DesignRequest = () => {
   return (
     <>
       <Helmet>
-        <title>تتعاون معنا - POVA Agency</title>
-        <meta name="description" content="تتعاون مع POVA Agency لتحقيق أهدافك. شاهد سابقة أعمالنا وابدأ مشروعك الآن." />
+        <title>تعاون معنا - POVA Agency</title>
+        <meta name="description" content="تعاون مع POVA Agency لتحقيق أهدافك. شاهد سابقة أعمالنا وابدأ مشروعك الآن." />
       </Helmet>
 
       <div className="min-h-screen bg-primary pt-24 pb-20">
@@ -80,7 +80,7 @@ const DesignRequest = () => {
                 transition={{ duration: 0.6 }}
                 className="text-3xl md:text-5xl font-bold text-white mb-4"
               >
-                تتعاون معنا
+                تعاون معنا
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}

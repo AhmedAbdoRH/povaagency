@@ -376,7 +376,7 @@ export default function Hero() {
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-base px-7 py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white" />
-                تتعاون معنا
+                تعاون معنا
               </Link>
             </motion.div>
 
