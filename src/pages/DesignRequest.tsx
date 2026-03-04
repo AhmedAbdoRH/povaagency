@@ -65,8 +65,8 @@ const DesignRequest = () => {
   return (
     <>
       <Helmet>
-        <title>اطلب خدمتك - POVA Agency</title>
-        <meta name="description" content="اطلب خدمات التسويق الرقمي، التصميم، والموشن جرافيك من POVA Agency." />
+        <title>تتعاون معنا - POVA Agency</title>
+        <meta name="description" content="تتعاون مع POVA Agency لتحقيق أهدافك. شاهد سابقة أعمالنا وابدأ مشروعك الآن." />
       </Helmet>
 
       <div className="min-h-screen bg-primary pt-24 pb-20">
@@ -80,7 +80,7 @@ const DesignRequest = () => {
                 transition={{ duration: 0.6 }}
                 className="text-3xl md:text-5xl font-bold text-white mb-4"
               >
-                ابدأ مشروعك <span className="text-accent">الآن</span>
+                تتعاون معنا
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -88,9 +88,56 @@ const DesignRequest = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-gray-400 text-lg"
               >
-                أخبرنا عن احتياجاتك وسيقوم فريقنا بتحويلها إلى واقع إبداعي
+                شاهد سابقة أعمالنا وابدأ مشروعك الآن. نحن هنا لندعم رحلتك الإبداعية وتحويل أفكارك إلى واقع ملموس.
               </motion.p>
             </div>
+
+            {/* Previous Work Showcase */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-[#1a1a1a] rounded-2xl p-8 mb-8 border border-gray-800"
+            >
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">سابقة أعمالنا</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { title: 'هوية بصرية متكاملة', category: 'هوية بصرية', image: '/work1.jpg' },
+                  { title: 'حملة تسويق رقمي', category: 'تسويق', image: '/work2.jpg' },
+                  { title: 'موقع إلكتروني', category: 'تصميم ويب', image: '/work3.jpg' },
+                  { title: 'فيديو تسويقي', category: 'إنتاج فيديو', image: '/work4.jpg' },
+                  { title: 'موشن جرافيك', category: 'موشن', image: '/work5.jpg' },
+                  { title: 'إدارة سوشيال ميديا', category: 'سوشيال ميديا', image: '/work6.jpg' }
+                ].map((work, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+                    className="group cursor-pointer"
+                  >
+                    <div className="aspect-[4/3] bg-[#2a2a2a] rounded-xl overflow-hidden mb-4">
+                      <img 
+                        src={work.image} 
+                        alt={work.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder-work.jpg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 className="text-white font-semibold text-sm mb-1">{work.title}</h3>
+                        <span className="text-accent text-xs">{work.category}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <p className="text-center text-gray-400 mt-6">
+                هذه نماذج قليلة من أعمالنا. نحن مستعدون لتنفيذ مشاريع مماثلة وأكثر إبداعاً لمشروعك.
+              </p>
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -205,7 +252,7 @@ const DesignRequest = () => {
                     </>
                   ) : (
                     <>
-                      إرسال الطلب
+                      ابدأ التعاون
                       <Send className="w-5 h-5" />
                     </>
                   )}
