@@ -2,8 +2,12 @@ export interface Page {
   id: string;
   name: string;
   description: string | null;
-  slug: string | null;
+  image_url: string | null; // الصورة الرئيسية المربعة
+  banner_url: string | null; // البانر
+  is_active: boolean;
+  display_order: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface ProductImage {
@@ -27,33 +31,67 @@ export interface Client {
   name: string;
   logo_url: string | null;
   description: string | null;
+  image_url: string | null;
+  project_url: string | null;
   specialization_id: string;
   is_active: boolean;
+  display_order: number;
   created_at: string;
+  updated_at: string;
   specialization?: Specialization;
+  content?: ClientContent[];
 }
 
-// Keeping Service for backward compatibility or if services are still needed
-export interface Service {
-  id: number;
-  page_id: string; // Renamed from category_id
-  specialization_id?: string | null; // Renamed from subcategory_id
+export interface ClientContent {
+  id: string;
+  client_id: string;
   title: string;
   description: string | null;
   image_url: string | null;
-  images?: ProductImage[]; 
-  gallery?: string[]; 
+  video_url: string | null;
+  content_type: 'image' | 'video' | 'text';
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  client?: Client;
+}
+
+// Service - Level 2 in hierarchy (belongs to Page)
+export interface Service {
+  id: string;
+  page_id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+  page?: Page;
+  specializations?: Specialization[];
+}
+
+// Legacy Service interface for backward compatibility
+export interface LegacyService {
+  id: number;
+  page_id: string;
+  specialization_id?: string | null;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  images?: ProductImage[];
+  gallery?: string[];
   price?: number | null;
   sale_price?: number | null;
   has_multiple_sizes?: boolean;
-  sizes?: ProductSize[]; 
-  is_featured?: boolean; 
-  is_best_seller?: boolean; 
+  sizes?: ProductSize[];
+  is_featured?: boolean;
+  is_best_seller?: boolean;
   dst_file_url?: string | null;
   emb_file_url?: string | null;
   created_at: string;
-  page?: Page; // Renamed from category
-  specialization?: Specialization; // Renamed from subcategory
+  page?: Page;
+  specialization?: Specialization;
   displayImage?: string;
 }
 
@@ -107,11 +145,26 @@ export interface Testimonial {
 
 export interface Specialization {
   id: string;
+  service_id: string; // Links to Service (Level 2)
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+  service?: Service;
+  clients?: Client[];
+}
+
+// Legacy Specialization interface for backward compatibility
+export interface LegacySpecialization {
+  id: string;
   name_ar: string;
   name_en: string;
   description_ar?: string | null;
   description_en?: string | null;
-  page_id: string; // Renamed from category_id
+  page_id: string;
   created_at: string;
   page?: Page;
 }

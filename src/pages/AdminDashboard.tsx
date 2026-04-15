@@ -1,199 +1,73 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Page, Specialization, Client, Banner } from '../types/database';
-import { Trash2, Edit, Plus, Save, X, Upload, Image, Layout, Layers, Users, Monitor } from 'lucide-react';
+import type { Page, Service, Specialization, Client, ClientContent } from '../types/database';
+import { Trash2, Edit } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const successGreen = '#228B22'; 
-
-interface AdminDashboardProps {
-  onSettingsUpdate?: () => void;
-}
-
-export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps) {
-  // State for Pages (formerly Categories)
+export default function AdminDashboard() {
   const [pages, setPages] = useState<Page[]>([]);
-  // State for Specializations (formerly Subcategories)
+  const [services, setServices] = useState<Service[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  // State for Clients (formerly Services/Products)
   const [clients, setClients] = useState<Client[]>([]);
-  // State for Banners
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [clientContent, setClientContent] = useState<ClientContent[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [selectedPage, setSelectedPage] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedSpecialization, setSelectedSpecialization] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<string | null>(null);
 
-  // Upload states
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
-
-  // Editing states
   const [editingPage, setEditingPage] = useState<string | null>(null);
+  const [editingService, setEditingService] = useState<string | null>(null);
   const [editingSpecialization, setEditingSpecialization] = useState<string | null>(null);
   const [editingClient, setEditingClient] = useState<string | null>(null);
-  const [editingBanner, setEditingBanner] = useState<string | null>(null);
+  const [editingClientContent, setEditingClientContent] = useState<string | null>(null);
 
-  // Modal state
-  const [deleteModal, setDeleteModal] = useState<{ id: string; type: 'page' | 'specialization' | 'client' | 'banner' } | null>(null);
+  const [showPageForm, setShowPageForm] = useState(false);
+  const [showServiceForm, setShowServiceForm] = useState(false);
+  const [showSpecializationForm, setShowSpecializationForm] = useState(false);
+  const [showClientForm, setShowClientForm] = useState(false);
+  const [showClientContentForm, setShowClientContentForm] = useState(false);
 
-  // Active Tab
-  const [activeTab, setActiveTab] = useState<'pages' | 'specializations' | 'banners'>('pages');
+  const [newPage, setNewPage] = useState({ name: '', description: '', image_url: '', banner_url: '' });
+  const [newService, setNewService] = useState({ page_id: '', name: '', description: '' });
+  const [newSpecialization, setNewSpecialization] = useState({ service_id: '', name: '', description: '', image_url: '' });
+  const [newClient, setNewClient] = useState({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' });
+  const [newClientContent, setNewClientContent] = useState({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' as 'image' | 'video' | 'text' });
 
-  // New Item States
-  const [newPage, setNewPage] = useState({ name: '', description: '', slug: '' });
-  const [newSpecialization, setNewSpecialization] = useState({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
-  const [newClient, setNewClient] = useState<Partial<Client>>({
-    name: '',
-    description: '',
-    logo_url: '',
-    specialization_id: '',
-    is_active: true
-  });
-  const [newBanner, setNewBanner] = useState<Partial<Banner>>({
-    type: 'image',
-    title: '',
-    description: '',
-    image_url: '',
-    page_id: '', // Added page selection
-    is_active: true
-  });
+  const [uploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
 
-  // Helper: Resize Image
-  const resizeImageIfNeeded = async (file: File, maxMegaBytes: number): Promise<File> => {
-    const maxSize = maxMegaBytes * 1024 * 1024;
-    if (file.size <= maxSize) return file;
-
-    return new Promise((resolve, reject) => {
-      const img = new window.Image();
-      const reader = new FileReader();
-      reader.onload = (e: any) => { img.src = e.target.result; };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return reject(new Error('Canvas context not available'));
-
-        let width = img.width;
-        let height = img.height;
-        const ratio = Math.sqrt(file.size / maxSize);
-        width = Math.floor(width / ratio);
-        height = Math.floor(height / ratio);
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error('Failed to create blob'));
-          const resizedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".webp"), {
-            type: 'image/webp',
-            lastModified: Date.now(),
-          });
-          resolve(resizedFile);
-        }, 'image/webp', 0.85);
-      };
-      img.onerror = reject;
-    });
-  };
-
-  // Helper: Handle Image Upload
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: 'client' | 'banner'
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const bucket = type === 'banner' ? 'banners' : 'services'; // Keeping 'services' bucket for clients to reuse existing storage or create 'clients' bucket
-    if (type === 'client') setUploadingImage(true);
-    if (type === 'banner') setUploadingBannerImage(true);
-
-    try {
-      if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
-      const processedFile = await resizeImageIfNeeded(file, 2);
-      const fileExt = processedFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(fileName, processedFile, { upsert: true });
-      
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(fileName);
-
-      if (type === 'client') {
-        setNewClient(prev => ({ ...prev, logo_url: publicUrl }));
-      } else if (type === 'banner') {
-        setNewBanner(prev => ({ ...prev, image_url: publicUrl }));
-      }
-      setSuccessMsg('تم رفع الصورة بنجاح!');
-    } catch (err: any) {
-      setError(`خطأ في رفع الصورة: ${err.message}`);
-    } finally {
-      if (type === 'client') setUploadingImage(false);
-      if (type === 'banner') setUploadingBannerImage(false);
-      event.target.value = '';
-    }
-  };
-
-  // Fetch Data
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch Pages (formerly Categories)
-      const { data: pagesData, error: pagesError } = await supabase
-        .from('pages')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (pagesError) throw pagesError;
-      setPages(pagesData || []);
+      const [pagesData, servicesData, specializationsData, clientsData, clientContentData] = await Promise.all([
+        supabase.from('pages').select('*').order('created_at', { ascending: false }),
+        supabase.from('services').select('*, page:pages(name)').order('created_at', { ascending: false }),
+        supabase.from('specializations').select('*, service:services(name)').order('created_at', { ascending: false }),
+        supabase.from('clients').select('*, specialization:specializations(name)').order('created_at', { ascending: false }),
+        supabase.from('client_content').select('*, client:clients(name)').order('created_at', { ascending: false }),
+      ]);
 
-      // 2. Fetch Specializations (formerly Subcategories)
-      const { data: specsData, error: specsError } = await supabase
-        .from('specializations')
-        .select('*, page:pages(name)')
-        .order('created_at', { ascending: false });
-      if (specsError) {
-          // If table not renamed yet, try 'subcategories' for fallback or just log
-          console.error("Error fetching specializations (check if table renamed):", specsError);
-      } else {
-          setSpecializations(specsData || []);
-      }
+      console.log('Fetched data:', { pagesData, servicesData, specializationsData, clientsData, clientContentData });
 
-      // 3. Fetch Clients (New table)
-      const { data: clientsData, error: clientsError } = await supabase
-        .from('clients')
-        .select('*, specialization:specializations(name_ar)')
-        .order('created_at', { ascending: false });
-      
-      if (clientsError) {
-           console.error("Error fetching clients (check if table created):", clientsError);
-           // Fallback: try fetching from 'services' if clients table doesn't exist yet, just to show something? 
-           // No, we strictly follow the new structure.
-      } else {
-           setClients(clientsData || []);
-      }
+      if (pagesData.error) console.error('Pages error:', pagesData.error);
+      if (servicesData.error) console.error('Services error:', servicesData.error);
+      if (specializationsData.error) console.error('Specializations error:', specializationsData.error);
+      if (clientsData.error) console.error('Clients error:', clientsData.error);
+      if (clientContentData.error) console.error('Client content error:', clientContentData.error);
 
-      // 4. Fetch Banners
-      const { data: bannersData, error: bannersError } = await supabase
-        .from('banners')
-        .select('*, page:pages(name)')
-        .order('created_at', { ascending: false });
-      if (bannersError) throw bannersError;
-      setBanners(bannersData || []);
-
+      setPages(pagesData.data || []);
+      setServices(servicesData.data || []);
+      setSpecializations(specializationsData.data || []);
+      setClients(clientsData.data || []);
+      setClientContent(clientContentData.data || []);
     } catch (err: any) {
-      setError(`خطأ في جلب البيانات: ${err.message}`);
+      console.error('Fetch error:', err);
+      toast.error(`خطأ: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -201,373 +75,546 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   useEffect(() => {
     const checkAuth = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) navigate('/admin/login');
-        else fetchData();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) navigate('/admin/login');
+      else fetchData();
     };
     checkAuth();
   }, [navigate]);
 
   useEffect(() => {
-    if (error) { toast.error(error); setError(null); }
-    if (successMsg) { toast.success(successMsg); setSuccessMsg(null); }
-  }, [error, successMsg]);
+    if (!selectedPage || editingService) return;
+    setNewService(prev => ({ ...prev, page_id: selectedPage }));
+  }, [selectedPage, editingService]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/admin/login');
+  useEffect(() => {
+    if (!selectedService || editingSpecialization) return;
+    setNewSpecialization(prev => ({ ...prev, service_id: selectedService }));
+  }, [selectedService, editingSpecialization]);
+
+  useEffect(() => {
+    if (!selectedSpecialization || editingClient) return;
+    setNewClient(prev => ({ ...prev, specialization_id: selectedSpecialization }));
+  }, [selectedSpecialization, editingClient]);
+
+  useEffect(() => {
+    if (!selectedClient || editingClientContent) return;
+    setNewClientContent(prev => ({ ...prev, client_id: selectedClient }));
+  }, [selectedClient, editingClientContent]);
+
+  const handleImageUpload = async (file: File, type: 'page' | 'page-image' | 'page-banner' | 'specialization' | 'client' | 'client-content') => {
+    setUploading(true);
+    try {
+      // Generate random filename with extension only
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('services')
+        .upload(fileName, file, { upsert: true });
+      
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('services')
+        .getPublicUrl(fileName);
+
+      if (type === 'page' || type === 'page-image') setNewPage(prev => ({ ...prev, image_url: publicUrl }));
+      if (type === 'page-banner') setNewPage(prev => ({ ...prev, banner_url: publicUrl }));
+      if (type === 'specialization') setNewSpecialization(prev => ({ ...prev, image_url: publicUrl }));
+      if (type === 'client') setNewClient(prev => ({ ...prev, image_url: publicUrl }));
+      if (type === 'client-content') setNewClientContent(prev => ({ ...prev, image_url: publicUrl }));
+
+      toast.success('تم رفع الصورة بنجاح!');
+    } catch (err: any) {
+      toast.error(`خطأ: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
   };
 
-  // --- Page Operations ---
-  const handleAddPage = async (e: React.FormEvent) => {
+  const handleAdd = async (type: 'page' | 'service' | 'specialization' | 'client' | 'client-content', e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPage.name.trim()) return setError("اسم الصفحة مطلوب.");
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('pages').insert([newPage]);
-      if (error) throw error;
-      setNewPage({ name: '', description: '', slug: '' });
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('يجب تسجيل الدخول أولاً');
+        navigate('/admin/login');
+        return;
+      }
+
+      console.log('Adding', type, 'with data:', 
+        type === 'page' ? newPage :
+        type === 'service' ? newService :
+        type === 'specialization' ? newSpecialization :
+        type === 'client' ? newClient : newClientContent
+      );
+
+      let data;
+      if (type === 'page') {
+        data = await supabase.from('pages').insert([newPage]).select();
+      } else if (type === 'service') {
+        const payload = {
+          ...newService,
+          page_id: newService.page_id || selectedPage || null,
+        };
+        data = await supabase.from('services').insert([payload]).select();
+      } else if (type === 'specialization') {
+        const payload = {
+          ...newSpecialization,
+          service_id: newSpecialization.service_id || selectedService || null,
+        };
+        data = await supabase.from('specializations').insert([payload]).select();
+      } else if (type === 'client') {
+        const payload = {
+          ...newClient,
+          specialization_id: newClient.specialization_id || selectedSpecialization || null,
+        };
+        data = await supabase.from('clients').insert([payload]).select();
+      } else if (type === 'client-content') {
+        const payload = {
+          ...newClientContent,
+          client_id: newClientContent.client_id || selectedClient || null,
+        };
+        data = await supabase.from('client_content').insert([payload]).select();
+      }
+
+      console.log('Insert result:', data);
+
+      if (data?.error) {
+        console.error('Insert error:', data.error);
+        throw data.error;
+      }
+
+      if (type === 'page') setNewPage({ name: '', description: '', image_url: '', banner_url: '' });
+      if (type === 'service') setNewService({ page_id: '', name: '', description: '' });
+      if (type === 'specialization') setNewSpecialization({ service_id: '', name: '', description: '', image_url: '' });
+      if (type === 'client') setNewClient({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' });
+      if (type === 'client-content') setNewClientContent({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' });
+
       await fetchData();
-      setSuccessMsg("تمت إضافة الصفحة بنجاح!");
-    } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
+      toast.success('تمت الإضافة بنجاح!');
+    } catch (err: any) {
+      toast.error(`خطأ: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleUpdatePage = async (e: React.FormEvent) => {
+  const handleUpdate = async (type: 'page' | 'service' | 'specialization' | 'client' | 'client-content', id: string, e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingPage) return;
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('pages').update(newPage).eq('id', editingPage);
-      if (error) throw error;
-      setEditingPage(null);
-      setNewPage({ name: '', description: '', slug: '' });
+      let data;
+      if (type === 'page') data = await supabase.from('pages').update(newPage).eq('id', id);
+      else if (type === 'service') data = await supabase.from('services').update(newService).eq('id', id);
+      else if (type === 'specialization') data = await supabase.from('specializations').update(newSpecialization).eq('id', id);
+      else if (type === 'client') data = await supabase.from('clients').update(newClient).eq('id', id);
+      else if (type === 'client-content') data = await supabase.from('client_content').update(newClientContent).eq('id', id);
+
+      if (data?.error) throw data.error;
+
+      if (type === 'page') { setEditingPage(null); setNewPage({ name: '', description: '', image_url: '', banner_url: '' }); }
+      if (type === 'service') { setEditingService(null); setNewService({ page_id: '', name: '', description: '' }); }
+      if (type === 'specialization') { setEditingSpecialization(null); setNewSpecialization({ service_id: '', name: '', description: '', image_url: '' }); }
+      if (type === 'client') { setEditingClient(null); setNewClient({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' }); }
+      if (type === 'client-content') { setEditingClientContent(null); setNewClientContent({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' }); }
+
       await fetchData();
-      setSuccessMsg("تم تحديث الصفحة بنجاح!");
-    } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
+      toast.success('تم التحديث بنجاح!');
+    } catch (err: any) {
+      toast.error(`خطأ: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeletePage = async (id: string) => {
-      // Logic handled in modal
-      setDeleteModal({ id, type: 'page' });
-  };
-
-  // --- Specialization Operations ---
-  const handleAddSpecialization = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSpecialization.name_ar.trim() || !newSpecialization.page_id) return setError("الاسم والصفحة مطلوبان.");
+  const handleDelete = async (type: 'page' | 'service' | 'specialization' | 'client' | 'client-content', id: string) => {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('specializations').insert([newSpecialization]);
-      if (error) throw error;
-      setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
+      let data;
+      if (type === 'page') data = await supabase.from('pages').delete().eq('id', id);
+      else if (type === 'service') data = await supabase.from('services').delete().eq('id', id);
+      else if (type === 'specialization') data = await supabase.from('specializations').delete().eq('id', id);
+      else if (type === 'client') data = await supabase.from('clients').delete().eq('id', id);
+      else if (type === 'client-content') data = await supabase.from('client_content').delete().eq('id', id);
+
+      if (data?.error) throw data.error;
       await fetchData();
-      setSuccessMsg("تمت إضافة التخصص بنجاح!");
-    } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
+      toast.success('تم الحذف بنجاح!');
+    } catch (err: any) {
+      toast.error(`خطأ: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleUpdateSpecialization = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!editingSpecialization) return;
-      setIsLoading(true);
-      try {
-          const { error } = await supabase.from('specializations').update(newSpecialization).eq('id', editingSpecialization);
-          if (error) throw error;
-          setEditingSpecialization(null);
-          setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
-          await fetchData();
-          setSuccessMsg("تم تحديث التخصص بنجاح!");
-      } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
+  const startEdit = (type: 'page' | 'service' | 'specialization' | 'client' | 'client-content', item: any) => {
+    if (type === 'page') {
+      setEditingPage(item.id);
+      setShowPageForm(true);
+      setNewPage({ name: item.name, description: item.description || '', image_url: item.image_url || '', banner_url: item.banner_url || '' });
+      setTimeout(() => document.getElementById('page-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    }
+    if (type === 'service') {
+      setEditingService(item.id);
+      setShowServiceForm(true);
+      setNewService({ page_id: item.page_id, name: item.name, description: item.description || '' });
+      setTimeout(() => document.getElementById('service-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    }
+    if (type === 'specialization') {
+      setEditingSpecialization(item.id);
+      setShowSpecializationForm(true);
+      setNewSpecialization({ service_id: item.service_id, name: item.name, description: item.description || '', image_url: item.image_url || '' });
+      setTimeout(() => document.getElementById('specialization-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    }
+    if (type === 'client') {
+      setEditingClient(item.id);
+      setShowClientForm(true);
+      setNewClient({ specialization_id: item.specialization_id, name: item.name, description: item.description || '', image_url: item.image_url || '', project_url: item.project_url || '', logo_url: item.logo_url || '' });
+      setTimeout(() => document.getElementById('client-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    }
+    if (type === 'client-content') {
+      setEditingClientContent(item.id);
+      setShowClientContentForm(true);
+      setNewClientContent({ client_id: item.client_id, title: item.title, description: item.description || '', image_url: item.image_url || '', video_url: item.video_url || '', content_type: item.content_type || 'image' });
+      setTimeout(() => document.getElementById('client-content-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    }
   };
 
-  // --- Client Operations ---
-  const handleAddClient = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newClient.name?.trim() || !newClient.specialization_id) return setError("اسم العميل والتخصص مطلوبان.");
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.from('clients').insert([newClient]);
-      if (error) throw error;
-      setNewClient({ name: '', description: '', logo_url: '', specialization_id: '', is_active: true });
-      await fetchData();
-      setSuccessMsg("تمت إضافة العميل بنجاح!");
-    } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
-  };
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">جاري التحميل...</div>;
 
-  const handleUpdateClient = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!editingClient) return;
-      setIsLoading(true);
-      try {
-          const { error } = await supabase.from('clients').update(newClient).eq('id', editingClient);
-          if (error) throw error;
-          setEditingClient(null);
-          setNewClient({ name: '', description: '', logo_url: '', specialization_id: '', is_active: true });
-          await fetchData();
-          setSuccessMsg("تم تحديث بيانات العميل بنجاح!");
-      } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
-  };
-
-  // --- Banner Operations ---
-  const handleAddBanner = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!newBanner.image_url) return setError("صورة البانر مطلوبة.");
-      setIsLoading(true);
-      try {
-          const { error } = await supabase.from('banners').insert([{...newBanner, page_id: newBanner.page_id || null}]);
-          if (error) throw error;
-          setNewBanner({ type: 'image', title: '', description: '', image_url: '', page_id: '', is_active: true });
-          await fetchData();
-          setSuccessMsg("تمت إضافة البانر بنجاح!");
-      } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
-  };
-
-  const handleUpdateBanner = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!editingBanner) return;
-      setIsLoading(true);
-      try {
-          const { error } = await supabase.from('banners').update({...newBanner, page_id: newBanner.page_id || null}).eq('id', editingBanner);
-          if (error) throw error;
-          setEditingBanner(null);
-          setNewBanner({ type: 'image', title: '', description: '', image_url: '', page_id: '', is_active: true });
-          await fetchData();
-          setSuccessMsg("تم تحديث البانر بنجاح!");
-      } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
-  };
-
-  // --- Delete Confirmation ---
-  const handleConfirmDelete = async () => {
-      if (!deleteModal) return;
-      setIsLoading(true);
-      try {
-          if (deleteModal.type === 'page') {
-              await supabase.from('pages').delete().eq('id', deleteModal.id);
-          } else if (deleteModal.type === 'specialization') {
-              await supabase.from('specializations').delete().eq('id', deleteModal.id);
-          } else if (deleteModal.type === 'client') {
-              await supabase.from('clients').delete().eq('id', deleteModal.id);
-          } else if (deleteModal.type === 'banner') {
-              await supabase.from('banners').delete().eq('id', deleteModal.id);
-          }
-          setDeleteModal(null);
-          await fetchData();
-          setSuccessMsg("تم الحذف بنجاح.");
-      } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
-  };
-
-  // --- Render Helpers ---
-  const renderSidebar = () => (
-      <div className="md:col-span-1 space-y-2">
-          <button onClick={() => setActiveTab('pages')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'pages' ? 'bg-[#ee5239] text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
-              <Layout className="h-5 w-5" /> <span>الصفحات (الأقسام)</span>
-          </button>
-          <button onClick={() => setActiveTab('specializations')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'specializations' ? 'bg-[#ee5239] text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
-              <Layers className="h-5 w-5" /> <span>التخصصات والعملاء</span>
-          </button>
-          <button onClick={() => setActiveTab('banners')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'banners' ? 'bg-[#ee5239] text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
-              <Image className="h-5 w-5" /> <span>البانرات</span>
-          </button>
-      </div>
-  );
+  const filteredServices = services.filter(s => !selectedPage || s.page_id === selectedPage);
+  const filteredSpecializations = specializations.filter(s => !selectedService || s.service_id === selectedService);
+  const filteredClients = clients.filter(c => !selectedSpecialization || c.specialization_id === selectedSpecialization);
+  const filteredClientContent = clientContent.filter(c => !selectedClient || c.client_id === selectedClient);
 
   return (
-    <div className="min-h-screen font-[Cairo] bg-[#1a1a1a] text-white" dir="rtl">
-        <ToastContainer position="bottom-right" theme="dark" rtl />
-        
-        {/* Modal */}
-        {deleteModal && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-                <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-700">
-                    <h3 className="text-xl font-bold mb-4 text-red-500">تأكيد الحذف</h3>
-                    <p className="text-gray-300 mb-6">هل أنت متأكد من رغبتك في حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.</p>
-                    <div className="flex justify-end gap-3">
-                        <button onClick={() => setDeleteModal(null)} className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500">إلغاء</button>
-                        <button onClick={handleConfirmDelete} className="px-4 py-2 rounded bg-red-600 hover:bg-red-700">حذف</button>
-                    </div>
-                </div>
-            </div>
-        )}
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white" dir="rtl">
+      <ToastContainer position="top-right" />
+      
+      <div className="container mx-auto p-6">
         {/* Header */}
-        <div className="bg-black/60 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-[#ee5239]">لوحة التحكم - POVA</h1>
-                <button onClick={handleLogout} className="bg-red-700 hover:bg-red-800 px-4 py-2 rounded text-sm font-bold transition-colors">تسجيل خروج</button>
-            </div>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">لوحة التحكم</h1>
+          <button onClick={() => { supabase.auth.signOut(); navigate('/admin/login'); }} className="flex items-center gap-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 px-6 py-3 rounded-xl transition-all duration-300 border border-red-500/30">
+            <Trash2 className="w-5 h-5" /> تسجيل الخروج
+          </button>
         </div>
 
-        <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-            {renderSidebar()}
-            
-            <div className="md:col-span-3">
-                {/* Pages Tab */}
-                {activeTab === 'pages' && (
-                    <div className="space-y-8">
-                        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Layout className="text-[#ee5239]" /> {editingPage ? 'تعديل صفحة' : 'إضافة صفحة جديدة'}</h2>
-                            <form onSubmit={editingPage ? handleUpdatePage : handleAddPage} className="space-y-4">
-                                <input type="text" placeholder="اسم الصفحة (مثال: خدماتنا، من نحن)" value={newPage.name} onChange={e => setNewPage({...newPage, name: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" />
-                                <input type="text" placeholder="Slug (رابط الصفحة - اختياري)" value={newPage.slug || ''} onChange={e => setNewPage({...newPage, slug: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" dir="ltr" />
-                                <textarea placeholder="وصف الصفحة" value={newPage.description || ''} onChange={e => setNewPage({...newPage, description: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" rows={3} />
-                                <div className="flex gap-2">
-                                    <button type="submit" className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-2 rounded font-bold flex-1">{editingPage ? 'حفظ التعديلات' : 'إضافة الصفحة'}</button>
-                                    {editingPage && <button type="button" onClick={() => {setEditingPage(null); setNewPage({name:'', description:'', slug:''})}} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded font-bold">إلغاء</button>}
-                                </div>
-                            </form>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4">
-                            {pages.map(page => (
-                                <div key={page.id} className="bg-gray-800 border border-gray-700 p-4 rounded-lg flex justify-between items-center group hover:border-[#ee5239] transition-colors">
-                                    <div>
-                                        <h3 className="font-bold text-lg">{page.name}</h3>
-                                        {page.slug && <p className="text-xs text-gray-400 font-mono">/{page.slug}</p>}
-                                        <p className="text-gray-400 text-sm">{page.description}</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => {setEditingPage(page.id); setNewPage({name: page.name, description: page.description, slug: page.slug || ''})}} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded"><Edit size={18} /></button>
-                                        <button onClick={() => setDeleteModal({id: page.id, type: 'page'})} className="p-2 text-red-400 hover:bg-red-400/10 rounded"><Trash2 size={18} /></button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Specializations & Clients Tab */}
-                {activeTab === 'specializations' && (
-                    <div className="space-y-8">
-                         {/* 1. Specializations Management */}
-                        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Layers className="text-[#ee5239]" /> {editingSpecialization ? 'تعديل تخصص' : 'إضافة تخصص جديد'}</h2>
-                            <form onSubmit={editingSpecialization ? handleUpdateSpecialization : handleAddSpecialization} className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <select value={newSpecialization.page_id} onChange={e => setNewSpecialization({...newSpecialization, page_id: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none">
-                                        <option value="">اختر الصفحة التابعة لها</option>
-                                        {pages.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                    </select>
-                                    <input type="text" placeholder="اسم التخصص (عربي)" value={newSpecialization.name_ar} onChange={e => setNewSpecialization({...newSpecialization, name_ar: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" />
-                                </div>
-                                <textarea placeholder="وصف التخصص" value={newSpecialization.description_ar || ''} onChange={e => setNewSpecialization({...newSpecialization, description_ar: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" rows={2} />
-                                <div className="flex gap-2">
-                                    <button type="submit" className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-2 rounded font-bold flex-1">{editingSpecialization ? 'حفظ التعديلات' : 'إضافة التخصص'}</button>
-                                    {editingSpecialization && <button type="button" onClick={() => {setEditingSpecialization(null); setNewSpecialization({page_id:'', name_ar:'', name_en:'', description_ar:'', description_en:''})}} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded font-bold">إلغاء</button>}
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* List of Specializations */}
-                        <div className="grid grid-cols-1 gap-4 max-h-60 overflow-y-auto mb-8 border border-gray-700 rounded p-2">
-                             {specializations.map(spec => (
-                                <div key={spec.id} className="bg-gray-800 p-3 rounded flex justify-between items-center">
-                                    <div>
-                                        <span className="font-bold text-[#ee5239] ml-2">[{spec.page?.name}]</span>
-                                        <span>{spec.name_ar}</span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => {setEditingSpecialization(spec.id); setNewSpecialization({page_id: spec.page_id, name_ar: spec.name_ar, name_en: spec.name_en, description_ar: spec.description_ar, description_en: spec.description_en})}} className="text-blue-400"><Edit size={16} /></button>
-                                        <button onClick={() => setDeleteModal({id: spec.id, type: 'specialization'})} className="text-red-400"><Trash2 size={16} /></button>
-                                    </div>
-                                </div>
-                             ))}
-                        </div>
-
-                        {/* 2. Clients Management */}
-                        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 border-t-4 border-t-[#ee5239]">
-                             <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Users className="text-[#ee5239]" /> {editingClient ? 'تعديل بيانات عميل' : 'إضافة عميل جديد'}</h2>
-                             <form onSubmit={editingClient ? handleUpdateClient : handleAddClient} className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <select value={newClient.specialization_id} onChange={e => setNewClient({...newClient, specialization_id: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none">
-                                        <option value="">اختر التخصص التابع له</option>
-                                        {specializations.map(s => <option key={s.id} value={s.id}>{s.name_ar}</option>)}
-                                    </select>
-                                    <input type="text" placeholder="اسم العميل / المشروع" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" />
-                                </div>
-                                <div className="flex gap-4 items-center">
-                                     <div className="flex-1">
-                                         <label className="block text-sm text-gray-400 mb-1">شعار العميل / صورة المشروع</label>
-                                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'client')} className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#ee5239] file:text-white hover:file:bg-[#d63d2a]" disabled={uploadingImage} />
-                                     </div>
-                                     {newClient.logo_url && <img src={newClient.logo_url} alt="Logo" className="w-16 h-16 object-cover rounded bg-white" />}
-                                </div>
-                                <textarea placeholder="وصف العميل / تفاصيل المشروع" value={newClient.description || ''} onChange={e => setNewClient({...newClient, description: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" rows={3} />
-                                <div className="flex gap-2">
-                                    <button type="submit" className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-2 rounded font-bold flex-1" disabled={uploadingImage}>{editingClient ? 'حفظ التعديلات' : 'إضافة العميل'}</button>
-                                    {editingClient && <button type="button" onClick={() => {setEditingClient(null); setNewClient({name:'', description:'', logo_url:'', specialization_id:'', is_active: true})}} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded font-bold">إلغاء</button>}
-                                </div>
-                             </form>
-                        </div>
-
-                        {/* Clients List */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {clients.map(client => (
-                                <div key={client.id} className="bg-gray-800 border border-gray-700 p-4 rounded-lg flex gap-4 group hover:border-[#ee5239] transition-all">
-                                    <div className="w-16 h-16 flex-shrink-0 bg-gray-900 rounded flex items-center justify-center overflow-hidden">
-                                        {client.logo_url ? <img src={client.logo_url} alt={client.name} className="w-full h-full object-cover" /> : <Users className="text-gray-600" />}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold">{client.name}</h3>
-                                        <p className="text-xs text-[#ee5239] mb-1">{client.specialization?.name_ar}</p>
-                                        <p className="text-xs text-gray-400 line-clamp-2">{client.description}</p>
-                                        <div className="flex gap-2 mt-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => {setEditingClient(client.id); setNewClient({name: client.name, description: client.description, logo_url: client.logo_url, specialization_id: client.specialization_id, is_active: client.is_active})}} className="text-blue-400"><Edit size={16} /></button>
-                                            <button onClick={() => setDeleteModal({id: client.id, type: 'client'})} className="text-red-400"><Trash2 size={16} /></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Banners Tab */}
-                {activeTab === 'banners' && (
-                     <div className="space-y-8">
-                        <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Image className="text-[#ee5239]" /> {editingBanner ? 'تعديل بانر' : 'إضافة بانر جديد'}</h2>
-                            <form onSubmit={editingBanner ? handleUpdateBanner : handleAddBanner} className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                     <input type="text" placeholder="عنوان البانر (اختياري)" value={newBanner.title || ''} onChange={e => setNewBanner({...newBanner, title: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none" />
-                                     <select value={newBanner.page_id || ''} onChange={e => setNewBanner({...newBanner, page_id: e.target.value || null})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ee5239] focus:outline-none">
-                                         <option value="">عرض في الصفحة الرئيسية (افتراضي)</option>
-                                         {pages.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                     </select>
-                                </div>
-                                <div>
-                                     <label className="block text-sm text-gray-400 mb-1">صورة البانر</label>
-                                     <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'banner')} className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#ee5239] file:text-white hover:file:bg-[#d63d2a]" disabled={uploadingBannerImage} />
-                                     {newBanner.image_url && <img src={newBanner.image_url} alt="Banner Preview" className="mt-2 w-full h-32 object-cover rounded border border-gray-600" />}
-                                </div>
-                                <div className="flex gap-2">
-                                    <button type="submit" className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-2 rounded font-bold flex-1" disabled={uploadingBannerImage}>{editingBanner ? 'حفظ التعديلات' : 'إضافة البانر'}</button>
-                                    {editingBanner && <button type="button" onClick={() => {setEditingBanner(null); setNewBanner({type:'image', title:'', description:'', image_url:'', page_id:''})}} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded font-bold">إلغاء</button>}
-                                </div>
-                            </form>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4">
-                             {banners.map(banner => (
-                                <div key={banner.id} className="bg-gray-800 border border-gray-700 p-4 rounded-lg group hover:border-[#ee5239] transition-colors">
-                                     <div className="relative h-32 mb-3 rounded overflow-hidden">
-                                         <img src={banner.image_url || ''} alt={banner.title || 'Banner'} className="w-full h-full object-cover" />
-                                         <div className="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white">
-                                             {banner.page ? banner.page.name : 'الرئيسية'}
-                                         </div>
-                                     </div>
-                                     <div className="flex justify-between items-center">
-                                         <h3 className="font-bold">{banner.title || 'بدون عنوان'}</h3>
-                                         <div className="flex gap-2">
-                                             <button onClick={() => {setEditingBanner(banner.id); setNewBanner({type: banner.type, title: banner.title, description: banner.description, image_url: banner.image_url, page_id: banner.page_id, is_active: banner.is_active})}} className="text-blue-400"><Edit size={18} /></button>
-                                             <button onClick={() => setDeleteModal({id: banner.id, type: 'banner'})} className="text-red-400"><Trash2 size={18} /></button>
-                                         </div>
-                                     </div>
-                                </div>
-                             ))}
-                        </div>
-                     </div>
-                )}
-            </div>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-6 text-sm">
+          <button onClick={() => { setSelectedPage(null); setSelectedService(null); setSelectedSpecialization(null); setSelectedClient(null); }} className={`hover:text-blue-400 transition-colors ${!selectedPage ? 'text-blue-400 font-bold' : 'text-gray-400'}`}>الصفحات</button>
+          {selectedPage && (
+            <>
+              <span className="text-gray-600">/</span>
+              <button onClick={() => { setSelectedService(null); setSelectedSpecialization(null); setSelectedClient(null); }} className={`hover:text-purple-400 transition-colors ${selectedPage && !selectedService ? 'text-purple-400 font-bold' : 'text-gray-400'}`}>الخدمات</button>
+            </>
+          )}
+          {selectedService && (
+            <>
+              <span className="text-gray-600">/</span>
+              <button onClick={() => { setSelectedSpecialization(null); setSelectedClient(null); }} className={`hover:text-pink-400 transition-colors ${selectedService && !selectedSpecialization ? 'text-pink-400 font-bold' : 'text-gray-400'}`}>التخصصات</button>
+            </>
+          )}
+          {selectedSpecialization && (
+            <>
+              <span className="text-gray-600">/</span>
+              <button onClick={() => { setSelectedClient(null); }} className={`hover:text-green-400 transition-colors ${selectedSpecialization && !selectedClient ? 'text-green-400 font-bold' : 'text-gray-400'}`}>العملاء</button>
+            </>
+          )}
+          {selectedClient && (
+            <>
+              <span className="text-gray-600">/</span>
+              <span className="text-orange-400 font-bold">محتوى العميل</span>
+            </>
+          )}
         </div>
+
+        {/* Tree View */}
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700/50 shadow-xl">
+          {!selectedPage && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">الصفحات</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                {pages.map(page => (
+                  <div key={page.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setSelectedPage(page.id)}>
+                    <div className="aspect-square relative">
+                      {page.image_url ? (
+                        <img src={page.image_url} alt={page.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800/50" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="font-bold leading-tight line-clamp-2">{page.name}</h3>
+                      </div>
+                      <div className="absolute top-2 left-2 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => startEdit('page', page)} className="p-2 bg-blue-500/20 hover:bg-blue-500/40 text-blue-200 rounded-xl transition-all duration-300 border border-blue-500/30"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('page', page.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button onClick={() => { setShowPageForm(true); setEditingPage(null); setNewPage({ name: '', description: '', image_url: '', banner_url: '' }); setTimeout(() => document.getElementById('page-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-blue-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                  <div className="text-5xl font-bold text-blue-400">+</div>
+                  <div className="mt-2 text-sm text-gray-300">إضافة صفحة</div>
+                </button>
+              </div>
+
+              {showPageForm && (
+                <form id="page-form" onSubmit={(e) => editingPage ? handleUpdate('page', editingPage, e) : handleAdd('page', e)} className="mb-2 bg-gray-700/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-600/50">
+                  <div className="grid gap-4">
+                    <input value={newPage.name} onChange={(e) => setNewPage({...newPage, name: e.target.value})} placeholder="اسم الصفحة" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-blue-500/50 focus:outline-none transition-all" required />
+                    <textarea value={newPage.description} onChange={(e) => setNewPage({...newPage, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-blue-500/50 focus:outline-none transition-all" rows={3} />
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-400">الصورة الرئيسية المربعة (تُعرض في الموقع)</label>
+                      <input type="file" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'page-image')} className="p-3 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-blue-500/50 focus:outline-none transition-all" accept="image/*" />
+                      {uploading && <span className="ml-2 text-blue-400">جاري الرفع...</span>}
+                      {newPage.image_url && <img src={newPage.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl border border-gray-600/50" />}
+                    </div>
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-400">البانر (يُعرض في الصفحة من الداخل)</label>
+                      <input type="file" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'page-banner')} className="p-3 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-blue-500/50 focus:outline-none transition-all" accept="image/*" />
+                      {uploading && <span className="ml-2 text-blue-400">جاري الرفع...</span>}
+                      {newPage.banner_url && <img src={newPage.banner_url} alt="Banner Preview" className="mt-2 w-full h-32 object-cover rounded-xl border border-gray-600/50" />}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="submit" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-blue-500/30">{editingPage ? 'تحديث' : 'إضافة'}</button>
+                      <button type="button" onClick={() => { setShowPageForm(false); setEditingPage(null); setNewPage({ name: '', description: '', image_url: '', banner_url: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {selectedPage && !selectedService && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">الخدمات - {pages.find(p => p.id === selectedPage)?.name}</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                {filteredServices.map(service => (
+                  <div key={service.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-purple-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setSelectedService(service.id)}>
+                    <div className="aspect-square p-4 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-bold leading-tight line-clamp-2">{service.name}</h3>
+                        <p className="text-gray-400 text-sm mt-1 line-clamp-3">{service.description}</p>
+                      </div>
+                      <div className="flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => startEdit('service', service)} className="p-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 rounded-xl transition-all duration-300 border border-purple-500/30"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('service', service.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button onClick={() => { setShowServiceForm(true); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '' }); setTimeout(() => document.getElementById('service-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-purple-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                  <div className="text-5xl font-bold text-purple-400">+</div>
+                  <div className="mt-2 text-sm text-gray-300">إضافة خدمة</div>
+                </button>
+              </div>
+
+              {showServiceForm && (
+                <form id="service-form" onSubmit={(e) => editingService ? handleUpdate('service', editingService, e) : handleAdd('service', e)} className="mb-2 bg-gray-700/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-600/50">
+                  <div className="grid gap-4">
+                    <input type="hidden" value={newService.page_id} onChange={(e) => setNewService({...newService, page_id: e.target.value})} />
+                    <input value={newService.name} onChange={(e) => setNewService({...newService, name: e.target.value})} placeholder="اسم الخدمة" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-purple-500/50 focus:outline-none transition-all" required />
+                    <textarea value={newService.description} onChange={(e) => setNewService({...newService, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-purple-500/50 focus:outline-none transition-all" rows={3} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="submit" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-purple-500/30">{editingService ? 'تحديث' : 'إضافة'}</button>
+                      <button type="button" onClick={() => { setShowServiceForm(false); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {selectedService && !selectedSpecialization && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">التخصصات - {services.find(s => s.id === selectedService)?.name}</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                {filteredSpecializations.map(specialization => (
+                  <div key={specialization.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-pink-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setSelectedSpecialization(specialization.id)}>
+                    <div className="aspect-square relative">
+                      {specialization.image_url ? (
+                        <img src={specialization.image_url} alt={specialization.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800/50" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="font-bold leading-tight line-clamp-2">{specialization.name}</h3>
+                      </div>
+                      <div className="absolute top-2 left-2 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => startEdit('specialization', specialization)} className="p-2 bg-pink-500/20 hover:bg-pink-500/40 text-pink-200 rounded-xl transition-all duration-300 border border-pink-500/30"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('specialization', specialization.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button onClick={() => { setShowSpecializationForm(true); setEditingSpecialization(null); setNewSpecialization({ service_id: selectedService, name: '', description: '', image_url: '' }); setTimeout(() => document.getElementById('specialization-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-pink-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                  <div className="text-5xl font-bold text-pink-400">+</div>
+                  <div className="mt-2 text-sm text-gray-300">إضافة تخصص</div>
+                </button>
+              </div>
+
+              {showSpecializationForm && (
+                <form id="specialization-form" onSubmit={(e) => editingSpecialization ? handleUpdate('specialization', editingSpecialization, e) : handleAdd('specialization', e)} className="mb-2 bg-gray-700/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-600/50">
+                  <div className="grid gap-4">
+                    <input type="hidden" value={newSpecialization.service_id} onChange={(e) => setNewSpecialization({...newSpecialization, service_id: e.target.value})} />
+                    <input value={newSpecialization.name} onChange={(e) => setNewSpecialization({...newSpecialization, name: e.target.value})} placeholder="اسم التخصص" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-pink-500/50 focus:outline-none transition-all" required />
+                    <textarea value={newSpecialization.description} onChange={(e) => setNewSpecialization({...newSpecialization, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-pink-500/50 focus:outline-none transition-all" rows={3} />
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-400">صورة التخصص</label>
+                      <input type="file" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'specialization')} className="p-3 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-pink-500/50 focus:outline-none transition-all" accept="image/*" />
+                      {uploading && <span className="ml-2 text-pink-400">جاري الرفع...</span>}
+                      {newSpecialization.image_url && <img src={newSpecialization.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl border border-gray-600/50" />}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="submit" className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-pink-500/30">{editingSpecialization ? 'تحديث' : 'إضافة'}</button>
+                      <button type="button" onClick={() => { setShowSpecializationForm(false); setEditingSpecialization(null); setNewSpecialization({ service_id: selectedService, name: '', description: '', image_url: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {selectedSpecialization && !selectedClient && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">العملاء - {specializations.find(s => s.id === selectedSpecialization)?.name}</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                {filteredClients.map(client => (
+                  <div key={client.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-green-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setSelectedClient(client.id)}>
+                    <div className="aspect-square relative">
+                      {client.image_url ? (
+                        <img src={client.image_url} alt={client.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800/50" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="font-bold leading-tight line-clamp-2">{client.name}</h3>
+                      </div>
+                      <div className="absolute top-2 left-2 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => startEdit('client', client)} className="p-2 bg-green-500/20 hover:bg-green-500/40 text-green-200 rounded-xl transition-all duration-300 border border-green-500/30"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('client', client.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button onClick={() => { setShowClientForm(true); setEditingClient(null); setNewClient({ specialization_id: selectedSpecialization, name: '', description: '', image_url: '', project_url: '', logo_url: '' }); setTimeout(() => document.getElementById('client-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-green-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                  <div className="text-5xl font-bold text-green-400">+</div>
+                  <div className="mt-2 text-sm text-gray-300">إضافة عميل</div>
+                </button>
+              </div>
+
+              {showClientForm && (
+                <form id="client-form" onSubmit={(e) => editingClient ? handleUpdate('client', editingClient, e) : handleAdd('client', e)} className="mb-2 bg-gray-700/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-600/50">
+                  <div className="grid gap-4">
+                    <input type="hidden" value={newClient.specialization_id} onChange={(e) => setNewClient({...newClient, specialization_id: e.target.value})} />
+                    <input value={newClient.name} onChange={(e) => setNewClient({...newClient, name: e.target.value})} placeholder="اسم العميل" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-green-500/50 focus:outline-none transition-all" required />
+                    <textarea value={newClient.description} onChange={(e) => setNewClient({...newClient, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-green-500/50 focus:outline-none transition-all" rows={3} />
+                    <input value={newClient.project_url} onChange={(e) => setNewClient({...newClient, project_url: e.target.value})} placeholder="رابط المشروع" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-green-500/50 focus:outline-none transition-all" />
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-400">صورة العميل</label>
+                      <input type="file" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'client')} className="p-3 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-green-500/50 focus:outline-none transition-all" accept="image/*" />
+                      {uploading && <span className="ml-2 text-green-400">جاري الرفع...</span>}
+                      {newClient.image_url && <img src={newClient.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl border border-gray-600/50" />}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="submit" className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-green-500/30">{editingClient ? 'تحديث' : 'إضافة'}</button>
+                      <button type="button" onClick={() => { setShowClientForm(false); setEditingClient(null); setNewClient({ specialization_id: selectedSpecialization, name: '', description: '', image_url: '', project_url: '', logo_url: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+
+          {selectedClient && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">محتوى العميل - {clients.find(c => c.id === selectedClient)?.name}</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                {filteredClientContent.map(content => (
+                  <div key={content.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-orange-500/50 transition-all duration-300 overflow-hidden">
+                    <div className="aspect-square relative">
+                      {content.image_url ? (
+                        <img src={content.image_url} alt={content.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800/50" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="font-bold leading-tight line-clamp-2">{content.title}</h3>
+                        <p className="text-gray-400 text-xs mt-1">{content.content_type}</p>
+                      </div>
+                      <div className="absolute top-2 left-2 flex gap-2">
+                        <button onClick={() => startEdit('client-content', content)} className="p-2 bg-orange-500/20 hover:bg-orange-500/40 text-orange-200 rounded-xl transition-all duration-300 border border-orange-500/30"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('client-content', content.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button onClick={() => { setShowClientContentForm(true); setEditingClientContent(null); setNewClientContent({ client_id: selectedClient, title: '', description: '', image_url: '', video_url: '', content_type: 'image' }); setTimeout(() => document.getElementById('client-content-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-orange-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                  <div className="text-5xl font-bold text-orange-400">+</div>
+                  <div className="mt-2 text-sm text-gray-300">إضافة محتوى</div>
+                </button>
+              </div>
+
+              {showClientContentForm && (
+                <form id="client-content-form" onSubmit={(e) => editingClientContent ? handleUpdate('client-content', editingClientContent, e) : handleAdd('client-content', e)} className="mb-2 bg-gray-700/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-600/50">
+                  <div className="grid gap-4">
+                    <input type="hidden" value={newClientContent.client_id} onChange={(e) => setNewClientContent({...newClientContent, client_id: e.target.value})} />
+                    <input value={newClientContent.title} onChange={(e) => setNewClientContent({...newClientContent, title: e.target.value})} placeholder="العنوان" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-orange-500/50 focus:outline-none transition-all" required />
+                    <textarea value={newClientContent.description} onChange={(e) => setNewClientContent({...newClientContent, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-orange-500/50 focus:outline-none transition-all" rows={3} />
+                    <select value={newClientContent.content_type} onChange={(e) => setNewClientContent({...newClientContent, content_type: e.target.value as 'image' | 'video' | 'text'})} className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-orange-500/50 focus:outline-none transition-all">
+                      <option value="image">صورة</option>
+                      <option value="video">فيديو</option>
+                      <option value="text">نص فقط</option>
+                    </select>
+                    {newClientContent.content_type === 'image' && (
+                      <div>
+                        <label className="block mb-2 text-sm text-gray-400">صورة المحتوى</label>
+                        <input type="file" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'client-content')} className="p-3 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-orange-500/50 focus:outline-none transition-all" accept="image/*" />
+                        {uploading && <span className="ml-2 text-orange-400">جاري الرفع...</span>}
+                        {newClientContent.image_url && <img src={newClientContent.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl border border-gray-600/50" />}
+                      </div>
+                    )}
+                    {newClientContent.content_type === 'video' && (
+                      <div>
+                        <label className="block mb-2 text-sm text-gray-400">رابط الفيديو</label>
+                        <input value={newClientContent.video_url} onChange={(e) => setNewClientContent({...newClientContent, video_url: e.target.value})} placeholder="رابط الفيديو (YouTube, Vimeo, etc.)" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-orange-500/50 focus:outline-none transition-all" />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="submit" className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-orange-500/30">{editingClientContent ? 'تحديث' : 'إضافة'}</button>
+                      <button type="button" onClick={() => { setShowClientContentForm(false); setEditingClientContent(null); setNewClientContent({ client_id: selectedClient, title: '', description: '', image_url: '', video_url: '', content_type: 'image' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
