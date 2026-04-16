@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   const [showClientContentForm, setShowClientContentForm] = useState(false);
 
   const [newPage, setNewPage] = useState({ name: '', description: '', image_url: '', banner_url: '' });
-  const [newService, setNewService] = useState({ page_id: '', name: '', description: '' });
+  const [newService, setNewService] = useState({ page_id: '', name: '', description: '', image_url: '' });
   const [newSpecialization, setNewSpecialization] = useState({ service_id: '', name: '', description: '', image_url: '' });
   const [newClient, setNewClient] = useState({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' });
   const [newClientContent, setNewClientContent] = useState({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' as 'image' | 'video' | 'text' });
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
     setNewClientContent(prev => ({ ...prev, client_id: selectedClient }));
   }, [selectedClient, editingClientContent]);
 
-  const handleImageUpload = async (file: File, type: 'page' | 'page-image' | 'page-banner' | 'specialization' | 'client' | 'client-content') => {
+  const handleImageUpload = async (file: File, type: 'page' | 'page-image' | 'page-banner' | 'service' | 'specialization' | 'client' | 'client-content') => {
     setUploading(true);
     try {
       // Generate random filename with extension only
@@ -120,6 +120,7 @@ export default function AdminDashboard() {
 
       if (type === 'page' || type === 'page-image') setNewPage(prev => ({ ...prev, image_url: publicUrl }));
       if (type === 'page-banner') setNewPage(prev => ({ ...prev, banner_url: publicUrl }));
+      if (type === 'service') setNewService(prev => ({ ...prev, image_url: publicUrl }));
       if (type === 'specialization') setNewSpecialization(prev => ({ ...prev, image_url: publicUrl }));
       if (type === 'client') setNewClient(prev => ({ ...prev, image_url: publicUrl }));
       if (type === 'client-content') setNewClientContent(prev => ({ ...prev, image_url: publicUrl }));
@@ -188,7 +189,7 @@ export default function AdminDashboard() {
       }
 
       if (type === 'page') setNewPage({ name: '', description: '', image_url: '', banner_url: '' });
-      if (type === 'service') setNewService({ page_id: '', name: '', description: '' });
+      if (type === 'service') setNewService({ page_id: '', name: '', description: '', image_url: '' });
       if (type === 'specialization') setNewSpecialization({ service_id: '', name: '', description: '', image_url: '' });
       if (type === 'client') setNewClient({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' });
       if (type === 'client-content') setNewClientContent({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' });
@@ -216,7 +217,7 @@ export default function AdminDashboard() {
       if (data?.error) throw data.error;
 
       if (type === 'page') { setEditingPage(null); setNewPage({ name: '', description: '', image_url: '', banner_url: '' }); }
-      if (type === 'service') { setEditingService(null); setNewService({ page_id: '', name: '', description: '' }); }
+      if (type === 'service') { setEditingService(null); setNewService({ page_id: '', name: '', description: '', image_url: '' }); }
       if (type === 'specialization') { setEditingSpecialization(null); setNewSpecialization({ service_id: '', name: '', description: '', image_url: '' }); }
       if (type === 'client') { setEditingClient(null); setNewClient({ specialization_id: '', name: '', description: '', image_url: '', project_url: '', logo_url: '' }); }
       if (type === 'client-content') { setEditingClientContent(null); setNewClientContent({ client_id: '', title: '', description: '', image_url: '', video_url: '', content_type: 'image' }); }
@@ -261,7 +262,7 @@ export default function AdminDashboard() {
     if (type === 'service') {
       setEditingService(item.id);
       setShowServiceForm(true);
-      setNewService({ page_id: item.page_id, name: item.name, description: item.description || '' });
+      setNewService({ page_id: item.page_id, name: item.name, description: item.description || '', image_url: item.image_url || '' });
       setTimeout(() => document.getElementById('service-form')?.scrollIntoView({ behavior: 'smooth' }), 0);
     }
     if (type === 'specialization') {
@@ -402,12 +403,18 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
                 {filteredServices.map(service => (
                   <div key={service.id} className="group bg-gray-700/30 backdrop-blur-sm rounded-2xl border border-gray-600/50 hover:border-purple-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onClick={() => setSelectedService(service.id)}>
-                    <div className="aspect-square p-4 flex flex-col justify-between">
-                      <div>
+                    <div className="aspect-square relative">
+                      {service.image_url ? (
+                        <img src={service.image_url} alt={service.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800/50 p-4 flex flex-col justify-between" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
                         <h3 className="font-bold leading-tight line-clamp-2">{service.name}</h3>
-                        <p className="text-gray-400 text-sm mt-1 line-clamp-3">{service.description}</p>
+                        <p className="text-gray-300 text-sm mt-1 line-clamp-2">{service.description}</p>
                       </div>
-                      <div className="flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
+                      <div className="absolute top-2 left-2 flex gap-2" onClick={(e) => e.stopPropagation()}>
                         <button onClick={() => startEdit('service', service)} className="p-2 bg-purple-500/20 hover:bg-purple-500/40 text-purple-200 rounded-xl transition-all duration-300 border border-purple-500/30"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => handleDelete('service', service.id)} className="p-2 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded-xl transition-all duration-300 border border-red-500/30"><Trash2 className="w-4 h-4" /></button>
                       </div>
@@ -415,7 +422,7 @@ export default function AdminDashboard() {
                   </div>
                 ))}
 
-                <button onClick={() => { setShowServiceForm(true); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '' }); setTimeout(() => document.getElementById('service-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-purple-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
+                <button onClick={() => { setShowServiceForm(true); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '', image_url: '' }); setTimeout(() => document.getElementById('service-form')?.scrollIntoView({ behavior: 'smooth' }), 0); }} className="bg-gray-700/20 hover:bg-gray-700/40 rounded-2xl border border-dashed border-gray-600/70 hover:border-purple-500/50 transition-all duration-300 flex flex-col items-center justify-center aspect-square">
                   <div className="text-5xl font-bold text-purple-400">+</div>
                   <div className="mt-2 text-sm text-gray-300">إضافة خدمة</div>
                 </button>
@@ -427,9 +434,16 @@ export default function AdminDashboard() {
                     <input type="hidden" value={newService.page_id} onChange={(e) => setNewService({...newService, page_id: e.target.value})} />
                     <input value={newService.name} onChange={(e) => setNewService({...newService, name: e.target.value})} placeholder="اسم الخدمة" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-purple-500/50 focus:outline-none transition-all" required />
                     <textarea value={newService.description} onChange={(e) => setNewService({...newService, description: e.target.value})} placeholder="الوصف" className="p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-purple-500/50 focus:outline-none transition-all" rows={3} />
+                    <div>
+                      <label className="block text-gray-400 mb-2">صورة الخدمة</label>
+                      <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'service')} className="w-full p-4 bg-gray-800/50 rounded-xl border border-gray-600/50 focus:border-purple-500/50 focus:outline-none transition-all" />
+                      {newService.image_url && (
+                        <img src={newService.image_url} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded-lg" />
+                      )}
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
                       <button type="submit" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 p-4 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-purple-500/30">{editingService ? 'تحديث' : 'إضافة'}</button>
-                      <button type="button" onClick={() => { setShowServiceForm(false); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
+                      <button type="button" onClick={() => { setShowServiceForm(false); setEditingService(null); setNewService({ page_id: selectedPage, name: '', description: '', image_url: '' }); }} className="bg-gray-700/50 hover:bg-gray-600/50 p-4 rounded-xl transition-all duration-300">إغلاق</button>
                     </div>
                   </div>
                 </form>

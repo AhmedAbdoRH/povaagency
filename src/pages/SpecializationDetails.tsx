@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Specialization, Client } from '../types/database';
 import ClientCard from '../components/ClientCard';
-import { ArrowRight, Users, Layers } from 'lucide-react';
+import { Users, Layers } from 'lucide-react';
 
 export default function SpecializationDetails() {
   const { id } = useParams<{ id: string }>();
@@ -21,10 +21,10 @@ export default function SpecializationDetails() {
       setIsLoading(true);
       setError(null);
 
-      // Fetch Specialization
+      // Fetch Specialization with Service and Page
       const { data: specData, error: specError } = await supabase
         .from('specializations')
-        .select('*, page:pages(id, name)')
+        .select('*, service:services(*, page:pages(id, name))')
         .eq('id', id)
         .single();
 
@@ -74,28 +74,32 @@ export default function SpecializationDetails() {
         <div className="mb-8 flex items-center gap-2 text-sm text-gray-400">
           <Link to="/" className="hover:text-[#ee5239] transition-colors">الرئيسية</Link>
           <span className="text-gray-600">/</span>
-          <Link to={`/page/${specialization.page_id}`} className="hover:text-[#ee5239] transition-colors">{specialization.page?.name}</Link>
-          <span className="text-gray-600">/</span>
-          <span className="text-white font-medium">{specialization.name_ar}</span>
+          {specialization.service?.page && (
+            <>
+              <Link to={`/page/${specialization.service.page.id}`} className="hover:text-[#ee5239] transition-colors">{specialization.service.page.name}</Link>
+              <span className="text-gray-600">/</span>
+            </>
+          )}
+          <span className="text-white font-medium">{specialization.name}</span>
         </div>
 
         <div className="bg-[#2a2a2a]/50 backdrop-blur-md rounded-2xl p-8 border border-white/5 shadow-2xl mb-12 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#ee5239]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-          
+
           <div className="relative z-10">
              <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
                 <div>
-                  <h1 className="text-4xl font-bold mb-2 text-[#ee5239]">{specialization.name_ar}</h1>
-                  {specialization.name_en && <h2 className="text-xl text-gray-500 font-medium">{specialization.name_en}</h2>}
+                  <h1 className="text-4xl font-bold mb-2 text-[#ee5239]">{specialization.name}</h1>
+                  {specialization.service?.name && <h2 className="text-xl text-gray-500 font-medium">{specialization.service.name}</h2>}
                 </div>
                 <div className="bg-[#ee5239]/10 text-[#ee5239] px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 border border-[#ee5239]/20">
                    <Layers size={16} />
                    <span>{clients.length} عميل</span>
                 </div>
              </div>
-             
-             {specialization.description_ar && (
-               <p className="text-gray-300 text-lg max-w-3xl leading-relaxed border-r-4 border-[#ee5239] pr-4">{specialization.description_ar}</p>
+
+             {specialization.description && (
+               <p className="text-gray-300 text-lg max-w-3xl leading-relaxed border-r-4 border-[#ee5239] pr-4">{specialization.description}</p>
              )}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, Phone, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Phone, MessageCircle } from 'lucide-react';
 import type { StoreSettings } from '../types/database';
+import UserLogin from './UserLogin';
 
 interface FooterProps {
   storeSettings?: StoreSettings | null;
@@ -88,9 +89,12 @@ export default function Footer({ storeSettings }: FooterProps) {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} POVA Agency. جميع الحقوق محفوظة.
-          </p>
+          <div className="flex flex-col items-center gap-4">
+            <UserLogin />
+            <p className="text-gray-500 text-sm">
+              © {new Date().getFullYear()} POVA Agency. جميع الحقوق محفوظة.
+            </p>
+          </div>
           <Link to="/admin/login" className="text-gray-600 hover:text-gray-400 text-xs">
             لوحة التحكم
           </Link>

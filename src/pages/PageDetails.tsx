@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import type { Page, Specialization } from '../types/database';
-import { Layers, ArrowRight } from 'lucide-react';
+import type { Page, Service, Specialization, Client } from '../types/database';
+import { Layers } from 'lucide-react';
+
+interface SpecializationWithClients extends Specialization {
+  clients?: Client[];
+}
+
+interface ServiceWithSpecializations extends Service {
+  specializations?: SpecializationWithClients[];
+}
 
 export default function PageDetails() {
   const { id } = useParams<{ id: string }>();
   const [page, setPage] = useState<Page | null>(null);
-  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [services, setServices] = useState<ServiceWithSpecializations[]>([]);
+  const [expandedService, setExpandedService] = useState<string | null>(null);
+  const [expandedSpecialization, setExpandedSpecialization] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,15 +40,15 @@ export default function PageDetails() {
       if (pageError) throw pageError;
       setPage(pageData);
 
-      // Fetch Specializations
-      const { data: specsData, error: specsError } = await supabase
-        .from('specializations')
-        .select('*')
+      // Fetch Services with Specializations and Clients
+      const { data: servicesData, error: servicesError } = await supabase
+        .from('services')
+        .select('*, specializations(*, clients(*))')
         .eq('page_id', id)
-        .order('name_ar');
+        .order('created_at', { ascending: true });
 
-      if (specsError) throw specsError;
-      setSpecializations(specsData || []);
+      if (servicesError) throw servicesError;
+      setServices(servicesData || []);
 
     } catch (err: any) {
       setError(err.message);
@@ -67,51 +77,153 @@ export default function PageDetails() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-primary text-white">
+    <div className="min-h-screen pt-24 pb-16 bg-gradient-to-b from-gray-900 to-gray-950 text-white">
       <div className="container mx-auto px-4">
         <div className="mb-8">
           <Link to="/" className="text-gray-400 hover:text-accent transition-colors flex items-center gap-2">
-            <ArrowRight size={16} /> العودة للرئيسية
+            ← العودة للرئيسية
           </Link>
         </div>
 
-        <div className="bg-secondary/30 backdrop-blur-md rounded-2xl p-8 border border-white/5 shadow-2xl">
-          <div className="mb-12 text-center">
-            <h1 className="text-4xl font-bold mb-4 text-accent">{page.name}</h1>
-            {page.description && (
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">{page.description}</p>
-            )}
-          </div>
+        <div className="bg-gray-800/50 backdrop-blur-md rounded-3xl overflow-hidden border border-gray-700/50 shadow-2xl">
+          {/* Banner */}
+          {page.banner_url ? (
+            <div className="w-full h-64 md:h-96 relative">
+              <img src={page.banner_url} alt={page.name} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent" />
+            </div>
+          ) : page.image_url ? (
+            <div className="w-full h-64 md:h-96 relative">
+              <img src={page.image_url} alt={page.name} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent" />
+            </div>
+          ) : null}
 
-          {specializations.length === 0 ? (
-            <div className="text-center py-12 bg-white/5 rounded-xl border border-white/5">
-              <Layers className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-              <p className="text-gray-400 text-lg">لا توجد تخصصات مضافة في هذه الصفحة حالياً.</p>
+          <div className="p-8 md:p-12">
+            <div className="mb-12 text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">{page.name}</h1>
+              {page.description && (
+                <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">{page.description}</p>
+              )}
+            </div>
+
+          {services.length === 0 ? (
+            <div className="text-center py-16 bg-gray-800/30 rounded-2xl border border-gray-700/30">
+              <Layers className="w-16 h-16 mx-auto text-gray-500 mb-4" />
+              <p className="text-gray-400 text-lg">لا توجد خدمات مضافة في هذه الصفحة حالياً.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {specializations.map((spec) => (
-                <Link
-                  key={spec.id}
-                  to={`/specialization/${spec.id}`}
-                  className="group block bg-secondary/50 hover:bg-secondary border border-white/5 hover:border-accent/50 rounded-xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/10"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-white group-hover:text-accent transition-colors">{spec.name_ar}</h3>
-                    <div className="w-10 h-10 rounded-full bg-white/5 group-hover:bg-accent/20 flex items-center justify-center transition-colors">
-                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-accent -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
-                    </div>
-                  </div>
-                  {spec.description_ar && (
-                    <p className="text-gray-400 text-sm line-clamp-2 mb-4">{spec.description_ar}</p>
-                  )}
-                  <span className="text-accent text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0 block">
-                    استعراض العملاء والمشاريع &larr;
-                  </span>
-                </Link>
-              ))}
+            <div className="space-y-8">
+              {/* Services as rectangular buttons */}
+              <div className="flex flex-wrap gap-4">
+                {services.map((service) => (
+                  <button
+                    key={service.id}
+                    onClick={() => setExpandedService(expandedService === service.id ? null : service.id)}
+                    className={`px-8 py-5 rounded-2xl border-2 font-semibold text-lg transition-all duration-300 transform hover:scale-105 ${
+                      expandedService === service.id
+                        ? 'bg-accent border-accent text-white shadow-lg shadow-accent/30'
+                        : 'bg-gray-800 border-gray-600 text-gray-200 hover:border-accent/50 hover:text-white hover:bg-gray-700'
+                    }`}
+                  >
+                    {service.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Divider line when service is expanded */}
+              {expandedService && (
+                <div className="h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent animate-in fade-in duration-500" />
+              )}
+
+              {/* Specializations as sub-buttons when service is expanded */}
+              {expandedService && (
+                <div className="pl-8 space-y-6 animate-in slide-in-from-left-6 duration-500">
+                  {(() => {
+                    const service = services.find(s => s.id === expandedService);
+                    if (!service) return null;
+
+                    return service.specializations && service.specializations.length > 0 ? (
+                      <>
+                        <div className="flex flex-wrap gap-3">
+                          {service.specializations.map((spec) => (
+                            <button
+                              key={spec.id}
+                              onClick={(e) => { e.stopPropagation(); setExpandedSpecialization(expandedSpecialization === spec.id ? null : spec.id); }}
+                              className={`px-6 py-4 rounded-xl border-2 font-medium transition-all duration-300 transform hover:scale-105 ${
+                                expandedSpecialization === spec.id
+                                  ? 'bg-accent/90 border-accent text-white shadow-lg shadow-accent/20'
+                                  : 'bg-gray-800/50 border-gray-600/50 text-gray-300 hover:border-accent/40 hover:text-white hover:bg-gray-700/50'
+                              }`}
+                            >
+                              {spec.name}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Divider line when specialization is expanded */}
+                        {expandedSpecialization && (
+                          <div className="h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent animate-in fade-in duration-500" />
+                        )}
+
+                        {/* Clients when specialization is expanded */}
+                        {expandedSpecialization && (
+                          <div className="pl-6 animate-in slide-in-from-left-6 duration-500">
+                            {(() => {
+                              const spec = service.specializations?.find(s => s.id === expandedSpecialization);
+                              if (!spec) return null;
+
+                              return (
+                                <div className="space-y-6">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-1 h-8 bg-accent rounded-full" />
+                                    <h4 className="text-xl font-bold text-accent">العملاء في {spec.name}</h4>
+                                  </div>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {spec.clients && spec.clients.length > 0 ? (
+                                      spec.clients.map((client: Client) => (
+                                        <Link
+                                          key={client.id}
+                                          to={`/client/${client.id}`}
+                                          className="bg-gray-800/50 border-2 border-gray-700/50 hover:border-accent/50 rounded-2xl p-6 transition-all duration-300 group hover:scale-105 hover:shadow-xl hover:shadow-accent/10"
+                                        >
+                                          {(client.logo_url || client.image_url) ? (
+                                            <img src={client.logo_url || client.image_url || ''} alt={client.name} className="w-20 h-20 object-contain mx-auto mb-4" />
+                                          ) : (
+                                            <div className="w-20 h-20 bg-accent/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                              <span className="text-2xl font-bold text-accent">{client.name.charAt(0)}</span>
+                                            </div>
+                                          )}
+                                          <h5 className="text-xl font-bold text-white group-hover:text-accent transition-colors text-center mb-2">{client.name}</h5>
+                                          {client.description && (
+                                            <p className="text-gray-400 text-sm line-clamp-2 text-center">{client.description}</p>
+                                          )}
+                                        </Link>
+                                      ))
+                                    ) : (
+                                      <div className="col-span-full text-center py-12 bg-gray-800/30 rounded-2xl border border-gray-700/30">
+                                        <Layers className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+                                        <p className="text-gray-500">لا يوجد عملاء في هذا التخصص</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-8 bg-gray-800/30 rounded-xl border border-gray-700/30">
+                        <p className="text-gray-500">لا توجد تخصصات في هذه الخدمة</p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

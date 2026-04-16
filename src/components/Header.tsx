@@ -1,32 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, Search, X, Menu, X as Close } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Menu, X as Close } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Page, StoreSettings, Client } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
-import UserLogin from './UserLogin';
 
 interface HeaderProps {
   storeSettings?: StoreSettings | null;
 }
 
 export default function Header({ storeSettings }: HeaderProps) {
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Client[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // Renamed states
+
   const [pages, setPages] = useState<Page[]>([]);
-  const [specsByPage, setSpecsByPage] = useState<Record<string, { id: string; name: string }[]>>({});
-  
-  const [expandedPages, setExpandedPages] = useState<Set<string>>(new Set());
+
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [loadingPages, setLoadingPages] = useState(true);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -40,7 +33,7 @@ export default function Header({ storeSettings }: HeaderProps) {
       // Search in clients table
       const { data: clients, error } = await supabase
         .from('clients')
-        .select(`*, specialization:specializations(name_ar)`)
+        .select(`*, specialization:specializations(name)`)
         .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
         .limit(10);
 
@@ -63,51 +56,22 @@ export default function Header({ storeSettings }: HeaderProps) {
     setIsSearchFocused(false);
   };
 
-  const togglePageExpansion = (pageId: string) => {
-    setExpandedPages(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(pageId)) newSet.delete(pageId);
-      else newSet.add(pageId);
-      return newSet;
-    });
-  };
-
   useEffect(() => {
-    const fetchPagesAndSpecs = async () => {
+    const fetchPages = async () => {
       try {
         const { data: pagesData, error: pageErr } = await supabase
           .from('pages')
-          .select('id, name, created_at, description, slug')
+          .select('*')
           .order('name');
 
         if (pageErr) throw pageErr;
         setPages(pagesData || []);
-
-        const { data: specs, error: specErr } = await supabase
-          .from('specializations')
-          .select('id, name_ar, page_id')
-          .order('name_ar');
-          
-        if (specErr) {
-             console.warn("Could not fetch specializations (table might not exist yet)", specErr);
-        } else {
-            const grouped: Record<string, { id: string; name: string }[]> = {};
-            (specs || []).forEach((s: any) => {
-              const key = s.page_id as string;
-              if (!key) return;
-              if (!grouped[key]) grouped[key] = [];
-              grouped[key].push({ id: s.id, name: s.name_ar });
-            });
-            setSpecsByPage(grouped);
-        }
       } catch (err) {
         console.error('Error fetching navigation:', err);
-      } finally {
-        setLoadingPages(false);
       }
     };
 
-    fetchPagesAndSpecs();
+    fetchPages();
   }, []);
 
   // ... (Click outside logic kept same) ...
@@ -159,38 +123,20 @@ export default function Header({ storeSettings }: HeaderProps) {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             <Link to="/" className="text-sm font-medium hover:text-accent transition-colors">الرئيسية</Link>
-            
+
             {/* Dynamic Pages Menu */}
             {pages.map(page => (
-               <div key={page.id} className="relative group">
-                  <Link to={`/page/${page.id}`} className="text-sm font-medium hover:text-accent transition-colors flex items-center gap-1 py-2">
-                    {page.name}
-                    {specsByPage[page.id]?.length > 0 && <ChevronDown className="w-4 h-4 opacity-50 group-hover:rotate-180 transition-transform" />}
-                  </Link>
-                  
-                  {/* Dropdown for Specializations */}
-                  {specsByPage[page.id]?.length > 0 && (
-                    <div className="absolute top-full right-0 w-64 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 overflow-hidden">
-                       <div className="py-2">
-                          {specsByPage[page.id].map(spec => (
-                             <Link key={spec.id} to={`/specialization/${spec.id}`} className="block px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-accent transition-colors">
-                                {spec.name}
-                             </Link>
-                          ))}
-                       </div>
-                    </div>
-                  )}
-               </div>
+               <Link key={page.id} to={`/page/${page.id}`} className="text-sm font-medium hover:text-accent transition-colors">
+                  {page.name}
+               </Link>
             ))}
-            
+
             <Link to="/about" className="text-sm font-medium hover:text-accent transition-colors">من نحن</Link>
             <Link to="/contact" className="text-sm font-medium hover:text-accent transition-colors">اتصل بنا</Link>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-             {/* User Login */}
-             <UserLogin />
              
              {/* Search */}
              <div className="relative" ref={searchRef}>
@@ -222,7 +168,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                                    </div>
                                    <div>
                                       <div className="text-sm font-medium text-white">{client.name}</div>
-                                      <div className="text-xs text-gray-400">{client.specialization?.name_ar}</div>
+                                      <div className="text-xs text-gray-400">{client.specialization?.name}</div>
                                    </div>
                                 </Link>
                              ))}
@@ -256,28 +202,13 @@ export default function Header({ storeSettings }: HeaderProps) {
                    
                    <nav className="space-y-2">
                       <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">الرئيسية</Link>
-                      
+
                       {pages.map(page => (
-                         <div key={page.id}>
-                            <button onClick={() => togglePageExpansion(page.id)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/5 font-medium text-right">
-                               {page.name}
-                               {specsByPage[page.id]?.length > 0 && <ChevronDown className={`w-4 h-4 transition-transform ${expandedPages.has(page.id) ? 'rotate-180' : ''}`} />}
-                            </button>
-                            
-                            <AnimatePresence>
-                               {expandedPages.has(page.id) && specsByPage[page.id]?.length > 0 && (
-                                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden bg-black/20 rounded-xl mt-1">
-                                     {specsByPage[page.id].map(spec => (
-                                        <Link key={spec.id} to={`/specialization/${spec.id}`} onClick={() => setIsMenuOpen(false)} className="block px-8 py-3 text-sm text-gray-300 hover:text-white border-r-2 border-transparent hover:border-accent">
-                                           {spec.name}
-                                        </Link>
-                                     ))}
-                                  </motion.div>
-                               )}
-                            </AnimatePresence>
-                         </div>
+                         <Link key={page.id} to={`/page/${page.id}`} onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">
+                            {page.name}
+                         </Link>
                       ))}
-                      
+
                       <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">من نحن</Link>
                       <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">اتصل بنا</Link>
                    </nav>

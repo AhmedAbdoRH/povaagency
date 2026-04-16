@@ -11,7 +11,7 @@ export default function ClientDetails() {
 
   useEffect(() => {
     if (id) {
-      supabase.from('clients').select('*, specialization:specializations(id, name_ar, page_id)').eq('id', id).single()
+      supabase.from('clients').select('*, specialization:specializations(id, name, service_id)').eq('id', id).single()
         .then(({ data, error }) => {
            if (!error) setClient(data);
            setLoading(false);
@@ -43,7 +43,7 @@ export default function ClientDetails() {
              
              <div className="p-8 md:p-12 relative">
                 <div className="absolute -top-10 right-8 md:right-12 bg-[#ee5239] text-white px-6 py-3 rounded-xl shadow-lg font-bold text-lg transform rotate-2">
-                   {client.specialization?.name_ar}
+                   {client.specialization?.name}
                 </div>
 
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 border-b border-white/10 pb-6">{client.name}</h1>

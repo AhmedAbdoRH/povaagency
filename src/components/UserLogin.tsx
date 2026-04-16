@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { User, LogOut, Menu, X } from 'lucide-react';
+import { User, LogOut, X } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -52,7 +52,7 @@ export default function UserLogin() {
       setIsLoading(true);
       setError('');
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
@@ -62,6 +62,9 @@ export default function UserLogin() {
       setShowLoginModal(false);
       setEmail('');
       setPassword('');
+
+      // Redirect to admin dashboard after successful login
+      navigate('/admin/dashboard');
     } catch (err: any) {
       setError(err.message === 'Invalid login credentials' 
         ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
@@ -171,7 +174,7 @@ export default function UserLogin() {
     <>
       <button
         onClick={() => setShowLoginModal(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg transition-colors text-sm font-medium"
+        className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors text-sm font-medium"
       >
         <User className="w-4 h-4" />
         تسجيل الدخول
