@@ -6,7 +6,6 @@ import { CartProvider } from './contexts/CartContext';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import BannerStrip from './components/BannerStrip';
-import Services from './components/Services';
 import Footer from './components/Footer';
 import Testimonials from './components/Testimonials';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -218,7 +217,6 @@ function StaggeredHome() {
       <VisionMission />
       <CompanyValues />
       <DigitalMarketingBenefits />
-      <Services />
     </>
   );
 }

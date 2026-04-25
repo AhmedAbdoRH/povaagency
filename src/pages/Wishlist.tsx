@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Heart, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Heart, ArrowLeft, Trash2 } from 'lucide-react';
+import type { Page } from '../types/database';
+import { resolveCoreServicesWithPages } from '../data/coreServices';
 
 interface WishlistItem {
   id: string;
@@ -9,14 +11,16 @@ interface WishlistItem {
   user_id: string;
   services: {
     id: string;
-    title: string;
-    price: number;
-    image_url: string;
+    name: string;
+    page_id: string;
+    price?: number | null;
+    image_url?: string | null;
   };
 }
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -24,29 +28,55 @@ export default function Wishlist() {
     checkUserAndFetchWishlist();
   }, []);
 
+  const routeByPageId = useMemo(
+    () =>
+      new Map(
+        resolveCoreServicesWithPages(pages)
+          .filter(item => item.page)
+          .map(item => [item.page!.id, `/service/${item.slug}`])
+      ),
+    [pages]
+  );
+
   async function checkUserAndFetchWishlist() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (!session) {
       navigate('/login');
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from('wishlist')
-        .select(`
-          *,
-          services (
-            id,
-            title,
-            price,
-            image_url
+      const [wishlistResult, pagesResult] = await Promise.all([
+        supabase
+          .from('wishlist')
+          .select(
+            `
+            *,
+            services (
+              id,
+              name,
+              page_id,
+              price,
+              image_url
+            )
+          `
           )
-        `)
-        .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id),
+        supabase
+          .from('pages')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: true }),
+      ]);
 
-      if (error) throw error;
-      setWishlist(data || []);
+      if (wishlistResult.error) throw wishlistResult.error;
+      if (pagesResult.error) throw pagesResult.error;
+
+      setWishlist(wishlistResult.data || []);
+      setPages(pagesResult.data || []);
     } catch (error) {
       console.error('Error fetching wishlist:', error);
     } finally {
@@ -56,14 +86,10 @@ export default function Wishlist() {
 
   const removeFromWishlist = async (itemId: string) => {
     try {
-      const { error } = await supabase
-        .from('wishlist')
-        .delete()
-        .eq('id', itemId);
-
+      const { error } = await supabase.from('wishlist').delete().eq('id', itemId);
       if (error) throw error;
-      
-      setWishlist(wishlist.filter(item => item.id !== itemId));
+
+      setWishlist(current => current.filter(item => item.id !== itemId));
     } catch (error) {
       console.error('Error removing from wishlist:', error);
     }
@@ -71,87 +97,92 @@ export default function Wishlist() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black pt-32 pb-20">
+    <div className="min-h-screen bg-black pb-20 pt-32">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-8 flex items-center gap-4">
             <button
               onClick={() => navigate('/profile')}
-              className="p-2 hover:bg-white/5 rounded-full transition-colors"
+              className="rounded-full p-2 transition-colors hover:bg-white/5"
             >
-              <ArrowLeft className="w-5 h-5 text-white" />
+              <ArrowLeft className="h-5 w-5 text-white" />
             </button>
             <h1 className="text-3xl font-bold text-white">المفضلة</h1>
           </div>
 
           {wishlist.length === 0 ? (
-            <div className="text-center py-16">
-              <Heart className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-white mb-2">المفضلة فارغة</h2>
-              <p className="text-gray-400 mb-6">أضف خدماتك المفضلة هنا</p>
+            <div className="py-16 text-center">
+              <Heart className="mx-auto mb-4 h-16 w-16 text-gray-600" />
+              <h2 className="mb-2 text-xl font-semibold text-white">المفضلة فارغة</h2>
+              <p className="mb-6 text-gray-400">أضف خدماتك المفضلة هنا</p>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-3 bg-accent hover:bg-accent/90 text-white rounded-lg font-medium transition-colors"
+                className="rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent/90"
               >
                 استكشف الخدمات
               </button>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {wishlist.map((item) => (
-                <div key={item.id} className="bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden group">
-                  {/* Image */}
-                  <div className="relative aspect-[4/3] bg-[#2a2a2a]">
-                    {item.services.image_url ? (
-                      <img 
-                        src={item.services.image_url} 
-                        alt={item.services.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Heart className="w-8 h-8 text-gray-600" />
-                      </div>
-                    )}
-                    
-                    {/* Remove Button */}
-                    <button
-                      onClick={() => removeFromWishlist(item.id)}
-                      className="absolute top-4 left-4 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
+              {wishlist.map(item => {
+                const targetRoute = routeByPageId.get(item.services.page_id) || '/';
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
-                      {item.services.title}
-                    </h3>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="text-xl font-bold text-accent">
-                        {item.services.price ? `${item.services.price} ج.م` : 'السعر عند الطلب'}
-                      </div>
-                      
+                return (
+                  <div
+                    key={item.id}
+                    className="group overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]"
+                  >
+                    <div className="relative aspect-[4/3] bg-[#2a2a2a]">
+                      {item.services.image_url ? (
+                        <img
+                          src={item.services.image_url}
+                          alt={item.services.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <Heart className="h-8 w-8 text-gray-600" />
+                        </div>
+                      )}
+
                       <button
-                        onClick={() => navigate(`/service/${item.services.id}`)}
-                        className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors"
+                        onClick={() => removeFromWishlist(item.id)}
+                        className="absolute left-4 top-4 rounded-full bg-black/50 p-2 transition-colors hover:bg-black/70"
                       >
-                        عرض التفاصيل
+                        <Trash2 className="h-4 w-4 text-white" />
                       </button>
                     </div>
+
+                    <div className="p-6">
+                      <h3 className="mb-2 line-clamp-2 text-lg font-semibold text-white">
+                        {item.services.name}
+                      </h3>
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-xl font-bold text-accent">
+                          {item.services.price
+                            ? `${item.services.price} ج.م`
+                            : 'السعر عند الطلب'}
+                        </div>
+
+                        <button
+                          onClick={() => navigate(targetRoute)}
+                          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90"
+                        >
+                          عرض التفاصيل
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

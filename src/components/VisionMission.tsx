@@ -45,9 +45,9 @@ export default function VisionMission() {
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold text-wrap-balance leading-[1.4]">{card.title}</h3>
               </div>
-              <div className="space-y-6 text-gray-800 leading-relaxed text-lg md:text-xl">
+              <div className="space-y-6 leading-relaxed text-lg md:text-xl">
                 {card.content.map((paragraph, idx) => (
-                  <p key={idx} className="font-medium">{paragraph}</p>
+                  <p key={idx} className="font-medium text-gray-700">{paragraph}</p>
                 ))}
               </div>
             </div>
