@@ -1,49 +1,59 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { Layers, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import type { Specialization, Client } from '../types/database';
+import type { Client, Page, Specialization } from '../types/database';
 import ClientCard from '../components/ClientCard';
-import { Users, Layers } from 'lucide-react';
+import { findCoreServiceByPageId } from '../data/coreServices';
 
 export default function SpecializationDetails() {
   const { id } = useParams<{ id: string }>();
   const [specialization, setSpecialization] = useState<Specialization | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [pages, setPages] = useState<Page[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) fetchSpecDetails();
+    if (id) fetchSpecDetails(id);
   }, [id]);
 
-  const fetchSpecDetails = async () => {
+  const fetchSpecDetails = async (specializationId: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch Specialization with Service and Page
       const { data: specData, error: specError } = await supabase
         .from('specializations')
         .select('*, service:services(*, page:pages(id, name))')
-        .eq('id', id)
+        .eq('id', specializationId)
         .single();
 
       if (specError) throw specError;
       setSpecialization(specData);
 
-      // Fetch Clients
       const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
         .select('*')
-        .eq('specialization_id', id)
+        .eq('specialization_id', specializationId)
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
 
       if (clientsError) throw clientsError;
       setClients(clientsData || []);
 
+      const { data: pagesData, error: pagesError } = await supabase
+        .from('pages')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
+
+      if (pagesError) throw pagesError;
+      setPages(pagesData || []);
     } catch (err: any) {
-      setError(err.message);
+      console.error('Error fetching specialization details:', err);
+      setError(err.message || 'تعذر تحميل القسم.');
     } finally {
       setIsLoading(false);
     }
@@ -51,73 +61,83 @@ export default function SpecializationDetails() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center bg-[#1a1a1a]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ee5239]"></div>
+      <div className="flex min-h-screen items-center justify-center bg-[#1a1a1a] pt-24">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#ee5239]" />
       </div>
     );
   }
 
   if (error || !specialization) {
     return (
-      <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4 bg-[#1a1a1a] text-white">
-        <div className="text-xl text-red-400">{error || 'التخصص غير موجود'}</div>
-        <Link to="/" className="bg-[#ee5239] text-white px-6 py-2 rounded-lg hover:bg-[#d63d2a] transition-colors">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a1a1a] pt-24 text-white">
+        <div className="text-xl text-red-400">{error || 'القسم غير موجود'}</div>
+        <Link to="/" className="rounded-lg bg-[#ee5239] px-6 py-2 text-white transition-colors hover:bg-[#d63d2a]">
           العودة للرئيسية
         </Link>
       </div>
     );
   }
 
+  const linkedPageId = specialization.service?.page?.id;
+  const linkedCoreService = linkedPageId ? findCoreServiceByPageId(pages, linkedPageId) : null;
+  const parentRoute = linkedCoreService ? `/service/${linkedCoreService.slug}` : linkedPageId ? `/page/${linkedPageId}` : '/';
+  const parentLabel = linkedCoreService?.title || specialization.service?.page?.name || 'الخدمة';
+
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-[#1a1a1a] text-white font-[Cairo]">
+    <div className="min-h-screen bg-[#1a1a1a] pb-16 pt-24 text-white font-[Cairo]">
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center gap-2 text-sm text-gray-400">
-          <Link to="/" className="hover:text-[#ee5239] transition-colors">الرئيسية</Link>
+          <Link to="/" className="transition-colors hover:text-[#ee5239]">
+            الرئيسية
+          </Link>
           <span className="text-gray-600">/</span>
-          {specialization.service?.page && (
-            <>
-              <Link to={`/page/${specialization.service.page.id}`} className="hover:text-[#ee5239] transition-colors">{specialization.service.page.name}</Link>
-              <span className="text-gray-600">/</span>
-            </>
-          )}
-          <span className="text-white font-medium">{specialization.name}</span>
+          <Link to={parentRoute} className="transition-colors hover:text-[#ee5239]">
+            {parentLabel}
+          </Link>
+          <span className="text-gray-600">/</span>
+          <span className="font-medium text-white">{specialization.name}</span>
         </div>
 
-        <div className="bg-[#2a2a2a]/50 backdrop-blur-md rounded-2xl p-8 border border-white/5 shadow-2xl mb-12 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#ee5239]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/5 bg-[#2a2a2a]/50 p-8 shadow-2xl backdrop-blur-md">
+          <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ee5239]/10 blur-3xl" />
 
           <div className="relative z-10">
-             <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
-                <div>
-                  <h1 className="text-4xl font-bold mb-2 text-[#ee5239]">{specialization.name}</h1>
-                  {specialization.service?.name && <h2 className="text-xl text-gray-500 font-medium">{specialization.service.name}</h2>}
-                </div>
-                <div className="bg-[#ee5239]/10 text-[#ee5239] px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 border border-[#ee5239]/20">
-                   <Layers size={16} />
-                   <span>{clients.length} عميل</span>
-                </div>
-             </div>
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h1 className="mb-2 text-4xl font-bold text-[#ee5239]">{specialization.name}</h1>
+                {specialization.service?.name && (
+                  <h2 className="text-xl font-medium text-gray-500">{specialization.service.name}</h2>
+                )}
+              </div>
 
-             {specialization.description && (
-               <p className="text-gray-300 text-lg max-w-3xl leading-relaxed border-r-4 border-[#ee5239] pr-4">{specialization.description}</p>
-             )}
+              <div className="flex items-center gap-2 rounded-full border border-[#ee5239]/20 bg-[#ee5239]/10 px-4 py-2 text-sm font-bold text-[#ee5239]">
+                <Layers size={16} />
+                <span>{clients.length} عمل</span>
+              </div>
+            </div>
+
+            {specialization.description && (
+              <p className="max-w-3xl border-r-4 border-[#ee5239] pr-4 text-lg leading-relaxed text-gray-300">
+                {specialization.description}
+              </p>
+            )}
           </div>
         </div>
 
         {clients.length === 0 ? (
-          <div className="text-center py-20 bg-[#2a2a2a]/30 rounded-2xl border border-white/5 border-dashed">
-            <Users className="w-20 h-20 mx-auto text-gray-700 mb-6" />
-            <h3 className="text-2xl font-bold text-gray-500 mb-2">لا يوجد عملاء</h3>
-            <p className="text-gray-600 text-lg">لم يتم إضافة أي عملاء لهذا التخصص حتى الآن.</p>
+          <div className="rounded-2xl border border-dashed border-white/5 bg-[#2a2a2a]/30 py-20 text-center">
+            <Users className="mx-auto mb-6 h-20 w-20 text-gray-700" />
+            <h3 className="mb-2 text-2xl font-bold text-gray-500">لا توجد أعمال</h3>
+            <p className="text-lg text-gray-600">لم يتم إضافة أعمال داخل هذا القسم حتى الآن.</p>
           </div>
         ) : (
           <div>
-            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 border-b border-white/10 pb-4">
-               <span className="w-2 h-8 bg-[#ee5239] rounded-full block"></span>
-               عملاؤنا ومشاريعنا في هذا التخصص
+            <h2 className="mb-8 flex items-center gap-3 border-b border-white/10 pb-4 text-2xl font-bold">
+              <span className="block h-8 w-2 rounded-full bg-[#ee5239]" />
+              الأعمال داخل هذا القسم
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {clients.map((client) => (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {clients.map(client => (
                 <ClientCard
                   key={client.id}
                   id={client.id}
