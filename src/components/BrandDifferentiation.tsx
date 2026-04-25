@@ -1,55 +1,103 @@
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { BarChart4, PieChart, Sparkles, LifeBuoy } from 'lucide-react';
 
 const differentiators = [
   {
     title: 'تحليل دقيق لمكانتك في السوق',
-    description: 'نوفر تحليلاً متعمقاً لموقع علامتك التجارية بين منافسيك ونرسم فرص النمو.',
+    description: 'نوفر تحليلاً متعمقاً لموقع علامتك التجارية بين منافسيك ونرسم فرص النمو بشكل واضح ودقيق، لنبدأ من حيث يجب.',
     icon: BarChart4,
+    color: 'from-[#ee5239] to-[#ff7a64]'
   },
   {
     title: 'تخطيط استراتيجي',
-    description: 'نضع استراتيجيات مصممة خصيصاً لتحقيق أهدافك التجارية بثقة ووضوح.',
+    description: 'نضع استراتيجيات مصممة خصيصاً لتحقيق أهدافك التجارية بثقة ووضوح. لا نعتمد على الحظ بل على تخطيط مدروس.',
     icon: PieChart,
+    color: 'from-blue-500 to-cyan-400'
   },
   {
     title: 'حلول تسويقية مميزة',
-    description: 'نقدم باقة خدمات متكاملة تنسجم لتلائم طبيعة مشروعك وتدعم نموه.',
+    description: 'نقدم باقة خدمات متكاملة تنسجم لتلائم طبيعة مشروعك وتدعم نموه بشكل متسارع ومستدام.',
     icon: Sparkles,
+    color: 'from-emerald-500 to-teal-400'
   },
   {
     title: 'تقديم دعم مستمر',
-    description: 'مرافقة واستشارات دائمة لضمان استمرار نجاحك وتميزك في السوق.',
+    description: 'مرافقة واستشارات دائمة لضمان استمرار نجاحك وتميزك في السوق، نحن شركاؤك في كل خطوة.',
     icon: LifeBuoy,
+    color: 'from-purple-500 to-pink-500'
   },
 ];
 
 export default function BrandDifferentiation() {
-  return (
-    <section className="py-20 bg-gradient-to-b from-accent to-[#f25b3d] text-white overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-white/80 mb-2">أربعة خدمات رئيسية توفرها بوفا خصيصاً لشركتك</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-[1.3] text-wrap-balance">كيف يمكن لـ بوفا تميز علامتك التجارية؟</h2>
-        </div>
+  const containerRef = useRef<HTMLDivElement>(null);
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {differentiators.map((item, index) => (
+  return (
+    <section ref={containerRef} className="relative bg-[#000000] py-32 text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(238,82,57,0.15),transparent_50%)]" />
+
+      <div className="container relative z-10 mx-auto px-4">
+        <div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
+          
+          {/* Sticky Side (Right in RTL) */}
+          <div className="lg:sticky lg:top-32 lg:w-1/2 lg:py-16">
             <motion.div
-              key={item.title}
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm mb-6"
+            >
+              <Sparkles className="h-4 w-4 text-accent" />
+              <span>خدمات رئيسية مخصصة لشركتك</span>
+            </motion.div>
+            
+            <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="rounded-3xl bg-white/10 border border-white/20 p-6 backdrop-blur-md h-full"
+              className="text-4xl md:text-6xl font-black leading-[1.6] mb-6"
             >
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-5">
-                <item.icon className="w-7 h-7" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-wrap-balance leading-[1.4]">{item.title}</h3>
-              <p className="text-white/85 leading-relaxed">{item.description}</p>
-            </motion.div>
-          ))}
+              كيف يمكن لـ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ee5239] to-orange-300">بوفا</span> تمييز علامتك التجارية؟
+            </motion.h2>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-lg text-gray-400 max-w-xl"
+            >
+              نحن نمزج بين التحليل العميق والتفكير الإبداعي لنقدم لك حلولاً تضع علامتك في صدارة المنافسين وتضمن نمواً مستداماً.
+            </motion.p>
+          </div>
+
+          {/* Scrolling Items Side (Left in RTL) */}
+          <div className="flex flex-col gap-8 lg:w-1/2">
+            {differentiators.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ margin: "-100px", once: false }}
+                transition={{ duration: 0.6 }}
+                className="group relative rounded-3xl bg-[#0a0a0a] p-8 border border-white/5 transition-all hover:border-white/20 hover:bg-[#111111]"
+              >
+                <div className={`absolute -inset-px rounded-3xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${item.color}`} />
+                
+                <div className="relative z-10">
+                  <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br mb-8 shadow-lg transition-transform duration-500 group-hover:scale-110 ${item.color}`}>
+                    <item.icon className="h-8 w-8 text-white" />
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                  <p className="text-gray-400 text-lg leading-relaxed group-hover:text-gray-300 transition-colors">
+                    {item.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
         </div>
       </div>
     </section>

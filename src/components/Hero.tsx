@@ -326,7 +326,7 @@ export default function Hero() {
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.25] mb-8 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.5] mb-8 tracking-tight">
               {[
                 { text: 'نحول الهوية', delay: 0.5, gradient: false },
                 { text: 'إلى حضور رقمي', delay: 0.65, gradient: true },
