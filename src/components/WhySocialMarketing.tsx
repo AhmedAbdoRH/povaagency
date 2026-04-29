@@ -88,15 +88,15 @@ export default function WhySocialMarketing() {
 
       <div className="relative z-10 -mt-[100vh]">
         <div className="container mx-auto px-4 py-32 text-center">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
-            >
-                <Sparkles className="h-4 w-4 text-accent" />
-                <span>{t('whySocialMarketing.statusBadge')}</span>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
+          >
+            <Sparkles className="h-4 w-4 text-accent" />
+            <span>{t('whySocialMarketing.statusBadge')}</span>
+          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -40,7 +40,7 @@ export default function BrandDifferentiation() {
 
       <div className="container relative z-10 mx-auto px-4">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
-          
+
           {/* Sticky Side */}
           <div className="lg:sticky lg:top-32 lg:w-1/2 lg:py-16">
             <motion.div
@@ -52,8 +52,8 @@ export default function BrandDifferentiation() {
               <Sparkles className="h-4 w-4 text-accent" />
               <span>{t('brandDifferentiation.statusBadge')}</span>
             </motion.div>
-            
-            <motion.h2 
+
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -61,8 +61,8 @@ export default function BrandDifferentiation() {
             >
               {t('brandDifferentiation.heading')}
             </motion.h2>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -85,12 +85,12 @@ export default function BrandDifferentiation() {
                 className="group relative rounded-3xl bg-[#0a0a0a] p-8 border border-white/5 transition-all hover:border-white/20 hover:bg-[#111111]"
               >
                 <div className={`absolute -inset-px rounded-3xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${item.color}`} />
-                
+
                 <div className="relative z-10">
                   <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br mb-8 shadow-lg transition-transform duration-500 group-hover:scale-110 ${item.color}`}>
                     <item.icon className="h-8 w-8 text-white" />
                   </div>
-                  
+
                   <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
                   <p className="text-gray-400 text-lg leading-relaxed group-hover:text-gray-300 transition-colors">
                     {item.description}
