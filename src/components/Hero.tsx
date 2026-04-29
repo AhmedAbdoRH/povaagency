@@ -290,7 +290,7 @@ export default function Hero() {
   return (
     <section
       dir="rtl"
-      className="relative min-h-screen bg-[#080c14] overflow-hidden flex items-center pt-6 sm:pt-8"
+      className="relative min-h-screen bg-[#080c14] overflow-hidden flex items-center pt-0"
     >
       {/* ── inject keyframes ── */}
       <style>{heroStyles}</style>
@@ -306,8 +306,8 @@ export default function Hero() {
       {particles.map((o, i) => <Particle key={i} {...o} />)}
 
       {/* ── main layout ── */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 z-10 relative">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 lg:py-20 z-10 relative">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
 
           {/* ── LEFT: copy ── */}
           <motion.div
@@ -328,7 +328,7 @@ export default function Hero() {
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.5] mb-8 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-[4rem] font-black text-white leading-[1.3] sm:leading-[1.5] mb-6 sm:mb-8 tracking-tight">
               {[
                 { text: t('hero.title').split(' إلى ')[0], delay: 0.5, gradient: false },
                 { text: t('hero.title').split(' إلى ')[1]?.split(' ')[0] + ' ' + t('hero.title').split(' إلى ')[1]?.split(' ')[1], delay: 0.65, gradient: true },
@@ -351,7 +351,7 @@ export default function Hero() {
 
             {/* description */}
             <motion.p
-              className="text-white/65 text-base sm:text-lg leading-relaxed mb-8"
+              className="text-white/65 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.55 }}
@@ -368,7 +368,7 @@ export default function Hero() {
             >
               <button
                 onClick={scrollToCollaboration}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-base px-7 py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1.5" />
@@ -376,7 +376,7 @@ export default function Hero() {
 
               <Link
                 to="/design-request"
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-base px-7 py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white" />
                 {t('hero.ctaCollaborate')}
@@ -414,7 +414,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="order-1 lg:order-2 flex justify-center lg:justify-start relative mt-16 lg:mt-0"
+            className="order-1 lg:order-2 flex justify-center lg:justify-start relative mt-8 lg:mt-0"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
@@ -437,7 +437,7 @@ export default function Hero() {
             >
               {/* ── premium phone shell ── */}
               <div
-                className="relative w-[260px] sm:w-[280px] rounded-[3.5rem] overflow-hidden p-[8px]"
+                className="relative w-[200px] sm:w-[240px] lg:w-[280px] rounded-[3.5rem] overflow-hidden p-[8px]"
                 style={{
                   background: 'linear-gradient(145deg, #3a3f58 0%, #1c1f2e 40%, #080a10 100%)',
                   boxShadow: `
