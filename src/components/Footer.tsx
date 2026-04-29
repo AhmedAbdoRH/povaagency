@@ -17,6 +17,11 @@ export default function Footer({ storeSettings }: FooterProps) {
 
           {/* Brand Info */}
           <div className="col-span-1 md:col-span-2">
+            <img 
+              src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png" 
+              alt="POVA Agency" 
+              className="h-12 w-auto object-contain mb-6"
+            />
             <h2 className="text-3xl font-bold text-white mb-6">{storeSettings?.store_name || 'POVA Agency'}</h2>
             <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
               {t('footer.description')}

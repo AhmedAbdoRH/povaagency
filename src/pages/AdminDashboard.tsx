@@ -242,9 +242,16 @@ export default function AdminDashboard() {
       <ToastContainer position="top-right" />
       <div className="container mx-auto p-6">
         <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-4xl font-bold text-transparent">لوحة التحكم</h1>
-            <p className="mt-2 text-sm text-gray-400">الخدمات الرئيسية هنا هي نفس كروت قسم حلول متكاملة لنجاحك الرقمي.</p>
+          <div className="flex items-center gap-4">
+            <img 
+              src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png" 
+              alt="POVA Agency" 
+              className="h-12 w-auto object-contain"
+            />
+            <div>
+              <h1 className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-4xl font-bold text-transparent">لوحة التحكم</h1>
+              <p className="mt-2 text-sm text-gray-400">الخدمات الرئيسية هنا هي نفس كروت قسم حلول متكاملة لنجاحك الرقمي.</p>
+            </div>
           </div>
           <button onClick={() => { supabase.auth.signOut(); navigate('/admin/login'); }} className="rounded-xl border border-red-500/30 bg-red-500/20 px-5 py-3 text-red-300">تسجيل الخروج</button>
         </div>

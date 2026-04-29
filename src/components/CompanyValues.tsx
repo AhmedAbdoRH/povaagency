@@ -4,7 +4,7 @@ import { Palette, Landmark, Brain, Users, TrendingUp, ShieldCheck, RefreshCcw, S
 import { useLanguage } from '../hooks/useLanguage';
 
 export default function CompanyValues() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const valueIcons = [Palette, Landmark, Brain, Users, TrendingUp, ShieldCheck, RefreshCcw, SunMedium];
   const valueColors = ['text-pink-500', 'text-amber-500', 'text-blue-500', 'text-green-500', 'text-emerald-500', 'text-indigo-500', 'text-cyan-500', 'text-orange-500'];
@@ -23,7 +23,7 @@ export default function CompanyValues() {
     target: targetRef,
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "85%"]);
+  const x = useTransform(scrollYProgress, [0, 1], language === 'en' ? ["85%", "0%"] : ["0%", "85%"]);
 
   return (
     <section ref={targetRef} className="relative h-[300vh] bg-[#f8f9fa]">

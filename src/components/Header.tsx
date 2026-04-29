@@ -119,13 +119,11 @@ export default function Header({ storeSettings }: HeaderProps) {
           
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 z-50">
-            {storeSettings?.logo_url ? (
-              <img src={storeSettings.logo_url} alt={storeSettings.store_name || 'Logo'} className="h-12 w-auto object-contain" />
-            ) : (
-              <span className="text-2xl font-bold bg-gradient-to-r from-accent to-gold bg-clip-text text-transparent">
-                {storeSettings?.store_name || 'POVA'}
-              </span>
-            )}
+            <img 
+              src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png" 
+              alt="POVA Agency" 
+              className="h-12 w-auto object-contain" 
+            />
           </Link>
 
           {/* Desktop Navigation */}
