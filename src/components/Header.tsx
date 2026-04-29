@@ -215,20 +215,20 @@ export default function Header({ storeSettings }: HeaderProps) {
 
       {/* Sidebar panel */}
       <div
-        dir="ltr"
         style={{
           position: 'fixed',
           top: 0,
-          left: 'auto',
-          right: isMenuOpen ? 0 : '-100vw',
+          left: language === 'ar' ? (isMenuOpen ? 0 : '-100vw') : 'auto',
+          right: language === 'en' ? (isMenuOpen ? 0 : '-100vw') : 'auto',
           bottom: 0,
           width: '85vw',
           maxWidth: '360px',
           background: '#0f0f0f',
-          borderLeft: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '-20px 0 60px rgba(0,0,0,0.5)',
+          borderLeft: language === 'en' ? '1px solid rgba(255,255,255,0.08)' : 'none',
+          borderRight: language === 'ar' ? '1px solid rgba(255,255,255,0.08)' : 'none',
+          boxShadow: language === 'en' ? '-20px 0 60px rgba(0,0,0,0.5)' : '20px 0 60px rgba(0,0,0,0.5)',
           zIndex: 9999,
-          transition: 'right 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: language === 'ar' ? 'left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' : 'right 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
@@ -273,7 +273,7 @@ export default function Header({ storeSettings }: HeaderProps) {
               className="flex items-center justify-between px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 font-bold text-base transition-colors"
             >
               {t('header.home')}
-              <ChevronLeft className="w-4 h-4 opacity-40" />
+              {language === 'ar' ? <ChevronLeft className="w-4 h-4 opacity-40" /> : <ChevronLeft className="w-4 h-4 opacity-40 rotate-180" />}
             </Link>
 
             {/* Services accordion */}
@@ -313,7 +313,7 @@ export default function Header({ storeSettings }: HeaderProps) {
               className="flex items-center justify-between px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 font-bold text-base transition-colors"
             >
               {t('header.aboutUs')}
-              <ChevronLeft className="w-4 h-4 opacity-40" />
+              {language === 'ar' ? <ChevronLeft className="w-4 h-4 opacity-40" /> : <ChevronLeft className="w-4 h-4 opacity-40 rotate-180" />}
             </Link>
 
             <Link
@@ -322,7 +322,7 @@ export default function Header({ storeSettings }: HeaderProps) {
               className="flex items-center justify-between px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 font-bold text-base transition-colors"
             >
               {t('header.contactUs')}
-              <ChevronLeft className="w-4 h-4 opacity-40" />
+              {language === 'ar' ? <ChevronLeft className="w-4 h-4 opacity-40" /> : <ChevronLeft className="w-4 h-4 opacity-40 rotate-180" />}
             </Link>
           </nav>
         </div>

@@ -41,10 +41,10 @@ export default function BrandDifferentiation() {
       <div className="container relative z-10 mx-auto px-4">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
           
-          {/* Sticky Side (Right in RTL) */}
+          {/* Sticky Side */}
           <div className="lg:sticky lg:top-32 lg:w-1/2 lg:py-16">
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: language === 'ar' ? -20 : 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm mb-6"

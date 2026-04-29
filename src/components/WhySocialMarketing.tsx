@@ -21,13 +21,13 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
         className="relative flex w-full max-w-4xl flex-col items-center gap-8 rounded-3xl border border-white/10 bg-[#0a0a0a] p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:flex-row md:p-12"
       >
         <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color}`} />
-        <div className={`absolute -left-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-20 ${item.color}`} />
+        <div className={`absolute ${language === 'ar' ? '-right-20' : '-left-20'} -top-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-20 ${item.color}`} />
 
         <div className={`flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br shadow-xl ${item.color}`}>
           <item.icon className="h-10 w-10 text-white" />
         </div>
 
-        <div className="flex-1 text-center md:text-right z-10">
+        <div className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10`}>
           <h3 className="mb-4 text-3xl font-bold text-white md:text-4xl">{item.title}</h3>
           <p className="text-lg leading-relaxed text-gray-400 md:text-xl">
             {item.description}

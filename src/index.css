@@ -144,3 +144,7 @@ p {
 .leading-balanced {
   line-height: 1.4 !important;
 }
+
+.dir-ltr {
+  direction: ltr !important;
+}

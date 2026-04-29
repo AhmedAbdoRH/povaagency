@@ -80,9 +80,9 @@ export default function Footer({ storeSettings }: FooterProps) {
             <h3 className="text-white font-bold text-lg mb-6">{t('footer.contactUs')}</h3>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+201006464349" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
+                <a href="tel:+201550014345" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
                   <Phone className="w-5 h-5" />
-                  <span className="dir-ltr">+20 100 646 4349</span>
+                  <span className="dir-ltr">0155 0014345</span>
                 </a>
               </li>
               <li>

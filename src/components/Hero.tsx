@@ -9,6 +9,7 @@ import {
   Send,
   Bookmark,
   ArrowLeft,
+  ArrowRight,
   Sparkles,
 } from 'lucide-react';
 
@@ -289,7 +290,6 @@ export default function Hero() {
 
   return (
     <section
-      dir="rtl"
       className="relative min-h-screen bg-[#080c14] overflow-hidden flex items-center pt-0"
     >
       {/* ── inject keyframes ── */}
@@ -311,10 +311,10 @@ export default function Hero() {
 
           {/* ── LEFT: copy ── */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: language === 'ar' ? 60 : -60 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.85, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.15 }}
-            className="order-2 lg:order-1 text-right max-w-xl mr-auto"
+            className={`order-2 lg:order-1 ${language === 'ar' ? 'text-right max-w-xl mr-auto' : 'text-left max-w-xl ml-auto'}`}
           >
             {/* tag */}
             <motion.div
@@ -361,7 +361,7 @@ export default function Hero() {
 
             {/* CTA */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end"
+              className={`flex flex-col sm:flex-row gap-3 sm:gap-4 ${language === 'ar' ? 'sm:justify-end' : 'sm:justify-start'}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1, duration: 0.5 }}
@@ -371,7 +371,11 @@ export default function Hero() {
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
-                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1.5" />
+                {language === 'ar' ? (
+                  <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1.5" />
+                ) : (
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
+                )}
               </button>
 
               <Link
@@ -385,7 +389,7 @@ export default function Hero() {
 
             {/* trust row */}
             <motion.div
-              className="flex items-center gap-5 mt-8 sm:justify-end"
+              className={`flex items-center gap-5 mt-8 ${language === 'ar' ? 'sm:justify-end' : 'sm:justify-start'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.4 }}
@@ -414,7 +418,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="order-1 lg:order-2 flex justify-center lg:justify-start relative mt-8 lg:mt-0"
+            className={`order-1 lg:order-2 flex justify-center ${language === 'ar' ? 'lg:justify-start' : 'lg:justify-end'} relative mt-8 lg:mt-0`}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
@@ -542,7 +546,7 @@ export default function Hero() {
                         <Heart className={`w-5 h-5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-white drop-shadow-md'}`} />
                       </div>
                       <span className="text-white/90 text-[10px] font-bold drop-shadow-md">
-                        {likeCount.toLocaleString('ar-EG')}
+                        {language === 'ar' ? likeCount.toLocaleString('ar-EG') : likeCount.toLocaleString('en-US')}
                       </span>
                     </motion.button>
 
@@ -554,7 +558,7 @@ export default function Hero() {
                       <div className="w-11 h-11 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
                         <MessageCircle className="w-5 h-5 text-white drop-shadow-md" />
                       </div>
-                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">٢٣١</span>
+                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
                     </motion.button>
 
                     <motion.button
@@ -565,7 +569,7 @@ export default function Hero() {
                       <div className="w-11 h-11 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
                         <Send className="w-5 h-5 text-white drop-shadow-md -ml-0.5" />
                       </div>
-                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">شارك</span>
+                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
                     </motion.button>
 
                     <motion.button
@@ -593,16 +597,16 @@ export default function Hero() {
                         <p className="text-accent text-[9px] font-medium">وكالة تسويق رقمي</p>
                       </div>
                       <button className="mr-auto text-[10px] font-bold text-white bg-accent/80 hover:bg-accent backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 transition-colors shadow-lg">
-                        متابعة
+                        {language === 'ar' ? 'متابعة' : 'Follow'}
                       </button>
                     </div>
                     <div className="bg-black/30 backdrop-blur-md rounded-xl p-2 border border-white/5">
                       <p className="text-white/90 text-[11px] leading-relaxed line-clamp-2 drop-shadow-md">
-                        استراتيجية + إبداع + تنفيذ دقيق = نمو مستمر لعلامتك 🚀✨
+                        {language === 'ar' ? 'استراتيجية + إبداع + تنفيذ دقيق = نمو مستمر لعلامتك 🚀✨' : 'Strategy + Creativity + Execution = Growth for your brand 🚀✨'}
                       </p>
                       <div className="flex gap-1.5 mt-1">
-                        <span className="text-[10px] text-accent font-bold drop-shadow-sm">#تسويق</span>
-                        <span className="text-[10px] text-white/80 font-medium">#هوية_بصرية</span>
+                        <span className="text-[10px] text-accent font-bold drop-shadow-sm">{language === 'ar' ? '#تسويق' : '#Marketing'}</span>
+                        <span className="text-[10px] text-white/80 font-medium">{language === 'ar' ? '#هوية_بصرية' : '#Branding'}</span>
                       </div>
                     </div>
                   </motion.div>

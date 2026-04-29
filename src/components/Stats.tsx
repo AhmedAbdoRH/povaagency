@@ -21,7 +21,8 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
     useEffect(() => {
         const unsub = springValue.on('change', (latest) => {
             if (ref.current) {
-                ref.current.textContent = Intl.NumberFormat('en-US').format(Math.round(latest)) + suffix;
+                const locale = document.documentElement.lang === 'ar' ? 'ar-EG' : 'en-US';
+                ref.current.textContent = Intl.NumberFormat(locale).format(Math.round(latest)) + suffix;
             }
         });
         return () => unsub();
