@@ -81,29 +81,33 @@ export default function Header({ storeSettings }: HeaderProps) {
   // ... (Click outside logic kept same) ...
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest('.mobile-menu-button')) {
+      if (!isMenuOpen) return;
+      
+      const target = event.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target) &&
+          !(event.target as HTMLElement).closest('.mobile-menu-button')) {
         setIsMenuOpen(false);
       }
-      if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest('.services-dropdown-button')) {
+      
+      if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(target) &&
+          !(event.target as HTMLElement).closest('.services-dropdown-button')) {
         setIsServicesDropdownOpen(false);
       }
-      if ('touches' in event) {
-        const target = event.target as HTMLElement;
-        if (searchInputRef.current && searchInputRef.current.contains(target)) return;
-      } else {
-        const target = event.target as HTMLElement;
-        if (searchRef.current && !searchRef.current.contains(target)) setIsSearchFocused(false);
+
+      if (!('touches' in event)) {
+        if (searchRef.current && !searchRef.current.contains(target)) {
+          setIsSearchFocused(false);
+        }
       }
     }
+    
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('touchstart', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, []);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (isMenuOpen) document.body.style.overflow = 'hidden';
@@ -237,97 +241,93 @@ export default function Header({ storeSettings }: HeaderProps) {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            className="fixed inset-0 bg-black/80 z-[100] lg:hidden backdrop-blur-sm" 
+            className="fixed inset-0 bg-black/90 z-[9999] lg:hidden backdrop-blur-md" 
             onClick={() => setIsMenuOpen(false)}
           >
              <motion.div 
                 ref={menuRef}
-                initial={{ x: language === 'ar' ? '100%' : '100%' }} 
-                animate={{ x: 0 }} 
-                exit={{ x: language === 'ar' ? '100%' : '100%' }} 
+                initial={{ x: '100%', opacity: 0 }} 
+                animate={{ x: 0, opacity: 1 }} 
+                exit={{ x: '100%', opacity: 0 }} 
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }} 
-                className={`absolute ${language === 'ar' ? 'right-0' : 'right-0'} top-0 bottom-0 w-[80%] max-w-sm bg-[#1a1a1a] border-l border-white/10 shadow-2xl overflow-y-auto`} 
+                className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-[#0a0a0a] border-l border-white/10 shadow-2xl overflow-y-auto flex flex-col" 
                 onClick={e => e.stopPropagation()}
              >
-                <div className="p-6">
-                   <div className="flex items-center justify-between mb-8">
-                      <span className="text-xl font-bold text-white">{t('header.menu')}</span>
-                      <button 
-                        onClick={() => setIsMenuOpen(false)} 
-                        className="p-2 hover:bg-white/5 rounded-full text-white transition-colors"
-                        aria-label={t('header.close')}
-                      >
-                         <Close className="w-6 h-6" />
-                      </button>
-                   </div>
-                   
-                   {/* Language Toggle in Mobile Menu */}
-                   <div className="mb-6 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                {/* Header inside Menu */}
+                <div className="p-6 flex items-center justify-between border-b border-white/5">
+                   <img 
+                     src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png" 
+                     alt="POVA" 
+                     className="h-10 w-auto"
+                   />
+                   <button 
+                     onClick={() => setIsMenuOpen(false)} 
+                     className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all"
+                   >
+                      <Close className="w-6 h-6" />
+                   </button>
+                </div>
+
+                <div className="flex-1 p-6 overflow-y-auto">
+                   {/* Language Toggle */}
+                   <div className="mb-8">
                       <button 
                         onClick={() => {
                           toggleLanguage();
                           setIsMenuOpen(false);
                         }}
-                        className="w-full flex items-center justify-center gap-3 font-bold text-accent"
+                        className="w-full flex items-center justify-between p-4 rounded-2xl bg-accent/10 border border-accent/20 text-accent font-bold"
                       >
-                        <Globe className="w-5 h-5" />
-                        <span>{language === 'ar' ? 'English' : 'العربية'}</span>
+                        <div className="flex items-center gap-3">
+                          <Globe className="w-5 h-5" />
+                          <span>{language === 'ar' ? 'English' : 'العربية'}</span>
+                        </div>
+                        <span className="text-xs opacity-50">{language.toUpperCase()}</span>
                       </button>
                    </div>
                    
-                   <nav className="space-y-3">
-                      <Link 
-                        to="/" 
-                        onClick={() => setIsMenuOpen(false)} 
-                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
-                      >
-                        {t('header.home')}
-                      </Link>
+                   <nav className="space-y-4">
+                      {[
+                        { to: '/', label: t('header.home') },
+                        { to: '/about', label: t('header.aboutUs') },
+                        { to: '/contact', label: t('header.contactUs') }
+                      ].map((link) => (
+                        <Link 
+                          key={link.to}
+                          to={link.to} 
+                          onClick={() => setIsMenuOpen(false)} 
+                          className="flex items-center justify-between px-6 py-5 rounded-3xl bg-white/5 hover:bg-accent hover:text-white transition-all text-lg font-black group"
+                        >
+                          {link.label}
+                          <ChevronDown className={`w-5 h-5 -rotate-90 opacity-0 group-hover:opacity-100 transition-all ${language === 'ar' ? 'rotate-90' : '-rotate-90'}`} />
+                        </Link>
+                      ))}
                       
-                      {/* Services Dropdown Mobile */}
-                      <div className="space-y-2">
-                        <details className="group rounded-2xl overflow-hidden bg-white/5 transition-all">
-                          <summary className="px-5 py-4 font-bold cursor-pointer flex items-center justify-between list-none">
-                            <span className="flex items-center gap-3">
-                              {t('header.services') || 'الخدمات'}
-                            </span>
-                            <ChevronDown className="w-5 h-5 group-open:rotate-180 transition-transform" />
-                          </summary>
-                          <div className="bg-black/20 space-y-1 px-4 py-3">
-                            {pages.map(page => (
-                              <Link
-                                key={page.id}
-                                to={`/page/${page.id}`}
-                                onClick={() => setIsMenuOpen(false)}
-                                className="block px-4 py-3 rounded-xl hover:bg-accent/20 hover:text-accent transition-all text-sm font-medium"
-                              >
-                                {page.name}
-                              </Link>
-                            ))}
-                          </div>
-                        </details>
+                      {/* Services with expanded items */}
+                      <div className="pt-4 mt-4 border-t border-white/5">
+                        <p className="px-6 mb-4 text-xs font-bold text-gray-500 uppercase tracking-widest">{t('header.services') || 'الخدمات'}</p>
+                        <div className="grid gap-3">
+                          {pages.map(page => (
+                            <Link
+                              key={page.id}
+                              to={`/page/${page.id}`}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 hover:bg-accent/20 hover:text-accent transition-all text-sm font-bold"
+                            >
+                              {page.name}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-
-                      <Link 
-                        to="/about" 
-                        onClick={() => setIsMenuOpen(false)} 
-                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
-                      >
-                        {t('header.aboutUs')}
-                      </Link>
-                      
-                      <Link 
-                        to="/contact" 
-                        onClick={() => setIsMenuOpen(false)} 
-                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
-                      >
-                        {t('header.contactUs')}
-                      </Link>
                    </nav>
+                </div>
 
-                   <div className="mt-12 pt-8 border-t border-white/5 text-center">
-                     <p className="text-gray-500 text-xs">{t('footer.brand')}</p>
-                   </div>
+                {/* Footer inside Menu */}
+                <div className="p-8 border-t border-white/5 bg-black/40">
+                   <p className="text-gray-500 text-sm font-medium mb-1">{t('footer.brand')}</p>
+                   <p className="text-gray-600 text-[10px] leading-relaxed">
+                     {t('footer.description')}
+                   </p>
                 </div>
              </motion.div>
           </motion.div>
