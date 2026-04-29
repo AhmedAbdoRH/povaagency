@@ -2,13 +2,15 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Clock, MessageCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function ContactUs() {
+  const { t } = useLanguage();
   return (
     <>
       <Helmet>
-        <title>اتصل بنا - POVA Agency</title>
-        <meta name="description" content="تواصل مع فريق POVA لمناقشة مشروعك القادم. نحن هنا لتحويل أفكارك إلى واقع." />
+        <title>{t('contact.title')} - POVA Agency</title>
+        <meta name="description" content={t('contact.subtitle')} />
       </Helmet>
 
       <div className="min-h-screen bg-primary pt-24 pb-20">
@@ -22,7 +24,7 @@ export default function ContactUs() {
               transition={{ duration: 0.6 }}
               className="text-4xl md:text-6xl font-bold text-white mb-6"
             >
-              ابدأ رحلتك مع <span className="text-accent">POVA</span>
+              {t('contact.title')} <span className="text-accent">POVA</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -30,7 +32,7 @@ export default function ContactUs() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
             >
-              سواء كنت تبحث عن استشارة تسويقية، تصميم هوية، أو إدارة حملات إعلانية، فريقنا جاهز للاستماع إليك.
+              {t('contact.subtitle')}
             </motion.p>
           </div>
 
@@ -49,7 +51,7 @@ export default function ContactUs() {
                     <Phone className="w-8 h-8 text-accent group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">اتصل بنا</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('footer.contactUs')}</h3>
                     <p className="text-gray-400 mb-4">نحن متاحون للرد على استفساراتك</p>
                     <a href="tel:+201006464349" className="text-xl font-bold text-white hover:text-accent transition-colors dir-ltr block">
                       +20 100 646 4349
@@ -69,7 +71,7 @@ export default function ContactUs() {
                     <MessageCircle className="w-8 h-8 text-accent group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">واتساب</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('footer.whatsapp')}</h3>
                     <p className="text-gray-400 mb-4">تواصل سريع ومباشر مع فريقنا</p>
                     <a
                       href="https://wa.me/201006464349"

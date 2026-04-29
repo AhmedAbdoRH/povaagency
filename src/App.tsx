@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import { CartProvider } from './contexts/CartContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import BannerStrip from './components/BannerStrip';
@@ -165,43 +166,45 @@ function App() {
 
   return (
     <ThemeProvider>
-      <CartProvider>
-        <Helmet>
-          <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
-          <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
-        </Helmet>
-        <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
-        <Router>
-          <Routes>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
-            
-            {/* New Routes */}
-            <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
-            <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
-            <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
-            <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
-            
-            {/* Standard Pages */}
-            <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
-            <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
-            <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
-            <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
-            <Route path="/profile" element={<Layout banners={banners}><Profile /></Layout>} />
-            <Route path="/orders" element={<Layout banners={banners}><Orders /></Layout>} />
-            <Route path="/wishlist" element={<Layout banners={banners}><Wishlist /></Layout>} />
-            
-            <Route path="/" element={
-              <Layout banners={banners}>
-                <StaggeredHome />
-              </Layout>
-            } />
-            
-            {/* Catch all redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </CartProvider>
+      <LanguageProvider>
+        <CartProvider>
+          <Helmet>
+            <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
+            <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
+          </Helmet>
+          <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
+          <Router>
+            <Routes>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
+              
+              {/* New Routes */}
+              <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
+              <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
+              <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
+              <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
+              
+              {/* Standard Pages */}
+              <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
+              <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
+              <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
+              <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
+              <Route path="/profile" element={<Layout banners={banners}><Profile /></Layout>} />
+              <Route path="/orders" element={<Layout banners={banners}><Orders /></Layout>} />
+              <Route path="/wishlist" element={<Layout banners={banners}><Wishlist /></Layout>} />
+              
+              <Route path="/" element={
+                <Layout banners={banners}>
+                  <StaggeredHome />
+                </Layout>
+              } />
+              
+              {/* Catch all redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
+        </CartProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

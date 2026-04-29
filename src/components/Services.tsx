@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layers } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import { supabase } from '../lib/supabase';
 import type { Page } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 
 export default function Services() {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [pages, setPages] = useState<Page[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,7 +20,7 @@ export default function Services() {
       try {
         const { data: pagesData, error: pagesError } = await supabase
           .from('pages')
-          .select('*')
+          .select('id, name, name_en, description, description_en, image_url, banner_url, is_active, display_order, created_at, updated_at')
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: true });
 
@@ -48,7 +50,7 @@ export default function Services() {
   if (isLoading) {
     return (
       <div className="bg-primary py-20 text-center text-white">
-        <div className="animate-pulse">جارٍ التحميل...</div>
+        <div className="animate-pulse">{t('services.loading')}</div>
       </div>
     );
   }
@@ -62,7 +64,7 @@ export default function Services() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-4 text-4xl font-bold text-white"
           >
-            استكشف خدماتنا
+            {t('services.heading')}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -70,13 +72,13 @@ export default function Services() {
             transition={{ delay: 0.2 }}
             className="mx-auto max-w-2xl text-lg text-gray-400"
           >
-            تصفح الخدمات الرئيسية المرتبطة مباشرة بالأقسام والأعمال داخل كل مجال.
+            {t('services.description')}
           </motion.p>
         </div>
 
         {pages.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-700 py-10 text-center text-gray-500">
-            لا توجد صفحات مضافة حاليًا.
+            {t('services.emptyState')}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -99,6 +101,11 @@ export default function Services() {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-black/0 transition-all duration-300 hover:bg-black/20" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="text-sm font-bold text-white text-center">
+                      {language === 'en' ? (page.name_en || page.name) : page.name}
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ))}

@@ -1,17 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
+import { useLanguage } from '../hooks/useLanguage';
 
-const stats = [
-    { value: 500, suffix: "+", label: "مشروع ناجح" },
-    { value: 100, suffix: "+", label: "عميل سعيد" },
-    { value: 5, suffix: "+", label: "سنوات خبرة" },
-    { value: 24, suffix: "/7", label: "دعم فني" },
-];
-
-function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
+function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
     const ref = useRef<HTMLSpanElement>(null);
-    const inView = useInView(ref, { once: true, margin: "-100px" });
-    
+    const inView = useInView(ref, { once: true, margin: '-100px' });
+
     const motionValue = useMotionValue(0);
     const springValue = useSpring(motionValue, {
         damping: 50,
@@ -25,17 +19,27 @@ function AnimatedCounter({ value, suffix }: { value: number, suffix: string }) {
     }, [inView, value, motionValue]);
 
     useEffect(() => {
-        return springValue.on("change", (latest) => {
+        const unsub = springValue.on('change', (latest) => {
             if (ref.current) {
                 ref.current.textContent = Intl.NumberFormat('en-US').format(Math.round(latest)) + suffix;
             }
         });
+        return () => unsub();
     }, [springValue, suffix]);
 
     return <span ref={ref} className="tabular-nums">0{suffix}</span>;
 }
 
 export default function Stats() {
+    const { t } = useLanguage();
+
+    const stats = [
+        { value: parseInt(t('stats.items.0.value') || '0', 10), suffix: t('stats.items.0.suffix'), label: t('stats.items.0.label') },
+        { value: parseInt(t('stats.items.1.value') || '0', 10), suffix: t('stats.items.1.suffix'), label: t('stats.items.1.label') },
+        { value: parseInt(t('stats.items.2.value') || '0', 10), suffix: t('stats.items.2.suffix'), label: t('stats.items.2.label') },
+        { value: parseInt(t('stats.items.3.value') || '0', 10), suffix: t('stats.items.3.suffix'), label: t('stats.items.3.label') },
+    ];
+
     return (
         <section className="relative overflow-hidden bg-black py-32">
             {/* Ambient Lighting Background */}
@@ -48,8 +52,8 @@ export default function Stats() {
                             key={index}
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-50px" }}
-                            transition={{ duration: 0.7, delay: index * 0.1, type: "spring" }}
+                            viewport={{ once: true, margin: '-50px' }}
+                            transition={{ duration: 0.7, delay: index * 0.1, type: 'spring' }}
                             className="relative group"
                         >
                             {/* Giant Stroke Text Background */}
@@ -61,7 +65,7 @@ export default function Stats() {
                             
                             <div className="relative z-10 flex flex-col items-center justify-center">
                                 <h3 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter drop-shadow-2xl">
-                                    <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                                    <AnimatedCounter value={stat.value} suffix={stat.suffix || ''} />
                                 </h3>
                                 <p className="text-xl md:text-2xl font-bold text-accent px-4 py-2 bg-accent/10 border border-accent/20 rounded-full backdrop-blur-sm">
                                     {stat.label}

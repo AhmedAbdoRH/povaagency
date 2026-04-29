@@ -1,51 +1,7 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { MessageSquareText, Sparkles, BadgeCheck, Camera, Heart, PlayCircle, Film } from 'lucide-react';
-
-const reasons = [
-  {
-    id: '01',
-    title: 'التواصل المرئي',
-    description: 'يمكنك من توصيل رسالة علامتك التجارية بشكل مشوق وواضح عبر قصص بصرية مؤثرة.',
-    icon: MessageSquareText,
-    offset: 20,
-  },
-  {
-    id: '02',
-    title: 'زيادة التفاعل',
-    description: 'يجذب انتباه العميل للمحتوى المقدم ويحفزه على المشاركة والتفاعل مع علامتك.',
-    icon: Sparkles,
-    offset: -20,
-  },
-  {
-    id: '03',
-    title: 'تمايز علامتك التجارية',
-    description: 'تتفوّق على المنافسين بتقديم محتوى غني يلامس احتياجات العميل ويبرز شخصيتك الخاصة.',
-    icon: BadgeCheck,
-    offset: 30,
-  },
-  {
-    id: '04',
-    title: 'عرض المنتج بصورة احترافية',
-    description: 'نبرز مزايا منتجاتك وفوائدها بإخراج بصري حيوي يسلط الضوء على التفاصيل الإبداعية.',
-    icon: Camera,
-    offset: -30,
-  },
-  {
-    id: '05',
-    title: 'الاتصال العاطفي',
-    description: 'نصنع رابطاً إنسانياً قوياً بين جمهورك والمنتج من خلال قصص ملهمة ومؤثرة.',
-    icon: Heart,
-    offset: 20,
-  },
-  {
-    id: '06',
-    title: 'دفع المشاهد للتفاعل',
-    description: 'نصمم مشاهد ديناميكية تدعو لاتخاذ إجراء وتزيد فرص التحويل والمشاركة.',
-    icon: PlayCircle,
-    offset: -20,
-  },
-];
+import { useLanguage } from '../hooks/useLanguage';
 
 function ParallaxCard({ reason, index }: { reason: any; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -89,6 +45,19 @@ function ParallaxCard({ reason, index }: { reason: any; index: number }) {
 }
 
 export default function VisualStorytellingReasons() {
+  const { t } = useLanguage();
+
+  const reasonIcons = [MessageSquareText, Sparkles, BadgeCheck, Camera, Heart, PlayCircle];
+  const offsets = [20, -20, 30, -30, 20, -20];
+
+  const reasons = Array.from({ length: 6 }, (_, index) => ({
+    id: String(index + 1).padStart(2, '0'),
+    title: t(`visualStorytellingReasons.reasons.${index}.title`),
+    description: t(`visualStorytellingReasons.reasons.${index}.description`),
+    icon: reasonIcons[index],
+    offset: offsets[index],
+  }));
+
   return (
     <section className="relative overflow-hidden bg-[#0a0a0a] py-32">
       {/* Abstract Background Shapes */}
@@ -104,25 +73,25 @@ export default function VisualStorytellingReasons() {
                 className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-medium text-accent backdrop-blur-sm"
             >
                 <Film className="h-4 w-4" />
-                <span>قوة الصورة والصوت</span>
+                <span>{t('visualStorytellingReasons.statusBadge')}</span>
             </motion.div>
-            
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.6] text-white mb-6"
           >
-            6 أسباب تجعل مشروعك بحاجة لـ <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400">سرد بصري</span>
+            {t('visualStorytellingReasons.heading')}
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className="text-lg text-gray-400 max-w-2xl mx-auto"
           >
-            نحوّل أفكارك إلى تجارب مرئية لا تُنسى، تبني الثقة وتخلق فرقاً حقيقياً في رحلة العميل منذ اللحظة الأولى.
+            {t('visualStorytellingReasons.description')}
           </motion.p>
         </div>
 

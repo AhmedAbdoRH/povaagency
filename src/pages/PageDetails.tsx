@@ -29,7 +29,7 @@ export default function PageDetails() {
 
       const { data: allPagesData, error: allPagesError } = await supabase
         .from('pages')
-        .select('*')
+        .select('id, name, name_en, description, description_en, image_url, banner_url, is_active, display_order, created_at, updated_at')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: true });
 
@@ -45,7 +45,7 @@ export default function PageDetails() {
 
       const { data: servicesData, error: servicesError } = await supabase
         .from('services')
-        .select('id, name, page_id, display_order, is_active')
+        .select('id, name, name_en, page_id, display_order, is_active')
         .eq('page_id', pageId)
         .eq('is_active', true)
         .order('display_order', { ascending: true })
@@ -61,7 +61,7 @@ export default function PageDetails() {
 
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('specializations')
-        .select('*, clients(*)')
+        .select('id, name, name_en, description, description_en, image_url, service_id, is_active, display_order, created_at, updated_at, clients(id, name, name_en, description, description_en, image_url, logo_url, project_url, specialization_id, is_active, display_order, created_at, updated_at)')
         .in('service_id', serviceIds)
         .eq('is_active', true)
         .order('display_order', { ascending: true })

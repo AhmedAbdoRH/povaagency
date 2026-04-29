@@ -1,39 +1,7 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Globe2, Radar, SlidersHorizontal, BarChart4, MessagesSquare, Lightbulb } from 'lucide-react';
-
-const benefits = [
-  {
-    title: 'اتساع دائرة وصولك للعملاء',
-    description: 'نوصلك إلى أسواق جديدة حول العالم ونكسر الحواجز الجغرافية بحملات مدروسة.',
-    icon: Globe2,
-    gradient: 'from-blue-500 to-cyan-500'
-  },
-  {
-    title: 'استهداف أدق للعملاء',
-    description: 'نخصص رسائلك لتصل إلى العميل الصحيح في اللحظة الأنسب باستخدام بيانات فورية.',
-    icon: Radar,
-    gradient: 'from-purple-500 to-fuchsia-500'
-  },
-  {
-    title: 'ترشيد التكلفة',
-    description: 'نضبط الميزانيات ونحوّل الإنفاق إلى قنوات تحقق أعلى مردود ممكن دون هدر.',
-    icon: SlidersHorizontal,
-    gradient: 'from-emerald-500 to-teal-500'
-  },
-  {
-    title: 'نتائج يمكن قياسها',
-    description: 'نوفر تقارير شفافة تعرض نسب النجاح والأرقام الدقيقة لكل حملة رقمية.',
-    icon: BarChart4,
-    gradient: 'from-orange-500 to-red-500'
-  },
-  {
-    title: 'تواصل مباشر مع العملاء',
-    description: 'نستمع إلى جمهورك ونتفاعل معهم لحظياً لنبني علاقة ثقة طويلة الأمد.',
-    icon: MessagesSquare,
-    gradient: 'from-pink-500 to-rose-500'
-  },
-];
+import { useLanguage } from '../hooks/useLanguage';
 
 function TiltCard({ benefit, index }: { benefit: any, index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -82,9 +50,7 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
       className="relative h-full w-full rounded-3xl cursor-pointer"
     >
         <div 
-            className="absolute inset-0 rounded-3xl bg-gradient-to-br opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-30 -z-10"
-            style={{ backgroundImage: `var(--tw-gradient-stops)` }}
-            {...{ className: `absolute inset-0 rounded-3xl bg-gradient-to-br opacity-0 blur-xl transition-opacity duration-500 hover:opacity-50 -z-10 ${benefit.gradient}` }}
+            className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-0 blur-xl transition-opacity duration-500 hover:opacity-50 -z-10 ${benefit.gradient}`}
         />
 
         <div
@@ -119,6 +85,18 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
 }
 
 export default function DigitalMarketingBenefits() {
+  const { t } = useLanguage();
+
+  const benefitIcons = [Globe2, Radar, SlidersHorizontal, BarChart4, MessagesSquare];
+  const gradients = ['from-blue-500 to-cyan-500', 'from-purple-500 to-fuchsia-500', 'from-emerald-500 to-teal-500', 'from-orange-500 to-red-500', 'from-pink-500 to-rose-500'];
+
+  const benefits = Array.from({ length: 5 }, (_, index) => ({
+    title: t(`digitalMarketingBenefits.benefits.${index}.title`),
+    description: t(`digitalMarketingBenefits.benefits.${index}.description`),
+    icon: benefitIcons[index],
+    gradient: gradients[index]
+  }));
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#0a0a0a] to-[#000000] py-32 perspective-1000">
         {/* Animated Background Blob */}
@@ -148,7 +126,7 @@ export default function DigitalMarketingBenefits() {
                 className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
             >
                 <Lightbulb className="h-4 w-4 text-yellow-400" />
-                <span>فوائد حقيقية، نتائج ملموسة</span>
+                <span>{t('digitalMarketingBenefits.statusBadge')}</span>
             </motion.div>
             
           <motion.h2 
@@ -157,7 +135,7 @@ export default function DigitalMarketingBenefits() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-white"
           >
-            ما الاستفادة التي ستحصل عليها شركتك من <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-purple-400">التسويق الرقمي؟</span>
+            {t('digitalMarketingBenefits.heading')}
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -166,7 +144,7 @@ export default function DigitalMarketingBenefits() {
             transition={{ delay: 0.1 }}
             className="text-xl text-gray-400"
           >
-            نربطك بالعملاء المناسبين ونقدم لك أدوات دقيقة لقياس النجاح وتحسين الأداء باستمرار لضمان تصدرك.
+            {t('digitalMarketingBenefits.description')}
           </motion.p>
         </div>
 

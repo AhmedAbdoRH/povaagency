@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, X as Close } from 'lucide-react';
+import { Search, Menu, X as Close, Globe, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../hooks/useLanguage';
 import type { Page, StoreSettings, Client } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,16 +11,19 @@ interface HeaderProps {
 }
 
 export default function Header({ storeSettings }: HeaderProps) {
+  const { t, language, toggleLanguage } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Client[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
 
   const [pages, setPages] = useState<Page[]>([]);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -81,6 +85,10 @@ export default function Header({ storeSettings }: HeaderProps) {
         !(event.target as HTMLElement).closest('.mobile-menu-button')) {
         setIsMenuOpen(false);
       }
+      if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).closest('.services-dropdown-button')) {
+        setIsServicesDropdownOpen(false);
+      }
       if ('touches' in event) {
         const target = event.target as HTMLElement;
         if (searchInputRef.current && searchInputRef.current.contains(target)) return;
@@ -122,21 +130,58 @@ export default function Header({ storeSettings }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium hover:text-accent transition-colors">الرئيسية</Link>
+            <Link to="/" className="text-sm font-medium hover:text-accent transition-colors">{t('header.home')}</Link>
 
-            {/* Dynamic Pages Menu */}
-            {pages.map(page => (
-               <Link key={page.id} to={`/page/${page.id}`} className="text-sm font-medium hover:text-accent transition-colors">
-                  {page.name}
-               </Link>
-            ))}
+            {/* Services Dropdown */}
+            <div ref={servicesDropdownRef} className="relative group">
+              <button 
+                onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
+                className="services-dropdown-button flex items-center gap-2 text-sm font-medium hover:text-accent transition-colors py-2"
+              >
+                {t('header.services') || 'الخدمات'}
+                <ChevronDown className={`w-4 h-4 transition-transform ${isServicesDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            <Link to="/about" className="text-sm font-medium hover:text-accent transition-colors">من نحن</Link>
-            <Link to="/contact" className="text-sm font-medium hover:text-accent transition-colors">اتصل بنا</Link>
+              <AnimatePresence>
+                {isServicesDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+                  >
+                    <div className="py-2">
+                      {pages.map(page => (
+                        <Link
+                          key={page.id}
+                          to={`/page/${page.id}`}
+                          onClick={() => setIsServicesDropdownOpen(false)}
+                          className="block px-4 py-3 text-sm font-medium hover:bg-white/5 hover:text-accent transition-colors"
+                        >
+                          {page.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link to="/about" className="text-sm font-medium hover:text-accent transition-colors">{t('header.aboutUs')}</Link>
+            <Link to="/contact" className="text-sm font-medium hover:text-accent transition-colors">{t('header.contactUs')}</Link>
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+             {/* Language Toggle */}
+             <button 
+               onClick={toggleLanguage}
+               className="p-2 hover:bg-white/5 rounded-full transition-colors flex items-center gap-2 text-sm font-medium"
+               title={t('header.language')}
+             >
+               <Globe className="w-5 h-5" />
+               <span className="hidden sm:inline">{language.toUpperCase()}</span>
+             </button>
              
              {/* Search */}
              <div className="relative" ref={searchRef}>
@@ -151,7 +196,7 @@ export default function Header({ storeSettings }: HeaderProps) {
                           <input 
                              ref={searchInputRef}
                              type="text" 
-                             placeholder="بحث عن عميل..." 
+                             placeholder={t('header.searchPlaceholder')}
                              value={searchQuery}
                              onChange={(e) => handleSearch(e.target.value)}
                              className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-accent"
@@ -194,23 +239,50 @@ export default function Header({ storeSettings }: HeaderProps) {
              <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="absolute right-0 top-0 bottom-0 w-[80%] max-w-sm bg-[#1a1a1a] border-l border-white/10 shadow-2xl overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <div className="p-6">
                    <div className="flex items-center justify-between mb-8">
-                      <span className="text-xl font-bold text-white">القائمة</span>
+                      <span className="text-xl font-bold text-white">{t('header.menu')}</span>
                       <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-white/5 rounded-full">
                          <Close className="w-6 h-6" />
                       </button>
                    </div>
                    
+                   {/* Language Toggle in Mobile Menu */}
+                   <div className="mb-6 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
+                      <button 
+                        onClick={toggleLanguage}
+                        className="w-full flex items-center justify-center gap-2 font-medium"
+                      >
+                        <Globe className="w-5 h-5" />
+                        <span>{language === 'ar' ? 'English' : 'العربية'}</span>
+                      </button>
+                   </div>
+                   
                    <nav className="space-y-2">
-                      <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">الرئيسية</Link>
+                      <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.home')}</Link>
 
-                      {pages.map(page => (
-                         <Link key={page.id} to={`/page/${page.id}`} onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">
-                            {page.name}
-                         </Link>
-                      ))}
+                      {/* Services Dropdown Mobile */}
+                      <div className="space-y-2">
+                        <details className="group rounded-xl overflow-hidden hover:bg-white/5 transition-colors">
+                          <summary className="px-4 py-3 font-medium cursor-pointer flex items-center justify-between">
+                            {t('header.services') || 'الخدمات'}
+                            <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+                          </summary>
+                          <div className="bg-white/5 space-y-1 px-4 py-2">
+                            {pages.map(page => (
+                              <Link
+                                key={page.id}
+                                to={`/page/${page.id}`}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block px-3 py-2 rounded-lg hover:bg-white/5 hover:text-accent transition-colors text-sm"
+                              >
+                                {page.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </details>
+                      </div>
 
-                      <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">من نحن</Link>
-                      <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">اتصل بنا</Link>
+                      <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.aboutUs')}</Link>
+                      <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.contactUs')}</Link>
                    </nav>
                 </div>
              </motion.div>

@@ -2,13 +2,15 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Target, Eye, Award, Users, Zap } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function AboutUs() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-primary pt-20 pb-20">
       <Helmet>
-        <title>من نحن - POVA Agency</title>
-        <meta name="description" content="POVA هي وكالة تسويق رقمي متكاملة تهدف إلى تحويل الأفكار إلى واقع ملموس وعلامات تجارية ناجحة." />
+        <title>{t('about.title')} - POVA Agency</title>
+        <meta name="description" content={t('about.subtitle')} />
       </Helmet>
 
       <div className="container mx-auto px-4">
@@ -28,7 +30,7 @@ export default function AboutUs() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
-            POVA ليست مجرد وكالة تسويق، بل هي شريكك الاستراتيجي في رحلة النمو. نجمع بين الإبداع الفني والتحليل الدقيق للبيانات لنقدم لك حلولاً تضمن تفوقك في السوق.
+            {t('about.description')}
           </motion.p>
         </div>
 

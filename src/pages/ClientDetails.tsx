@@ -3,17 +3,35 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Client } from '../types/database';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
+
+interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
+  specialization?: {
+    id: string;
+    name: string;
+    name_en: string | null;
+    service_id: string;
+  } | null;
+}
 
 export default function ClientDetails() {
   const { id } = useParams<{ id: string }>();
-  const [client, setClient] = useState<Client | null>(null);
+  const { language } = useLanguage();
+  const [client, setClient] = useState<ClientWithPartialSpec | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (id) {
-      supabase.from('clients').select('*, specialization:specializations(id, name, service_id)').eq('id', id).single()
+      supabase.from('clients').select('id, name, name_en, description, description_en, image_url, logo_url, project_url, specialization_id, is_active, display_order, created_at, updated_at, specializations(id, name, name_en, service_id)').eq('id', id).single()
         .then(({ data, error }) => {
-           if (!error) setClient(data);
+           if (!error && data) {
+             const { specializations, ...clientData } = data;
+             const clientWithSpec = {
+               ...clientData,
+               specialization: specializations?.[0] || null
+             };
+             setClient(clientWithSpec);
+           }
            setLoading(false);
         });
     }
@@ -43,10 +61,10 @@ export default function ClientDetails() {
              
              <div className="p-8 md:p-12 relative">
                 <div className="absolute -top-10 right-8 md:right-12 bg-[#ee5239] text-white px-6 py-3 rounded-xl shadow-lg font-bold text-lg transform rotate-2">
-                   {client.specialization?.name}
+                   {language === 'en' ? (client.specialization?.name_en || client.specialization?.name) : client.specialization?.name}
                 </div>
 
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 border-b border-white/10 pb-6">{client.name}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-8 border-b border-white/10 pb-6">{language === 'en' ? (client.name_en || client.name) : client.name}</h1>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                    <div className="lg:col-span-2">
@@ -55,7 +73,7 @@ export default function ClientDetails() {
                          تفاصيل المشروع / العميل
                       </h3>
                       <div className="prose prose-invert prose-lg max-w-none">
-                         <p className="text-gray-300 leading-relaxed whitespace-pre-line text-lg">{client.description || 'لا يوجد وصف متاح لهذا العميل.'}</p>
+                         <p className="text-gray-300 leading-relaxed whitespace-pre-line text-lg">{language === 'en' ? (client.description_en || client.description) : client.description || 'لا يوجد وصف متاح لهذا العميل.'}</p>
                       </div>
                    </div>
                    

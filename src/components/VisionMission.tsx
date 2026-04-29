@@ -1,31 +1,33 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Eye, Rocket } from 'lucide-react';
-
-const data = [
-  {
-    id: 'vision',
-    title: 'رؤيتنا',
-    icon: Eye,
-    gradient: 'from-orange-500/80 to-red-600/80',
-    content: [
-      'ادخل إلى العالم الرقمي مع بوفا، حيث تتجاوز العلامات التجارية المألوف وتعيش المستقبل بقصص نابضة بالحياة وغامرة، تترك أثراً لا يُمحى في القلوب.',
-      'نصنع عالماً تكون فيه كل علامة تجارية تحفة فنية؛ مزيجاً فريداً من الإبداع يدفعها نحو آفاق غير محدودة.'
-    ],
-  },
-  {
-    id: 'mission',
-    title: 'مهمتنا',
-    icon: Rocket,
-    gradient: 'from-blue-600/80 to-cyan-500/80',
-    content: [
-      'نطلق العنان لإمكانات علامتك عبر روايات تجارية تبهر وتُلهم، مزودة بالطاقة والابتكار في كل تفصيلة.',
-      'نكون شريكك الدائم، نرسم خريطة دقيقة لرحلة علامتك منذ الانطلاقة وحتى الاحتفاء بالنتائج المذهلة.'
-    ],
-  },
-];
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function VisionMission() {
+  const { t } = useLanguage();
+
+  const data = [
+    {
+      id: 'vision',
+      title: t('visionMission.vision.title'),
+      icon: Eye,
+      gradient: 'from-orange-500/80 to-red-600/80',
+      content: [
+        t('visionMission.vision.content.0'),
+        t('visionMission.vision.content.1')
+      ],
+    },
+    {
+      id: 'mission',
+      title: t('visionMission.mission.title'),
+      icon: Rocket,
+      gradient: 'from-blue-600/80 to-cyan-500/80',
+      content: [
+        t('visionMission.mission.content.0'),
+        t('visionMission.mission.content.1')
+      ],
+    },
+  ];
   return (
     <section className="relative min-h-[800px] flex items-center py-32 bg-[#050505] text-white overflow-hidden">
         {/* Background Elements */}

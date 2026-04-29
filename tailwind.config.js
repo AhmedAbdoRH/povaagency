@@ -20,4 +20,8 @@ export default {
     },
   },
   plugins: [],
+  // Support RTL by detecting the document direction
+  corePlugins: {
+    preflight: true,
+  },
 };

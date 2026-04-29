@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../hooks/useLanguage';
 import {
   Play,
   Heart,
@@ -213,6 +214,7 @@ const particles = [
 ];
 
 export default function Hero() {
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -322,26 +324,28 @@ export default function Hero() {
               className="inline-flex items-center gap-2 bg-accent/10 border border-accent/25 text-accent text-xs sm:text-sm font-semibold rounded-full px-4 py-1.5 mb-6"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              حلول تسويق بصياغة تنفيذية احترافية
+              {t('hero.statusBadge')}
             </motion.div>
 
             {/* headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.5] mb-8 tracking-tight">
               {[
-                { text: 'نحول الهوية', delay: 0.5, gradient: false },
-                { text: 'إلى حضور رقمي', delay: 0.65, gradient: true },
-                { text: 'يلفت ويبيع', delay: 0.8, gradient: false },
+                { text: t('hero.title').split(' إلى ')[0], delay: 0.5, gradient: false },
+                { text: t('hero.title').split(' إلى ')[1]?.split(' ')[0] + ' ' + t('hero.title').split(' إلى ')[1]?.split(' ')[1], delay: 0.65, gradient: true },
+                { text: t('hero.title').split(' إلى ')[1]?.split(' ').slice(2).join(' ') || '', delay: 0.8, gradient: false },
               ].map(({ text, delay, gradient }) => (
-                <motion.span
-                  key={text}
-                  className={`block py-1 ${gradient ? 'text-transparent bg-clip-text' : ''}`}
-                  style={gradient ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
-                  initial={{ opacity: 0, y: 32 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-                >
-                  {text}
-                </motion.span>
+                text && (
+                  <motion.span
+                    key={text}
+                    className={`block py-1 ${gradient ? 'text-transparent bg-clip-text' : ''}`}
+                    style={gradient ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
+                    initial={{ opacity: 0, y: 32 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  >
+                    {text}
+                  </motion.span>
+                )
               ))}
             </h1>
 
@@ -352,8 +356,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.55 }}
             >
-              في <span className="text-white font-semibold">POVA</span> نبني لك تجربة متكاملة من الفكرة إلى التنفيذ،
-              بمحتوى مدروس وهوية بصرية واضحة تساعدك على تحقيق أهدافك بثقة.
+              {t('hero.subtitle')}
             </motion.p>
 
             {/* CTA */}
@@ -367,7 +370,7 @@ export default function Hero() {
                 onClick={scrollToServices}
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-base px-7 py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
               >
-                ابدأ مشروعك الآن
+                {t('hero.cta')}
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1.5" />
               </button>
 
@@ -376,7 +379,7 @@ export default function Hero() {
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-base px-7 py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-white" />
-                تعاون معنا
+                {t('hero.ctaCollaborate')}
               </Link>
             </motion.div>
 
@@ -397,7 +400,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-white/50 text-sm">
-                <span className="text-white font-semibold">+120</span> عميل راضٍ
+                <span className="text-white font-semibold">+120</span> {t('hero.happyClients')}
               </p>
               <div className="w-px h-4 bg-white/10" />
               <div className="flex items-center gap-1 text-amber-400 text-sm font-semibold">

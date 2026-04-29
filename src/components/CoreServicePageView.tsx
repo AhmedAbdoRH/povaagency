@@ -1,10 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Briefcase, Layers } from 'lucide-react';
-import type { Client, Page, Specialization } from '../types/database';
+import type { Client, Page } from '../types/database';
 import type { CoreServiceDefinition } from '../data/coreServices';
+import { useLanguage } from '../hooks/useLanguage';
 
-export interface SpecializationWithClients extends Specialization {
+export interface SpecializationWithClients {
+  id: string;
+  service_id: string;
+  name: string;
+  name_en: string | null;
+  description: string | null;
+  description_en: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
   clients?: Client[];
   service?: {
     id: string;
@@ -23,6 +35,7 @@ export default function CoreServicePageView({
   page,
   sections,
 }: CoreServicePageViewProps) {
+  const { language } = useLanguage();
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(sections[0]?.id || null);
 
   useEffect(() => {
@@ -42,7 +55,12 @@ export default function CoreServicePageView({
 
   const HeroIcon = coreService.icon;
   const heroImage = page?.banner_url || page?.image_url || null;
-  const summary = page?.description || coreService.description;
+  const summary = language === 'en' 
+    ? (page?.description_en || page?.description || coreService.description)
+    : (page?.description || coreService.description);
+  const pageTitle = language === 'en'
+    ? (page?.name_en || page?.name || coreService.title)
+    : (page?.name || coreService.title);
   const hasLinkedPage = Boolean(page);
 
   return (
@@ -53,7 +71,7 @@ export default function CoreServicePageView({
             الرئيسية
           </Link>
           <span>/</span>
-          <span className="text-accent">{coreService.title}</span>
+          <span className="text-accent">{pageTitle}</span>
         </div>
 
         <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#101010] shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
@@ -75,7 +93,7 @@ export default function CoreServicePageView({
               </div>
 
               <h1 className="mb-5 text-4xl font-extrabold leading-[1.3] md:text-5xl">
-                {coreService.title}
+                {pageTitle}
               </h1>
 
               <p className="max-w-3xl text-lg leading-8 text-gray-200">
@@ -133,7 +151,7 @@ export default function CoreServicePageView({
                         : 'border-white/10 bg-white/[0.03] text-gray-200 hover:border-white/20 hover:bg-white/[0.06]'
                     }`}
                   >
-                    <div className="font-bold">{section.name}</div>
+                    <div className="font-bold">{language === 'en' ? (section.name_en || section.name) : section.name}</div>
                     <div className="mt-1 text-xs opacity-80">
                       {(section.clients?.length || 0).toString()} عمل
                     </div>
@@ -145,10 +163,10 @@ export default function CoreServicePageView({
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] p-6">
                   <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-white">{selectedSection.name}</h3>
+                      <h3 className="text-2xl font-bold text-white">{language === 'en' ? (selectedSection.name_en || selectedSection.name) : selectedSection.name}</h3>
                       {selectedSection.description && (
                         <p className="mt-3 max-w-3xl leading-8 text-gray-300">
-                          {selectedSection.description}
+                          {language === 'en' ? (selectedSection.description_en || selectedSection.description) : selectedSection.description}
                         </p>
                       )}
                     </div>
@@ -185,13 +203,13 @@ export default function CoreServicePageView({
                           </div>
 
                           <div className="flex items-center justify-between gap-3">
-                            <h4 className="text-xl font-bold text-white">{client.name}</h4>
+                            <h4 className="text-xl font-bold text-white">{language === 'en' ? (client.name_en || client.name) : client.name}</h4>
                             <ArrowRight className="h-5 w-5 text-accent transition-transform group-hover:-translate-x-1" />
                           </div>
 
                           {client.description && (
                             <p className="mt-3 line-clamp-3 text-sm leading-7 text-gray-400">
-                              {client.description}
+                              {language === 'en' ? (client.description_en || client.description) : client.description}
                             </p>
                           )}
                         </Link>

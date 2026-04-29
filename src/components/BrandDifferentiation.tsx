@@ -1,35 +1,37 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { BarChart4, PieChart, Sparkles, LifeBuoy } from 'lucide-react';
-
-const differentiators = [
-  {
-    title: 'تحليل دقيق لمكانتك في السوق',
-    description: 'نوفر تحليلاً متعمقاً لموقع علامتك التجارية بين منافسيك ونرسم فرص النمو بشكل واضح ودقيق، لنبدأ من حيث يجب.',
-    icon: BarChart4,
-    color: 'from-[#ee5239] to-[#ff7a64]'
-  },
-  {
-    title: 'تخطيط استراتيجي',
-    description: 'نضع استراتيجيات مصممة خصيصاً لتحقيق أهدافك التجارية بثقة ووضوح. لا نعتمد على الحظ بل على تخطيط مدروس.',
-    icon: PieChart,
-    color: 'from-blue-500 to-cyan-400'
-  },
-  {
-    title: 'حلول تسويقية مميزة',
-    description: 'نقدم باقة خدمات متكاملة تنسجم لتلائم طبيعة مشروعك وتدعم نموه بشكل متسارع ومستدام.',
-    icon: Sparkles,
-    color: 'from-emerald-500 to-teal-400'
-  },
-  {
-    title: 'تقديم دعم مستمر',
-    description: 'مرافقة واستشارات دائمة لضمان استمرار نجاحك وتميزك في السوق، نحن شركاؤك في كل خطوة.',
-    icon: LifeBuoy,
-    color: 'from-purple-500 to-pink-500'
-  },
-];
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function BrandDifferentiation() {
+  const { t } = useLanguage();
+
+  const differentiators = [
+    {
+      title: t('brandDifferentiation.aspects.0.title'),
+      description: t('brandDifferentiation.aspects.0.description'),
+      icon: BarChart4,
+      color: 'from-[#ee5239] to-[#ff7a64]'
+    },
+    {
+      title: t('brandDifferentiation.aspects.1.title'),
+      description: t('brandDifferentiation.aspects.1.description'),
+      icon: PieChart,
+      color: 'from-blue-500 to-cyan-400'
+    },
+    {
+      title: t('brandDifferentiation.aspects.2.title'),
+      description: t('brandDifferentiation.aspects.2.description'),
+      icon: Sparkles,
+      color: 'from-emerald-500 to-teal-400'
+    },
+    {
+      title: t('brandDifferentiation.aspects.3.title'),
+      description: t('brandDifferentiation.aspects.3.description'),
+      icon: LifeBuoy,
+      color: 'from-purple-500 to-pink-500'
+    },
+  ];
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -48,7 +50,7 @@ export default function BrandDifferentiation() {
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm mb-6"
             >
               <Sparkles className="h-4 w-4 text-accent" />
-              <span>خدمات رئيسية مخصصة لشركتك</span>
+              <span>{t('brandDifferentiation.statusBadge')}</span>
             </motion.div>
             
             <motion.h2 
@@ -57,7 +59,7 @@ export default function BrandDifferentiation() {
               viewport={{ once: true }}
               className="text-4xl md:text-6xl font-black leading-[1.6] mb-6"
             >
-              كيف يمكن لـ <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ee5239] to-orange-300">بوفا</span> تمييز علامتك التجارية؟
+              {t('brandDifferentiation.heading')}
             </motion.h2>
             
             <motion.p 
@@ -67,7 +69,7 @@ export default function BrandDifferentiation() {
               transition={{ delay: 0.1 }}
               className="text-lg text-gray-400 max-w-xl"
             >
-              نحن نمزج بين التحليل العميق والتفكير الإبداعي لنقدم لك حلولاً تضع علامتك في صدارة المنافسين وتضمن نمواً مستداماً.
+              {t('brandDifferentiation.description')}
             </motion.p>
           </div>
 

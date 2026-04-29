@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Phone, MessageCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 import type { StoreSettings } from '../types/database';
 import UserLogin from './UserLogin';
 
@@ -8,6 +9,7 @@ interface FooterProps {
 }
 
 export default function Footer({ storeSettings }: FooterProps) {
+  const { t } = useLanguage();
   return (
     <footer className="bg-black border-t border-white/10 pt-16 pb-8">
       <div className="container mx-auto px-4">
@@ -15,9 +17,9 @@ export default function Footer({ storeSettings }: FooterProps) {
 
           {/* Brand Info */}
           <div className="col-span-1 md:col-span-2">
-            <h2 className="text-3xl font-bold text-white mb-6">POVA Agency</h2>
+            <h2 className="text-3xl font-bold text-white mb-6">{storeSettings?.store_name || 'POVA Agency'}</h2>
             <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
-              شريكك الاستراتيجي للنمو الرقمي. نحول الأفكار إلى علامات تجارية استثنائية من خلال التصميم المبتكر والتسويق الذكي.
+              {t('footer.description')}
             </p>
             <div className="flex gap-4">
               <a
@@ -51,26 +53,26 @@ export default function Footer({ storeSettings }: FooterProps) {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6">روابط سريعة</h3>
+            <h3 className="text-white font-bold text-lg mb-6">{t('footer.quickLinks')}</h3>
             <ul className="space-y-4">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-accent transition-colors">الرئيسية</Link>
+                <Link to="/" className="text-gray-400 hover:text-accent transition-colors">{t('header.home')}</Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-400 hover:text-accent transition-colors">من نحن</Link>
+                <Link to="/about" className="text-gray-400 hover:text-accent transition-colors">{t('header.aboutUs')}</Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-400 hover:text-accent transition-colors">اتصل بنا</Link>
+                <Link to="/contact" className="text-gray-400 hover:text-accent transition-colors">{t('header.contactUs')}</Link>
               </li>
               <li>
-                <Link to="/design-request" className="text-gray-400 hover:text-accent transition-colors">اطلب تصميم</Link>
+                <Link to="/design-request" className="text-gray-400 hover:text-accent transition-colors">{t('footer.designRequest')}</Link>
               </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6">تواصل معنا</h3>
+            <h3 className="text-white font-bold text-lg mb-6">{t('footer.contactUs')}</h3>
             <ul className="space-y-4">
               <li>
                 <a href="tel:+201006464349" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
@@ -81,7 +83,7 @@ export default function Footer({ storeSettings }: FooterProps) {
               <li>
                 <a href="https://wa.me/message/IUSOLSYPTTE6G1" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
                   <MessageCircle className="w-5 h-5" />
-                  <span>واتساب</span>
+                  <span>{t('footer.whatsapp')}</span>
                 </a>
               </li>
             </ul>
@@ -92,11 +94,11 @@ export default function Footer({ storeSettings }: FooterProps) {
           <div className="flex flex-col items-center gap-4">
             <UserLogin />
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} POVA Agency. جميع الحقوق محفوظة.
+              © {new Date().getFullYear()} {storeSettings?.store_name || 'POVA Agency'}. {t('footer.rights')}
             </p>
           </div>
           <Link to="/admin/login" className="text-gray-600 hover:text-gray-400 text-xs">
-            لوحة التحكم
+            {t('footer.admin')}
           </Link>
         </div>
       </div>

@@ -1,40 +1,7 @@
-import React from 'react';
+import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Eye, Handshake, Target, DollarSign, BarChart3, Sparkles } from 'lucide-react';
-import { useRef } from 'react';
-
-const highlights = [
-  {
-    title: 'زيادة رؤية علامتك التجارية',
-    description: 'نصنع حضوراً رقمياً يضمن تواجدك في أذهان جمهورك المستهدف بشكل مستمر. في عالم مزدحم، نجعلك الخيار الأول والأكثر تميزاً.',
-    icon: Eye,
-    color: 'from-orange-500 to-red-500',
-  },
-  {
-    title: 'تواصل أعمق مع عملائك',
-    description: 'نصمم محتوى تفاعلياً يبني جسراً دائماً مع مجتمعك ويحول المتابعين إلى عملاء أوفياء يثقون بعلامتك.',
-    icon: Handshake,
-    color: 'from-blue-500 to-indigo-500',
-  },
-  {
-    title: 'إعلانات موجهة بدقة',
-    description: 'نستهدف الفئات الأدق بالرسائل المناسبة. لا نهدر ميزانيتك، بل نضع إعلانك أمام من يبحثون عنك تماماً.',
-    icon: Target,
-    color: 'from-green-500 to-emerald-500',
-  },
-  {
-    title: 'أعلى عائد استثماري',
-    description: 'نستثمر الميزانيات بحكمة عبر قنوات تحقق أعلى عائد استثماري، لنضمن أن كل دولار يعود بأرباح مضاعفة.',
-    icon: DollarSign,
-    color: 'from-purple-500 to-fuchsia-500',
-  },
-  {
-    title: 'قرارات مبنية على البيانات',
-    description: 'نوفر لوحات قياس دقيقة توضح أثر كل حملة وتساعدك في اتخاذ قرارات استراتيجية أسرع وأكثر ذكاءً.',
-    icon: BarChart3,
-    color: 'from-pink-500 to-rose-500',
-  },
-];
+import { useLanguage } from '../hooks/useLanguage';
 
 function Card({ item, index, progress, targetScale }: { item: any; index: number; progress: any; targetScale: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,6 +39,41 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
 }
 
 export default function WhySocialMarketing() {
+  const { t } = useLanguage();
+
+  const highlights = [
+    {
+      title: t('whySocialMarketing.highlights.0.title'),
+      description: t('whySocialMarketing.highlights.0.description'),
+      icon: Eye,
+      color: 'from-orange-500 to-red-500',
+    },
+    {
+      title: t('whySocialMarketing.highlights.1.title'),
+      description: t('whySocialMarketing.highlights.1.description'),
+      icon: Handshake,
+      color: 'from-blue-500 to-indigo-500',
+    },
+    {
+      title: t('whySocialMarketing.highlights.2.title'),
+      description: t('whySocialMarketing.highlights.2.description'),
+      icon: Target,
+      color: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: t('whySocialMarketing.highlights.3.title'),
+      description: t('whySocialMarketing.highlights.3.description'),
+      icon: DollarSign,
+      color: 'from-purple-500 to-fuchsia-500',
+    },
+    {
+      title: t('whySocialMarketing.highlights.4.title'),
+      description: t('whySocialMarketing.highlights.4.description'),
+      icon: BarChart3,
+      color: 'from-pink-500 to-rose-500',
+    },
+  ];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -93,15 +95,15 @@ export default function WhySocialMarketing() {
                 className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
             >
                 <Sparkles className="h-4 w-4 text-accent" />
-                <span>قوة التواصل المستمر</span>
+                <span>{t('whySocialMarketing.statusBadge')}</span>
             </motion.div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.6] max-w-4xl mx-auto"
           >
-            لماذا يعتبر التسويق عبر منصات التواصل <span className="text-accent">ضرورة حتمية</span>؟
+            {t('whySocialMarketing.heading')}
           </motion.h2>
         </div>
 

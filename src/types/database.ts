@@ -1,7 +1,9 @@
 export interface Page {
   id: string;
   name: string;
+  name_en: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null; // الصورة الرئيسية المربعة
   banner_url: string | null; // البانر
   is_active: boolean;
@@ -29,8 +31,10 @@ export interface ProductSize {
 export interface Client {
   id: string;
   name: string;
+  name_en: string | null;
   logo_url: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null;
   project_url: string | null;
   specialization_id: string;
@@ -62,7 +66,9 @@ export interface Service {
   id: string;
   page_id: string;
   name: string;
+  name_en: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null;
   is_active: boolean;
   display_order: number;
@@ -148,7 +154,9 @@ export interface Specialization {
   id: string;
   service_id: string; // Links to Service (Level 2)
   name: string;
+  name_en: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null;
   is_active: boolean;
   display_order: number;

@@ -1,0 +1,310 @@
+{
+  "header": {
+    "home": "Home",
+    "services": "Services",
+    "aboutUs": "About Us",
+    "contactUs": "Contact Us",
+    "search": "Search",
+    "searchPlaceholder": "Search for a client...",
+    "menu": "Menu",
+    "close": "Close",
+    "language": "Language"
+  },
+  "footer": {
+    "brand": "POVA Agency",
+    "description": "Your strategic partner for digital growth. We transform ideas into exceptional brands through innovative design and smart marketing.",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "designRequest": "Request Design",
+    "phone": "+20 100 646 4349",
+    "whatsapp": "WhatsApp",
+    "rights": "All rights reserved",
+    "admin": "Admin Panel",
+    "year": "Year"
+  },
+  "hero": {
+    "statusBadge": "Professional execution, amazing results",
+    "title": "We Transform Your Identity Into a Digital Presence That Attracts and Sells",
+    "subtitle": "At POVA, we build a comprehensive experience for you from idea to execution, with thoughtful content and clear visual identity to help you achieve your goals with confidence.",
+    "cta": "Start Your Project Now",
+    "ctaCollaborate": "Collaborate With Us",
+    "happyClients": "happy customers"
+  },
+  "features": {
+    "statusBadge": "Exceptional design, amazing results",
+    "heading": "Why Choose POVA?",
+    "description": "At POVA, we don't offer ordinary services - we create integrated digital experiences that exceed expectations and put your brand at the forefront.",
+    "items": [
+      {
+        "title": "Precise Strategies",
+        "description": "We analyze your target audience accurately to build marketing plans that reach them directly and achieve your goals with high efficiency."
+      },
+      {
+        "title": "Unlimited Creativity",
+        "description": "Our team creates out-of-the-box ideas to differentiate your brand and make it shine in a competitive landscape."
+      },
+      {
+        "title": "Tangible Results",
+        "description": "We focus on ROI and performance transparency."
+      },
+      {
+        "title": "True Partnership",
+        "description": "Your success is our success. We're with you every step of the way."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "value": "500",
+        "suffix": "+",
+        "label": "successful projects"
+      },
+      {
+        "value": "100",
+        "suffix": "+",
+        "label": "happy customers"
+      },
+      {
+        "value": "5",
+        "suffix": "+",
+        "label": "years of experience"
+      },
+      {
+        "value": "24",
+        "suffix": "/7",
+        "label": "technical support"
+      }
+    ]
+  },
+  "services": {
+    "heading": "Explore Our Services",
+    "description": "Browse the main services directly related to departments and business within each field.",
+    "emptyState": "No pages added yet.",
+    "loading": "Loading...",
+    "webDesign": "Web Design",
+    "graphicDesign": "Graphic Design",
+    "seo": "SEO",
+    "socialMedia": "Social Media",
+    "contentCreation": "Content Creation",
+    "branding": "Branding"
+  },
+  "marketingCoreServices": {
+    "badge": "Our Core Services",
+    "heading": "Integrated Solutions for Your Digital Success",
+    "description": "These cards have become the main service pages. Clicking on any service will take you directly to its sections and then the works under each section."
+  },
+  "whySocialMarketing": {
+    "statusBadge": "The Power of Continuous Communication",
+    "heading": "Why is Social Media Marketing an Absolute Necessity?",
+    "highlights": [
+      {
+        "title": "Increase Your Brand Visibility",
+        "description": "We create a digital presence that ensures your continued presence in your target audience's minds. In a crowded world, we make you the first and most distinctive choice."
+      },
+      {
+        "title": "Deeper Connection With Your Customers",
+        "description": "We design interactive content that builds lasting bridges with your community and transforms followers into loyal customers who trust your brand."
+      },
+      {
+        "title": "Precisely Targeted Advertising",
+        "description": "We target the most precise segments with appropriate messages. We don't waste your budget; we place your ad in front of exactly who is looking for you."
+      },
+      {
+        "title": "Highest ROI",
+        "description": "We invest budgets wisely across channels that deliver the highest ROI, ensuring every dollar returns with multiplied profits."
+      },
+      {
+        "title": "Data-Driven Decisions",
+        "description": "We provide accurate dashboards that show the impact of each campaign and help you make strategic decisions faster and smarter."
+      }
+    ]
+  },
+  "visualStorytellingReasons": {
+    "statusBadge": "The Power of Images and Sound",
+    "heading": "6 Reasons Why Your Project Needs Visual Storytelling",
+    "description": "We transform your ideas into unforgettable visual experiences that build trust and create a real difference in the customer journey from the very first moment.",
+    "reasons": [
+      {
+        "id": "01",
+        "title": "Visual Communication",
+        "description": "Enables you to convey your brand message in a compelling and clear way through impactful visual stories."
+      },
+      {
+        "id": "02",
+        "title": "Increased Engagement",
+        "description": "Captures the customer's attention to your content and motivates them to interact and engage with your brand."
+      },
+      {
+        "id": "03",
+        "title": "Brand Differentiation",
+        "description": "Stand out from competitors by providing rich content that addresses customer needs and highlights your unique personality."
+      },
+      {
+        "id": "04",
+        "title": "Professional Product Display",
+        "description": "We highlight your products' features and benefits with dynamic visual output that emphasizes creative details."
+      },
+      {
+        "id": "05",
+        "title": "Emotional Connection",
+        "description": "We create a strong human bond between your audience and the product through inspiring and impactful stories."
+      },
+      {
+        "id": "06",
+        "title": "Driving Viewer Action",
+        "description": "We design dynamic scenes that call for action and increase conversion and engagement opportunities."
+      }
+    ]
+  },
+  "visionMission": {
+    "vision": {
+      "title": "Our Vision",
+      "content": [
+        "Enter the digital world with Pova, where brands transcend the ordinary and live the future with vibrant and exciting stories, leaving an indelible mark on hearts.",
+        "We create a world where every brand is a work of art; a unique blend of creativity that propels them toward unlimited horizons."
+      ]
+    },
+    "mission": {
+      "title": "Our Mission",
+      "content": [
+        "We unlock your brand's potential through business narratives that dazzle and inspire, powered by innovation in every detail.",
+        "We are your permanent partner, charting a precise roadmap for your brand's journey from launch to celebrating amazing results."
+      ]
+    }
+  },
+  "companyValues": {
+    "statusBadge": "Our Core Values",
+    "heading": "The Values That Shape Pova's Identity",
+    "description": "Our culture is built on clear principles that drive us to innovate and give our clients confidence that we are the most committed and innovative partner.",
+    "values": [
+      {
+        "title": "Creative Spirit",
+        "description": "We enjoy creating ideas that inspire your audience and move their hearts, keeping your brand alive and vibrant."
+      },
+      {
+        "title": "Reality",
+        "description": "We tell real stories that communicate with customers honestly and translate your vision into impactful narratives."
+      },
+      {
+        "title": "Smart and Thoughtful Creativity",
+        "description": "We combine refined taste with data intelligence to deliver solutions that reflect your brand's personality."
+      },
+      {
+        "title": "Together We Win",
+        "description": "We believe in true partnership, working shoulder to shoulder to turn challenges into achievements."
+      },
+      {
+        "title": "Growth",
+        "description": "We commit to continuous plans that boost your performance and maintain steady results progression step by step."
+      },
+      {
+        "title": "Credibility",
+        "description": "Transparency is our foundation, we provide clear data and recommendations based on accurate numbers."
+      },
+      {
+        "title": "Flexibility and Prosperity",
+        "description": "We adapt quickly to market changes to keep you leading in a changing world."
+      },
+      {
+        "title": "Makers of Positive Impact",
+        "description": "We strive to leave a balanced footprint that serves your brand and society through humanitarian and inspiring projects."
+      }
+    ]
+  },
+  "digitalMarketingBenefits": {
+    "statusBadge": "Real Benefits, Tangible Results",
+    "heading": "What Benefits Will Your Company Get From Digital Marketing?",
+    "description": "We connect you with the right customers and provide you with precise tools to measure success and continuously improve performance to ensure your leadership.",
+    "benefits": [
+      {
+        "title": "Expand Your Reach to Customers",
+        "description": "We connect you to new markets around the world and break geographic barriers with well-planned campaigns."
+      },
+      {
+        "title": "More Precise Customer Targeting",
+        "description": "We customize your messages to reach the right customer at the right time using real-time data."
+      },
+      {
+        "title": "Cost Optimization",
+        "description": "We optimize budgets and convert spending to channels that deliver the highest possible returns without waste."
+      },
+      {
+        "title": "Measurable Results",
+        "description": "We provide transparent reports showing success rates and accurate figures for each digital campaign."
+      },
+      {
+        "title": "Direct Customer Communication",
+        "description": "We listen to your audience and engage with them in real-time to build long-term trust relationships."
+      }
+    ]
+  },
+  "brandDifferentiation": {
+    "statusBadge": "Customized Core Services For Your Company",
+    "heading": "What Sets Us Apart From Others?",
+    "description": "At POVA, we don't offer ordinary services - we provide customized solutions that give your brand a unique identity that lasts in your customers' minds.",
+    "aspects": [
+      {
+        "title": "Precise Market Position Analysis",
+        "description": "We provide in-depth analysis of your brand's position among competitors and clearly map out growth opportunities, so we start where we should."
+      },
+      {
+        "title": "Strategic Planning",
+        "description": "We design strategies customized specifically to achieve your business goals with confidence and clarity. We don't rely on luck but on thoughtful planning."
+      },
+      {
+        "title": "Distinctive Marketing Solutions",
+        "description": "We offer an integrated suite of services that harmonize to suit your project's nature and support its accelerated and sustainable growth."
+      },
+      {
+        "title": "Continuous Support",
+        "description": "Ongoing guidance and consultations to ensure your continued success and distinction in the market, we are your partners every step of the way."
+      }
+    ]
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Our journey in the digital marketing world",
+    "description": "We are a specialized team of creative and experienced marketers in the field of digital marketing and design. We help companies and individuals build their brand and achieve their digital goals."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help you",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send",
+    "sending": "Sending...",
+    "success": "Your message has been sent successfully!",
+    "error": "Something went wrong. Please try again."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "delete": "Delete",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "noResults": "No results found",
+    "viewMore": "View More",
+    "back": "Back"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "logout": "Logout",
+    "users": "Users",
+    "settings": "Settings",
+    "analytics": "Analytics",
+    "reports": "Reports",
+    "addNew": "Add New",
+    "save": "Save",
+    "saved": "Saved",
+    "nameAr": "Arabic Name",
+    "nameEn": "English Name",
+    "descriptionAr": "Arabic Description",
+    "descriptionEn": "English Description"
+  }
+}

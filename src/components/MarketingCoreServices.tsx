@@ -5,8 +5,10 @@ import { Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Page } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function MarketingCoreServices() {
+  const { t, language } = useLanguage();
   const [pages, setPages] = useState<Page[]>([]);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function MarketingCoreServices() {
       try {
         const { data, error } = await supabase
           .from('pages')
-          .select('*')
+          .select('id, name, name_en, description, description_en, image_url, banner_url, is_active, display_order, created_at, updated_at')
           .order('display_order', { ascending: true })
           .order('created_at', { ascending: true });
 
@@ -50,7 +52,7 @@ export default function MarketingCoreServices() {
             className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-2 shadow-2xl backdrop-blur-md"
           >
             <Sparkles className="h-5 w-5 animate-pulse text-accent" />
-            <span className="text-sm font-bold tracking-wider text-gray-200">خدماتنا الأساسية</span>
+            <span className="text-sm font-bold tracking-wider text-gray-200">{t('marketingCoreServices.badge')}</span>
           </motion.div>
 
           <motion.h2
@@ -61,7 +63,7 @@ export default function MarketingCoreServices() {
             className="mb-6 text-4xl font-extrabold leading-[1.5] text-white md:text-5xl lg:text-6xl"
             style={{ textShadow: '0 0 30px rgba(238,82,57,0.3)' }}
           >
-            حلول متكاملة لنجاحك الرقمي
+            {t('marketingCoreServices.heading')}
           </motion.h2>
 
           <motion.p
@@ -71,7 +73,7 @@ export default function MarketingCoreServices() {
             transition={{ delay: 0.2 }}
             className="text-lg leading-relaxed text-gray-400 md:text-xl"
           >
-            هذه الكروت أصبحت هي صفحات الخدمات الرئيسية. عند الضغط على أي خدمة ستدخل مباشرة إلى الأقسام الخاصة بها ثم الأعمال الموجودة تحت كل قسم.
+            {t('marketingCoreServices.description')}
           </motion.p>
         </div>
 
@@ -117,11 +119,11 @@ export default function MarketingCoreServices() {
                 </div>
 
                 <h3 className="mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-2xl font-bold leading-[1.4] text-transparent transition-all duration-300 group-hover:to-white">
-                  {service.title}
+                  {language === 'en' ? (service.page?.name_en || service.title) : service.title}
                 </h3>
 
                 <p className="flex-grow leading-relaxed text-gray-300 transition-colors duration-300 group-hover:text-white">
-                  {service.description}
+                  {language === 'en' ? (service.page?.description_en || service.description) : service.description}
                 </p>
 
                 <div className="mt-6 text-sm text-gray-400">
