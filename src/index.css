@@ -118,8 +118,8 @@ html[dir="ltr"] .mr-auto {
 /* Typography Enhancements */
 h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
-  line-height: 1.35;
-  letter-spacing: -0.01em; /* Slight tightening for modern premium look */
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 p {

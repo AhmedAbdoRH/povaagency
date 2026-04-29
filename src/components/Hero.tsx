@@ -215,7 +215,7 @@ const particles = [
 ];
 
 export default function Hero() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -328,7 +328,7 @@ export default function Hero() {
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-[4rem] font-black text-white leading-[1.3] sm:leading-[1.5] mb-6 sm:mb-8 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-[4rem] font-black text-white leading-[1.4] sm:leading-[1.5] mb-6 sm:mb-8 tracking-tight">
               {[
                 { text: t('hero.title').split(' إلى ')[0], delay: 0.5, gradient: false },
                 { text: t('hero.title').split(' إلى ')[1]?.split(' ')[0] + ' ' + t('hero.title').split(' إلى ')[1]?.split(' ')[1], delay: 0.65, gradient: true },
@@ -337,8 +337,8 @@ export default function Hero() {
                 text && (
                   <motion.span
                     key={text}
-                    className={`block py-1 ${gradient ? 'text-transparent bg-clip-text' : ''}`}
-                    style={gradient ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
+                    className={`block py-2 ${gradient ? 'text-transparent bg-clip-text' : ''}`}
+                    style={gradient ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.15em' } : {}}
                     initial={{ opacity: 0, y: 32 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}

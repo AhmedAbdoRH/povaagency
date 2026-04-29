@@ -39,7 +39,7 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
 }
 
 export default function WhySocialMarketing() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const highlights = [
     {

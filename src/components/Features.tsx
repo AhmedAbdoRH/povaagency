@@ -50,7 +50,7 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
 
 export default function Features() {
     const { t } = useLanguage();
-    
+
     const features = [
         {
             icon: Target,
@@ -81,12 +81,12 @@ export default function Features() {
             color: "from-purple-500/20 to-transparent",
         }
     ];
-    
+
     return (
         <section className="relative overflow-hidden bg-black py-32 selection:bg-accent/30">
             {/* Background elements */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-            
+
             <div className="container relative z-10 mx-auto px-4">
                 <div className="mb-20 flex flex-col items-center text-center">
                     <motion.div
@@ -98,7 +98,7 @@ export default function Features() {
                         <Sparkles className="h-4 w-4" />
                         <span>{t('features.statusBadge')}</span>
                     </motion.div>
-                    
+
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}

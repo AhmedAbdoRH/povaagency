@@ -4,7 +4,7 @@ import { BarChart4, PieChart, Sparkles, LifeBuoy } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
 export default function BrandDifferentiation() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const differentiators = [
     {
