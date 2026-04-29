@@ -233,44 +233,73 @@ export default function Header({ storeSettings }: HeaderProps) {
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 z-50 lg:hidden backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}>
-             <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="absolute right-0 top-0 bottom-0 w-[80%] max-w-sm bg-[#1a1a1a] border-l border-white/10 shadow-2xl overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 bg-black/80 z-[100] lg:hidden backdrop-blur-sm" 
+            onClick={() => setIsMenuOpen(false)}
+          >
+             <motion.div 
+                ref={menuRef}
+                initial={{ x: language === 'ar' ? '100%' : '100%' }} 
+                animate={{ x: 0 }} 
+                exit={{ x: language === 'ar' ? '100%' : '100%' }} 
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }} 
+                className={`absolute ${language === 'ar' ? 'right-0' : 'right-0'} top-0 bottom-0 w-[80%] max-w-sm bg-[#1a1a1a] border-l border-white/10 shadow-2xl overflow-y-auto`} 
+                onClick={e => e.stopPropagation()}
+             >
                 <div className="p-6">
                    <div className="flex items-center justify-between mb-8">
                       <span className="text-xl font-bold text-white">{t('header.menu')}</span>
-                      <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-white/5 rounded-full">
+                      <button 
+                        onClick={() => setIsMenuOpen(false)} 
+                        className="p-2 hover:bg-white/5 rounded-full text-white transition-colors"
+                        aria-label={t('header.close')}
+                      >
                          <Close className="w-6 h-6" />
                       </button>
                    </div>
                    
                    {/* Language Toggle in Mobile Menu */}
-                   <div className="mb-6 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
+                   <div className="mb-6 p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
                       <button 
-                        onClick={toggleLanguage}
-                        className="w-full flex items-center justify-center gap-2 font-medium"
+                        onClick={() => {
+                          toggleLanguage();
+                          setIsMenuOpen(false);
+                        }}
+                        className="w-full flex items-center justify-center gap-3 font-bold text-accent"
                       >
                         <Globe className="w-5 h-5" />
                         <span>{language === 'ar' ? 'English' : 'العربية'}</span>
                       </button>
                    </div>
                    
-                   <nav className="space-y-2">
-                      <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.home')}</Link>
-
+                   <nav className="space-y-3">
+                      <Link 
+                        to="/" 
+                        onClick={() => setIsMenuOpen(false)} 
+                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
+                      >
+                        {t('header.home')}
+                      </Link>
+                      
                       {/* Services Dropdown Mobile */}
                       <div className="space-y-2">
-                        <details className="group rounded-xl overflow-hidden hover:bg-white/5 transition-colors">
-                          <summary className="px-4 py-3 font-medium cursor-pointer flex items-center justify-between">
-                            {t('header.services') || 'الخدمات'}
-                            <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+                        <details className="group rounded-2xl overflow-hidden bg-white/5 transition-all">
+                          <summary className="px-5 py-4 font-bold cursor-pointer flex items-center justify-between list-none">
+                            <span className="flex items-center gap-3">
+                              {t('header.services') || 'الخدمات'}
+                            </span>
+                            <ChevronDown className="w-5 h-5 group-open:rotate-180 transition-transform" />
                           </summary>
-                          <div className="bg-white/5 space-y-1 px-4 py-2">
+                          <div className="bg-black/20 space-y-1 px-4 py-3">
                             {pages.map(page => (
                               <Link
                                 key={page.id}
                                 to={`/page/${page.id}`}
                                 onClick={() => setIsMenuOpen(false)}
-                                className="block px-3 py-2 rounded-lg hover:bg-white/5 hover:text-accent transition-colors text-sm"
+                                className="block px-4 py-3 rounded-xl hover:bg-accent/20 hover:text-accent transition-all text-sm font-medium"
                               >
                                 {page.name}
                               </Link>
@@ -279,9 +308,26 @@ export default function Header({ storeSettings }: HeaderProps) {
                         </details>
                       </div>
 
-                      <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.aboutUs')}</Link>
-                      <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 rounded-xl hover:bg-white/5 font-medium">{t('header.contactUs')}</Link>
+                      <Link 
+                        to="/about" 
+                        onClick={() => setIsMenuOpen(false)} 
+                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
+                      >
+                        {t('header.aboutUs')}
+                      </Link>
+                      
+                      <Link 
+                        to="/contact" 
+                        onClick={() => setIsMenuOpen(false)} 
+                        className="block px-5 py-4 rounded-2xl bg-white/5 hover:bg-accent hover:text-white transition-all font-bold"
+                      >
+                        {t('header.contactUs')}
+                      </Link>
                    </nav>
+
+                   <div className="mt-12 pt-8 border-t border-white/5 text-center">
+                     <p className="text-gray-500 text-xs">{t('footer.brand')}</p>
+                   </div>
                 </div>
              </motion.div>
           </motion.div>

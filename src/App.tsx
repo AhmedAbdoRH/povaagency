@@ -24,6 +24,7 @@ import Orders from './pages/Orders';
 import Wishlist from './pages/Wishlist';
 import StructuredData from './components/StructuredData';
 import Hero from './components/Hero';
+import CollaborationForm from './components/CollaborationForm';
 import DesignRequest from './pages/DesignRequest';
 import Features from './components/Features';
 import Stats from './components/Stats';
@@ -158,6 +159,7 @@ function App() {
         {isHome && <MarketingCoreServices />}
         <main>{children}</main>
         {/* {isHome && <Testimonials />} */}
+        <CollaborationForm />
         <Footer storeSettings={storeSettings} />
         <WhatsAppButton />
       </div>

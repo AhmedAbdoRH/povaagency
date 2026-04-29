@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Download, Users } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
 import type { Client, ClientContent, Page, Service, Specialization } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 
-type FormMode = 'page' | 'spec' | 'client' | 'content' | null;
+type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | null;
 
 const emptyPageForm = { name: '', name_en: '', description: '', description_en: '', image_url: '', banner_url: '' };
 const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '' };
@@ -24,6 +24,7 @@ export default function AdminDashboard() {
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [contents, setContents] = useState<ClientContent[]>([]);
+  const [customerRequests, setCustomerRequests] = useState<any[]>([]);
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -47,23 +48,26 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [p, s, sp, c, cc] = await Promise.all([
+      const [p, s, sp, c, cc, cr] = await Promise.all([
         supabase.from('pages').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('services').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('specializations').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('clients').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('client_content').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
+        supabase.from('collaboration_requests').select('*').order('created_at', { ascending: false }),
       ]);
       if (p.error) throw p.error;
       if (s.error) throw s.error;
       if (sp.error) throw sp.error;
       if (c.error) throw c.error;
       if (cc.error) throw cc.error;
+      if (cr.error) throw cr.error;
       setPages(p.data || []);
       setServices(s.data || []);
       setSpecializations(sp.data || []);
       setClients(c.data || []);
       setContents(cc.data || []);
+      setCustomerRequests(cr.data || []);
     } catch (error: any) {
       toast.error(`خطأ: ${error.message}`);
     } finally {
@@ -168,12 +172,35 @@ export default function AdminDashboard() {
     await fetchData();
   };
 
-  const removeItem = async (table: 'pages' | 'specializations' | 'clients' | 'client_content', id: string) => {
+  const removeItem = async (table: 'pages' | 'specializations' | 'clients' | 'client_content' | 'collaboration_requests', id: string) => {
     if (!window.confirm('هل أنت متأكد من الحذف؟')) return;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) return toast.error(`خطأ: ${error.message}`);
     toast.success('تم الحذف.');
     await fetchData();
+  };
+
+  const exportCustomersToCSV = () => {
+    if (customerRequests.length === 0) return toast.info('لا توجد بيانات لتصديرها');
+    
+    const headers = ['الاسم', 'رقم الهاتف', 'الخدمات المختارة', 'تاريخ الطلب'];
+    const rows = customerRequests.map(req => [
+      req.name,
+      req.phone,
+      Array.isArray(req.selected_services) ? req.selected_services.join(' - ') : req.selected_services,
+      new Date(req.created_at).toLocaleString('ar-EG')
+    ]);
+
+    const csvContent = "\uFEFF" + [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `customer_data_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const renderTopCard = (item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
@@ -256,11 +283,21 @@ export default function AdminDashboard() {
           <button onClick={() => { supabase.auth.signOut(); navigate('/admin/login'); }} className="rounded-xl border border-red-500/30 bg-red-500/20 px-5 py-3 text-red-300">تسجيل الخروج</button>
         </div>
 
-        <div className="mb-6 flex items-center gap-2 text-sm">
-          <button onClick={() => { setSelectedPage(null); setSelectedSpec(null); setSelectedClient(null); }} className={!selectedPage ? 'font-bold text-blue-400' : 'text-gray-400'}>الخدمات الرئيسية</button>
-          {selectedPage && <><span>/</span><button onClick={() => { setSelectedSpec(null); setSelectedClient(null); }} className={!selectedSpec ? 'font-bold text-pink-400' : 'text-gray-400'}>الأقسام</button></>}
-          {selectedSpec && <><span>/</span><button onClick={() => setSelectedClient(null)} className={!selectedClient ? 'font-bold text-green-400' : 'text-gray-400'}>الأعمال</button></>}
-          {selectedClient && <><span>/</span><span className="font-bold text-orange-400">محتوى العمل</span></>}
+        <div className="mb-6 flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <button onClick={() => { setActiveForm(null); setSelectedPage(null); setSelectedSpec(null); setSelectedClient(null); }} className={!selectedPage && activeForm !== 'customers' ? 'font-bold text-blue-400' : 'text-gray-400'}>الخدمات الرئيسية</button>
+            {selectedPage && <><span>/</span><button onClick={() => { setSelectedSpec(null); setSelectedClient(null); }} className={!selectedSpec ? 'font-bold text-pink-400' : 'text-gray-400'}>الأقسام</button></>}
+            {selectedSpec && <><span>/</span><button onClick={() => setSelectedClient(null)} className={!selectedClient ? 'font-bold text-green-400' : 'text-gray-400'}>الأعمال</button></>}
+            {selectedClient && <><span>/</span><span className="font-bold text-orange-400">محتوى العمل</span></>}
+          </div>
+          <div className="h-4 w-px bg-gray-700 mx-2" />
+          <button 
+            onClick={() => { setActiveForm('customers'); setSelectedPage(null); setSelectedSpec(null); setSelectedClient(null); }} 
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${activeForm === 'customers' ? 'bg-accent/20 text-accent font-bold' : 'text-gray-400 hover:text-white'}`}
+          >
+            <Users className="w-4 h-4" />
+            بيانات العملاء
+          </button>
         </div>
 
         <div className="rounded-3xl border border-gray-700/50 bg-gray-800/50 p-6">
@@ -320,6 +357,72 @@ export default function AdminDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{filteredContents.map(item => <div key={item.id} className="overflow-hidden rounded-2xl border border-gray-600/50 bg-gray-700/30"><div className="relative aspect-square">{item.image_url ? <img src={item.image_url} alt={item.title} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gray-800/50" />}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-0 left-0 right-0 p-3"><h3 className="line-clamp-2 font-bold">{item.title}</h3><p className="mt-1 text-xs text-gray-400">{item.content_type}</p></div></div><div className="flex gap-2 p-3"><button onClick={() => { setEditingContent(item.id); setContentForm({ client_id: item.client_id, title: item.title, description: item.description || '', image_url: item.image_url || '', video_url: item.video_url || '', content_type: item.content_type || 'image' }); setActiveForm('content'); }} className="flex-1 rounded-lg bg-orange-500/20 py-2 text-orange-200"><Edit className="mx-auto h-4 w-4" /></button><button onClick={() => removeItem('client_content', item.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button></div></div>)}</div>
               {activeForm === 'content' && <form onSubmit={saveContent} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5"><input value={contentForm.title} onChange={e => setContentForm({ ...contentForm, title: e.target.value })} placeholder="عنوان المحتوى" className="rounded-xl bg-gray-800/50 p-4" required /><textarea value={contentForm.description} onChange={e => setContentForm({ ...contentForm, description: e.target.value })} placeholder="وصف المحتوى" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><select value={contentForm.content_type} onChange={e => setContentForm({ ...contentForm, content_type: e.target.value as 'image' | 'video' | 'text' })} className="rounded-xl bg-gray-800/50 p-4"><option value="image">صورة</option><option value="video">فيديو</option><option value="text">نص</option></select>{contentForm.content_type === 'image' && <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'content')} className="rounded-xl bg-gray-800/50 p-3" />}{contentForm.content_type === 'video' && <input value={contentForm.video_url} onChange={e => setContentForm({ ...contentForm, video_url: e.target.value })} placeholder="رابط الفيديو" className="rounded-xl bg-gray-800/50 p-4" />}{uploading && <div className="text-sm text-orange-300">جارٍ الرفع...</div>}<div className="grid grid-cols-2 gap-3"><button type="submit" className="rounded-xl bg-orange-600 p-4">{editingContent ? 'تحديث' : 'إضافة'}</button><button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">إغلاق</button></div></form>}
+            </div>
+          )}
+
+          {activeForm === 'customers' && (
+            <div>
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-accent">بيانات العملاء</h2>
+                  <p className="mt-2 text-sm text-gray-400">جميع طلبات التعاون التي تم إرسالها من خلال الموقع.</p>
+                </div>
+                <button 
+                  onClick={exportCustomersToCSV}
+                  className="flex items-center gap-2 rounded-xl bg-accent px-6 py-3 font-bold text-white shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                >
+                  <Download className="h-5 w-5" />
+                  تصدير البيانات (CSV)
+                </button>
+              </div>
+
+              <div className="overflow-x-auto rounded-2xl border border-gray-700/50 bg-gray-900/50">
+                <table className="w-full text-right">
+                  <thead>
+                    <tr className="border-b border-gray-700/50 bg-gray-800/30">
+                      <th className="px-6 py-4 text-sm font-bold text-gray-300">الاسم</th>
+                      <th className="px-6 py-4 text-sm font-bold text-gray-300">رقم الهاتف</th>
+                      <th className="px-6 py-4 text-sm font-bold text-gray-300">الخدمات</th>
+                      <th className="px-6 py-4 text-sm font-bold text-gray-300">التاريخ</th>
+                      <th className="px-6 py-4 text-sm font-bold text-gray-300">الإجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {customerRequests.length > 0 ? (
+                      customerRequests.map((req) => (
+                        <tr key={req.id} className="border-b border-gray-800/30 transition-colors hover:bg-white/5">
+                          <td className="px-6 py-4 font-medium text-white">{req.name}</td>
+                          <td className="px-6 py-4 font-mono text-gray-300" dir="ltr">{req.phone}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {Array.isArray(req.selected_services) ? req.selected_services.map((s: string, i: number) => (
+                                <span key={i} className="rounded-md bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent border border-accent/20">
+                                  {s}
+                                </span>
+                              )) : req.selected_services}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-xs text-gray-400">
+                            {new Date(req.created_at).toLocaleString('ar-EG')}
+                          </td>
+                          <td className="px-6 py-4">
+                            <button 
+                              onClick={() => removeItem('collaboration_requests', req.id)}
+                              className="rounded-lg bg-red-500/10 p-2 text-red-500 hover:bg-red-500/20 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center text-gray-500">لا توجد بيانات متاحة حالياً</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

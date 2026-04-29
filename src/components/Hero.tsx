@@ -283,8 +283,8 @@ export default function Hero() {
     setLikeCount(v => liked ? v - 1 : v + 1);
   };
 
-  const scrollToServices = () => {
-    document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToCollaboration = () => {
+    document.getElementById('collaboration-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -367,7 +367,7 @@ export default function Hero() {
               transition={{ delay: 1.1, duration: 0.5 }}
             >
               <button
-                onClick={scrollToServices}
+                onClick={scrollToCollaboration}
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-base px-7 py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
@@ -642,7 +642,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2 }}
-        onClick={scrollToServices}
+        onClick={scrollToCollaboration}
       >
         <span className="text-white/30 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
         <motion.div
