@@ -80,13 +80,13 @@ export default function Footer({ storeSettings }: FooterProps) {
             <h3 className="text-white font-bold text-lg mb-6">{t('footer.contactUs')}</h3>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+201550014345" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
+                <a href="tel:+201503600455" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
                   <Phone className="w-5 h-5" />
-                  <span className="dir-ltr">0155 0014345</span>
+                  <span className="dir-ltr">01503600455</span>
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/message/IUSOLSYPTTE6G1" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
+                <a href="https://wa.me/201503600455" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
                   <MessageCircle className="w-5 h-5" />
                   <span>{t('footer.whatsapp')}</span>
                 </a>

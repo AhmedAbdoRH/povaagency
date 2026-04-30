@@ -39,7 +39,7 @@ export default function MarketingCoreServices() {
   const linkedCoreServices = resolveCoreServicesWithPages(pages);
 
   return (
-    <section className="relative overflow-hidden bg-[#050505] py-16 pt-20 text-white">
+    <section id="services-section" className="relative overflow-hidden bg-[#050505] py-16 pt-20 text-white">
       <div className="pointer-events-none absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-accent/20 blur-[150px] mix-blend-screen" />
       <div className="pointer-events-none absolute bottom-0 left-0 h-[600px] w-[600px] rounded-full bg-blue-900/20 blur-[150px] mix-blend-screen" />
 

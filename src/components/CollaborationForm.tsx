@@ -116,7 +116,7 @@ export default function CollaborationForm() {
               viewport={{ once: true }}
               className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight"
             >
-              {language === 'ar' ? 'حول فكرتك إلى واقع' : 'Turn Your Idea Into Reality'}
+              {language === 'ar' ? 'حول أفكارك إلى واقع' : 'Turn Your Ideas Into Reality'}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}

@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Sparkles,
+  Briefcase,
 } from 'lucide-react';
 
 /* ─── CSS for hero background animations ─── */
@@ -288,6 +289,10 @@ export default function Hero() {
     document.getElementById('collaboration-form')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToPortfolio = () => {
+    document.getElementById('services-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section
       className="relative min-h-screen bg-[#080c14] overflow-hidden flex items-center pt-0"
@@ -328,24 +333,18 @@ export default function Hero() {
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-[4rem] font-black text-white leading-[1.4] sm:leading-[1.5] mb-6 sm:mb-8 tracking-tight">
-              {[
-                { text: t('hero.title').split(' إلى ')[0], delay: 0.5, gradient: false },
-                { text: t('hero.title').split(' إلى ')[1]?.split(' ')[0] + ' ' + t('hero.title').split(' إلى ')[1]?.split(' ')[1], delay: 0.65, gradient: true },
-                { text: t('hero.title').split(' إلى ')[1]?.split(' ').slice(2).join(' ') || '', delay: 0.8, gradient: false },
-              ].map(({ text, delay, gradient }) => (
-                text && (
-                  <motion.span
-                    key={text}
-                    className={`block py-2 ${gradient ? 'text-transparent bg-clip-text' : ''}`}
-                    style={gradient ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.15em' } : {}}
-                    initial={{ opacity: 0, y: 32 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  >
-                    {text}
-                  </motion.span>
-                )
+            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.1] mb-8 tracking-tight">
+              {t('hero.title').split('\n').map((text, index, array) => (
+                <motion.span
+                  key={index}
+                  className={`block py-1 ${index === 1 && array.length === 3 ? 'text-transparent bg-clip-text' : ''}`}
+                  style={index === 1 && array.length === 3 ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
+                  initial={{ opacity: 0, y: 32 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + index * 0.15, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
+                  {text}
+                </motion.span>
               ))}
             </h1>
 
@@ -378,13 +377,13 @@ export default function Hero() {
                 )}
               </button>
 
-              <Link
-                to="/design-request"
+              <button
+                onClick={scrollToPortfolio}
                 className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
               >
-                <Play className="w-4 h-4 fill-white" />
+                <Briefcase className="w-4 h-4" />
                 {t('hero.ctaCollaborate')}
-              </Link>
+              </button>
             </motion.div>
 
             {/* trust row */}
@@ -441,7 +440,7 @@ export default function Hero() {
             >
               {/* ── premium phone shell ── */}
               <div
-                className="relative w-[200px] sm:w-[240px] lg:w-[280px] rounded-[3.5rem] overflow-hidden p-[8px]"
+                className="relative w-[200px] sm:w-[240px] lg:w-[280px] rounded-[2.2rem] overflow-hidden p-[6px]"
                 style={{
                   background: 'linear-gradient(145deg, #3a3f58 0%, #1c1f2e 40%, #080a10 100%)',
                   boxShadow: `
@@ -453,7 +452,7 @@ export default function Hero() {
                 }}
               >
                 {/* inner bezel */}
-                <div className="absolute inset-0 rounded-[3.5rem] pointer-events-none"
+                <div className="absolute inset-0 rounded-[2.2rem] pointer-events-none"
                   style={{
                     boxShadow: 'inset 0 4px 6px -1px rgba(255, 255, 255, 0.1), inset 0 2px 4px -1px rgba(255, 255, 255, 0.06)'
                   }}
@@ -461,41 +460,41 @@ export default function Hero() {
 
                 {/* side buttons */}
                 <div
-                  className="absolute -right-1 top-32 w-1.5 h-16 rounded-l-md pointer-events-none"
+                  className="absolute -right-1 top-32 w-1 h-16 rounded-l-md pointer-events-none"
                   style={{ background: 'linear-gradient(90deg, #4a4f68, #2a2f48)', boxShadow: '-1px 0 2px rgba(0,0,0,0.5)' }}
                 />
                 <div
-                  className="absolute -left-1 top-24 w-1.5 h-10 rounded-r-md pointer-events-none"
+                  className="absolute -left-1 top-24 w-1 h-10 rounded-r-md pointer-events-none"
                   style={{ background: 'linear-gradient(-90deg, #4a4f68, #2a2f48)', boxShadow: '1px 0 2px rgba(0,0,0,0.5)' }}
                 />
                 <div
-                  className="absolute -left-1 top-40 w-1.5 h-12 rounded-r-md pointer-events-none"
+                  className="absolute -left-1 top-40 w-1 h-12 rounded-r-md pointer-events-none"
                   style={{ background: 'linear-gradient(-90deg, #4a4f68, #2a2f48)', boxShadow: '1px 0 2px rgba(0,0,0,0.5)' }}
                 />
 
                 {/* ── screen container ── */}
-                <div className="relative w-full h-full rounded-[3rem] overflow-hidden bg-black isolation-isolate z-10" style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)' }}>
+                <div className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black isolation-isolate z-10" style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)' }}>
 
                   {/* dynamic island */}
-                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[90px] h-[26px] bg-black rounded-full z-50 flex items-center justify-between px-2.5">
+                  <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[50px] h-[14px] bg-black rounded-full z-50 flex items-center justify-between px-2">
                     {/* camera lens */}
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#111] border border-white/5 flex items-center justify-center">
-                      <div className="w-1 h-1 rounded-full bg-blue-500/30 blur-[1px]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#111] border border-white/5 flex items-center justify-center">
+                      <div className="w-0.5 h-0.5 rounded-full bg-blue-500/30 blur-[1px]" />
                     </div>
                     {/* sensor */}
-                    <div className="w-2 h-2 rounded-full bg-[#111]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#111]" />
                   </div>
 
                   {/* ── status bar ── */}
-                  <div className="absolute top-0 inset-x-0 flex items-center justify-between px-6 pt-3.5 pb-2 z-40 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-                    <span className="text-white/90 text-[11px] font-medium tracking-wide">9:41</span>
+                  <div className="absolute top-0 inset-x-0 flex items-center justify-between px-6 pt-2.5 pb-2 z-40 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
+                    <span className="text-white/90 text-[8px] font-medium tracking-wide">9:41</span>
                     <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
                       </svg>
-                      <div className="w-[22px] h-[11px] rounded-[3px] border border-white/60 flex items-center px-0.5 relative">
-                        <div className="bg-white h-[7px] w-4/5 rounded-[1px]" />
-                        <div className="absolute -right-[2px] top-1/2 -translate-y-1/2 w-[2px] h-1 bg-white/60 rounded-r-sm" />
+                      <div className="w-[14px] h-[7px] rounded-[1px] border border-white/60 flex items-center px-0.5 relative">
+                        <div className="bg-white h-[4px] w-4/5 rounded-[1px]" />
+                        <div className="absolute -right-[2px] top-1/2 -translate-y-1/2 w-[1px] h-[3px] bg-white/60 rounded-r-sm" />
                       </div>
                     </div>
                   </div>
@@ -542,10 +541,10 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="إعجاب"
                     >
-                      <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${liked ? 'bg-red-500/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
-                        <Heart className={`w-5 h-5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-white drop-shadow-md'}`} />
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${liked ? 'bg-red-500/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
+                        <Heart className={`w-3.5 h-3.5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-white drop-shadow-md'}`} />
                       </div>
-                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">
+                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">
                         {language === 'ar' ? likeCount.toLocaleString('ar-EG') : likeCount.toLocaleString('en-US')}
                       </span>
                     </motion.button>
@@ -555,10 +554,10 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="تعليق"
                     >
-                      <div className="w-11 h-11 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
-                        <MessageCircle className="w-5 h-5 text-white drop-shadow-md" />
+                      <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
+                        <MessageCircle className="w-3.5 h-3.5 text-white drop-shadow-md" />
                       </div>
-                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
+                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
                     </motion.button>
 
                     <motion.button
@@ -566,10 +565,10 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="مشاركة"
                     >
-                      <div className="w-11 h-11 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
-                        <Send className="w-5 h-5 text-white drop-shadow-md -ml-0.5" />
+                      <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
+                        <Send className="w-3.5 h-3.5 text-white drop-shadow-md -ml-0.5" />
                       </div>
-                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
+                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
                     </motion.button>
 
                     <motion.button
@@ -578,8 +577,8 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="حفظ"
                     >
-                      <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${saved ? 'bg-accent/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
-                        <Bookmark className={`w-5 h-5 transition-all duration-300 ${saved ? 'text-accent fill-accent drop-shadow-[0_0_8px_rgba(238,82,57,0.5)]' : 'text-white drop-shadow-md'}`} />
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${saved ? 'bg-accent/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
+                        <Bookmark className={`w-3.5 h-3.5 transition-all duration-300 ${saved ? 'text-accent fill-accent drop-shadow-[0_0_8px_rgba(238,82,57,0.5)]' : 'text-white drop-shadow-md'}`} />
                       </div>
                     </motion.button>
                   </motion.div>
@@ -589,34 +588,34 @@ export default function Hero() {
                     style={{ translateZ: 30 }}
                     className="absolute bottom-6 left-4 right-16 z-20"
                   >
-                    <div className="flex items-center gap-2.5 mb-2 relative">
-                      <div className="w-9 h-9 rounded-full flex-shrink-0 overflow-hidden border-2 border-white/30 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+                    <div className="flex items-center gap-1.5 mb-2 relative">
+                      <div className="w-6 h-6 rounded-full flex-shrink-0 overflow-hidden border border-white/30 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
                         style={{ background: 'linear-gradient(135deg, #ee5239, #f8a04a)' }} />
-                      <div className="flex flex-col bg-black/30 backdrop-blur-md rounded-lg px-2 py-1 border border-white/5">
-                        <p className="text-white text-[12px] font-bold drop-shadow-md leading-none mb-1">pova_agency</p>
-                        <p className="text-accent text-[9px] font-medium">وكالة تسويق رقمي</p>
+                      <div className="flex flex-col bg-black/40 backdrop-blur-md rounded-lg px-2 py-0.5 border border-white/5">
+                        <p className="text-white text-[9px] font-bold drop-shadow-md leading-none mb-0.5">pova_agency</p>
+                        <p className="text-accent text-[7px] font-medium">وكالة تسويق رقمي</p>
                       </div>
-                      <button className="mr-auto text-[10px] font-bold text-white bg-accent/80 hover:bg-accent backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 transition-colors shadow-lg">
+                      <button className="mr-auto text-[7px] font-bold text-white bg-accent/80 hover:bg-accent backdrop-blur-md border border-white/20 rounded-full px-2 py-0.5 transition-colors shadow-lg">
                         {language === 'ar' ? 'متابعة' : 'Follow'}
                       </button>
                     </div>
                     <div className="bg-black/30 backdrop-blur-md rounded-xl p-2 border border-white/5">
-                      <p className="text-white/90 text-[11px] leading-relaxed line-clamp-2 drop-shadow-md">
+                      <p className="text-white/90 text-[9px] leading-relaxed line-clamp-2 drop-shadow-md">
                         {language === 'ar' ? 'استراتيجية + إبداع + تنفيذ دقيق = نمو مستمر لعلامتك 🚀✨' : 'Strategy + Creativity + Execution = Growth for your brand 🚀✨'}
                       </p>
                       <div className="flex gap-1.5 mt-1">
-                        <span className="text-[10px] text-accent font-bold drop-shadow-sm">{language === 'ar' ? '#تسويق' : '#Marketing'}</span>
-                        <span className="text-[10px] text-white/80 font-medium">{language === 'ar' ? '#هوية_بصرية' : '#Branding'}</span>
+                        <span className="text-[8px] text-accent font-bold drop-shadow-sm">{language === 'ar' ? '#تسويق' : '#Marketing'}</span>
+                        <span className="text-[8px] text-white/80 font-medium">{language === 'ar' ? '#هوية_بصرية' : '#Branding'}</span>
                       </div>
                     </div>
                   </motion.div>
 
                   {/* bottom home indicator */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[4px] bg-white/50 backdrop-blur-sm rounded-full z-40 shadow-[0_1px_3px_rgba(0,0,0,0.5)]" />
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[2px] bg-white/50 backdrop-blur-sm rounded-full z-40 shadow-[0_1px_3px_rgba(0,0,0,0.5)]" />
 
                   {/* dynamic light reflection (glare) */}
                   <motion.div
-                    className="absolute inset-0 z-50 pointer-events-none rounded-[3rem]"
+                    className="absolute inset-0 z-50 pointer-events-none rounded-[1.8rem]"
                     style={{
                       background: 'radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.15) 0%, transparent 60%)',
                       // @ts-ignore
@@ -627,7 +626,7 @@ export default function Hero() {
 
                   {/* static ambient reflection */}
                   <div
-                    className="absolute inset-0 rounded-[3rem] pointer-events-none z-30"
+                    className="absolute inset-0 rounded-[1.8rem] pointer-events-none z-30"
                     style={{
                       background: 'linear-gradient(105deg, rgba(255,255,255,0.08) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.03) 100%)',
                     }}

@@ -78,7 +78,7 @@ export default function ProductDetails() {
     if (!service) return;
     const productUrl = window.location.href;
     const message = `استفسار عن المنتج: ${service.title}\nرابط المنتج: ${productUrl}`;
-    window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/201503600455?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   // Get all images for the main product carousel
@@ -181,7 +181,7 @@ export default function ProductDetails() {
                   <div className="flex flex-col gap-4">
                     {/* زر احمر احترافي لطلب المنتج عبر واتساب */}
                     <a
-                      href={`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(`أريد طلب المنتج: ${service.title}\n${window.location.href}`)}`}
+                      href={`https://wa.me/201503600455?text=${encodeURIComponent(`أريد طلب المنتج: ${service.title}\n${window.location.href}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"

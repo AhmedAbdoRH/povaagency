@@ -135,7 +135,7 @@ export default function AIChatBot() {
 7. إذا لم تجد خدمة مطابقة تماماً، اقترح الأقرب أو اطلب منه التواصل معنا مباشرة لتفصيل طلب خاص.
 8. لا تخترع خدمات غير موجودة في القائمة.
 9. استخدم إيموجيز مناسبة لقطاع الأعمال والتكنولوجيا (🚀, 💡, ✨, 📈).
-10. رقم التواصل (للطوارئ أو الطلبات الخاصة): +20 100 646 4349
+10. رقم التواصل (للطوارئ أو الطلبات الخاصة): +20 150 360 0455
 `;
 
         return context;
@@ -297,7 +297,7 @@ export default function AIChatBot() {
 
                                                 {!message.isUser && message.id !== '1' && (
                                                     <a
-                                                        href="https://wa.me/message/IUSOLSYPTTE6G1"
+                                                        href="https://wa.me/201503600455"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="mt-3 flex items-center justify-center gap-2 text-xs bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-semibold py-2 px-3 rounded-lg transition-all border border-[#25D366]/30"

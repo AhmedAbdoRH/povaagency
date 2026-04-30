@@ -52,7 +52,7 @@ export default function ServiceCard({ title, description, imageUrl, price, saleP
     e.preventDefault();
     const productUrl = `${window.location.origin}/service/${id}`;
     const message = `استفسار عن الخدمة: ${title}\nرابط الخدمة: ${productUrl}`;
-    window.open(`https://wa.me/message/IUSOLSYPTTE6G1?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/201503600455?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

@@ -53,8 +53,8 @@ export default function ContactUs() {
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2">{t('footer.contactUs')}</h3>
                     <p className="text-gray-400 mb-4">نحن متاحون للرد على استفساراتك</p>
-                    <a href="tel:+201006464349" className="text-xl font-bold text-white hover:text-accent transition-colors dir-ltr block">
-                      +20 100 646 4349
+                    <a href="tel:+201503600455" className="text-xl font-bold text-white hover:text-accent transition-colors dir-ltr block">
+                      +20 150 360 0455
                     </a>
                   </div>
                 </div>
@@ -74,12 +74,12 @@ export default function ContactUs() {
                     <h3 className="text-2xl font-bold text-white mb-2">{t('footer.whatsapp')}</h3>
                     <p className="text-gray-400 mb-4">تواصل سريع ومباشر مع فريقنا</p>
                     <a
-                      href="https://wa.me/201006464349"
+                      href="https://wa.me/201503600455"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xl font-bold text-white hover:text-accent transition-colors dir-ltr block"
                     >
-                      +20 100 646 4349
+                      +20 150 360 0455
                     </a>
                   </div>
                 </div>
