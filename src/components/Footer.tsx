@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Phone, MessageCircle } from 'lucide-react';
+import { Facebook, Instagram, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import type { StoreSettings } from '../types/database';
 import UserLogin from './UserLogin';
@@ -89,6 +89,12 @@ export default function Footer({ storeSettings }: FooterProps) {
                 <a href="https://wa.me/201503600455" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
                   <MessageCircle className="w-5 h-5" />
                   <span>{t('footer.whatsapp')}</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://maps.app.goo.gl/9VvT7zRYfh46ZQTC6" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-gray-400 hover:text-accent transition-colors">
+                  <MapPin className="w-5 h-5" />
+                  <span>تقاطع شارع الموقف مع كلية التجارة</span>
                 </a>
               </li>
             </ul>

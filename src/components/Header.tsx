@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Menu, X as Close, Globe, ChevronDown, ChevronLeft } from 'lucide-react';
+import { Menu, X as Close, Globe, ChevronDown, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../hooks/useLanguage';
 import type { Page, StoreSettings, Client } from '../types/database';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolveCoreServicesWithPages } from '../data/coreServices';
+import { Layers } from 'lucide-react';
 
 interface HeaderProps {
   storeSettings?: StoreSettings | null;
@@ -12,33 +14,14 @@ interface HeaderProps {
 
 export default function Header({ storeSettings }: HeaderProps) {
   const { t, language, toggleLanguage } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Client[]>([]);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const [servicesOpenMobile, setServicesOpenMobile] = useState(false);
   const [pages, setPages] = useState<Page[]>([]);
 
-  const searchRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const servicesDropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (query.trim().length < 2) { setSearchResults([]); return; }
-    try {
-      const { data: clients, error } = await supabase
-        .from('clients')
-        .select(`*, specialization:specializations(name)`)
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(10);
-      if (error) throw error;
-      setSearchResults(clients || []);
-    } catch { setSearchResults([]); }
-  };
 
-  const clearSearch = () => { setSearchQuery(''); setSearchResults([]); setIsSearchFocused(false); };
 
   useEffect(() => {
     supabase.from('pages').select('*').order('name').then(({ data }) => setPages(data || []));
@@ -51,7 +34,7 @@ export default function Header({ storeSettings }: HeaderProps) {
         setIsServicesDropdownOpen(false);
       }
       if (!('touches' in e)) {
-        if (searchRef.current && !searchRef.current.contains(target)) setIsSearchFocused(false);
+        // No search to check here
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -110,9 +93,17 @@ export default function Header({ storeSettings }: HeaderProps) {
                       className="absolute top-full start-0 mt-2 w-52 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50"
                     >
                       <div className="py-2">
-                        {pages.map(page => (
-                          <Link key={page.id} to={`/page/${page.id}`} onClick={() => setIsServicesDropdownOpen(false)} className="block px-5 py-3 text-sm font-medium hover:bg-white/5 hover:text-accent transition-colors">
-                            {page.name}
+                        {resolveCoreServicesWithPages(pages).filter(cs => cs.page).map(cs => (
+                          <Link 
+                            key={cs.page!.id} 
+                            to={`/page/${cs.page!.id}`} 
+                            onClick={() => setIsServicesDropdownOpen(false)} 
+                            className="flex items-center gap-3 px-5 py-3 text-sm font-medium hover:bg-white/5 hover:text-accent transition-colors group"
+                          >
+                            <div className={`p-1.5 rounded-lg bg-white/5 group-hover:bg-accent/10 transition-colors ${cs.iconColor || 'text-accent'}`}>
+                              {cs.icon ? <cs.icon className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+                            </div>
+                            {language === 'en' ? (cs.page!.name_en || cs.page!.name) : cs.page!.name}
                           </Link>
                         ))}
                       </div>
@@ -133,54 +124,15 @@ export default function Header({ storeSettings }: HeaderProps) {
                 className="p-2 hover:bg-white/5 rounded-full transition-colors flex items-center gap-1.5 text-sm font-medium"
               >
                 <Globe className="w-5 h-5" />
-                <span className="hidden sm:inline text-xs">{language.toUpperCase()}</span>
+                <span className="inline text-[10px] font-bold">
+                  <span className={language === 'ar' ? 'text-accent' : 'text-white/50'}>AR</span>
+                  <span className="mx-0.5 opacity-30">/</span>
+                  <span className={language === 'en' ? 'text-accent' : 'text-white/50'}>EN</span>
+                </span>
               </button>
 
               {/* Search */}
-              <div className="relative" ref={searchRef}>
-                <button onClick={() => setIsSearchFocused(!isSearchFocused)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                  <Search className="w-5 h-5" />
-                </button>
 
-                <AnimatePresence>
-                  {isSearchFocused && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full end-0 mt-2 w-72 md:w-80 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-xl overflow-hidden z-50"
-                    >
-                      <div className="p-3">
-                        <input
-                          ref={searchInputRef}
-                          type="text"
-                          placeholder={t('header.searchPlaceholder')}
-                          value={searchQuery}
-                          onChange={e => handleSearch(e.target.value)}
-                          className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-accent"
-                          autoFocus
-                        />
-                      </div>
-                      {searchResults.length > 0 && (
-                        <div className="max-h-60 overflow-y-auto border-t border-white/10">
-                          {searchResults.map(client => (
-                            <Link key={client.id} to={`/client/${client.id}`} onClick={clearSearch} className="flex items-center gap-3 p-3 hover:bg-white/5 transition-colors">
-                              <div className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                                {client.logo_url ? <img src={client.logo_url} alt={client.name} className="w-full h-full object-cover" /> : <Search className="w-4 h-4 text-gray-500" />}
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-white">{client.name}</div>
-                                <div className="text-xs text-gray-400">{(client as any).specialization?.name}</div>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
 
               {/* Mobile Menu Toggle Button */}
               <button
@@ -253,17 +205,7 @@ export default function Header({ storeSettings }: HeaderProps) {
         {/* Sidebar Body */}
         <div className="flex-1 p-5 flex flex-col gap-6 overflow-y-auto">
 
-          {/* Language toggle */}
-          <button
-            onClick={() => { toggleLanguage(); closeMenu(); }}
-            className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl bg-accent/10 border border-accent/20 text-accent font-bold transition-colors hover:bg-accent/20"
-          >
-            <div className="flex items-center gap-3">
-              <Globe className="w-5 h-5" />
-              <span>{language === 'ar' ? 'English' : 'العربية'}</span>
-            </div>
-            <span className="text-xs opacity-60 font-mono">{language.toUpperCase()}</span>
-          </button>
+
 
           {/* Navigation links */}
           <nav className="flex flex-col gap-2">
@@ -278,32 +220,26 @@ export default function Header({ storeSettings }: HeaderProps) {
 
             {/* Services accordion */}
             <div className="rounded-2xl bg-white/5 overflow-hidden">
-              <button
-                onClick={() => setServicesOpenMobile(!servicesOpenMobile)}
-                className="w-full flex items-center justify-between px-5 py-4 font-bold text-base transition-colors hover:bg-white/10"
-              >
-                {t('header.services') || 'الخدمات'}
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${servicesOpenMobile ? 'rotate-180' : ''}`} />
-              </button>
-              <div
-                style={{
-                  maxHeight: servicesOpenMobile ? `${pages.length * 60 + 16}px` : '0',
-                  overflow: 'hidden',
-                  transition: 'max-height 0.3s ease',
-                }}
-              >
-                <div className="px-3 pb-3 flex flex-col gap-1">
-                  {pages.map(page => (
-                    <Link
-                      key={page.id}
-                      to={`/page/${page.id}`}
-                      onClick={closeMenu}
-                      className="block px-4 py-3 rounded-xl hover:bg-white/10 hover:text-accent text-sm font-medium transition-colors text-gray-300"
-                    >
-                      {page.name}
-                    </Link>
-                  ))}
-                </div>
+              <div className="px-5 py-4 border-b border-white/5">
+                <h3 className="font-bold text-base text-accent flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  {t('header.services') || 'الخدمات'}
+                </h3>
+              </div>
+              <div className="px-3 py-2 flex flex-col gap-1">
+                {resolveCoreServicesWithPages(pages).filter(cs => cs.page).map(cs => (
+                  <Link
+                    key={cs.page!.id}
+                    to={`/page/${cs.page!.id}`}
+                    onClick={closeMenu}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 hover:text-accent text-sm font-medium transition-colors text-gray-300 group"
+                  >
+                    <div className={`p-2 rounded-lg bg-white/5 group-hover:bg-accent/10 transition-colors ${cs.iconColor || 'text-accent'}`}>
+                      {cs.icon ? <cs.icon className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+                    </div>
+                    {language === 'en' ? (cs.page!.name_en || cs.page!.name) : cs.page!.name}
+                  </Link>
+                ))}
               </div>
             </div>
 

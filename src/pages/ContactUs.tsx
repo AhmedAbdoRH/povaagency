@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Clock, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Clock, MessageCircle, Map } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
 export default function ContactUs() {
@@ -107,22 +107,30 @@ export default function ContactUs() {
             </div>
 
             {/* Map or Image */}
-            <motion.div
+            <motion.a
+              href="https://maps.app.goo.gl/9VvT7zRYfh46ZQTC6"
+              target="_blank"
+              rel="noopener noreferrer"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-secondary rounded-3xl overflow-hidden border border-gray-800 relative min-h-[400px]"
+              className="bg-secondary rounded-3xl overflow-hidden border border-gray-800 relative min-h-[400px] group block cursor-pointer"
             >
-              {/* Placeholder for map or office image */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-black flex items-center justify-center">
-                <div className="text-center p-8">
-                  <MapPin className="w-16 h-16 text-accent mx-auto mb-4 opacity-50" />
-                  <h3 className="text-2xl font-bold text-white mb-2">موقعنا</h3>
-                  <p className="text-gray-400">القاهرة، مصر</p>
-                  <p className="text-sm text-gray-600 mt-4">سيتم إضافة الخريطة قريباً</p>
+              <div className="absolute inset-0 bg-[#121212] flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-50" />
+                <div className="text-center p-8 relative z-10">
+                  <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-accent group-hover:scale-110 transition-all duration-300">
+                    <MapPin className="w-10 h-10 text-accent group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">موقعنا على الخريطة</h3>
+                  <p className="text-gray-400 text-lg mb-8">تقاطع شارع الموقف مع كلية التجارة</p>
+                  <span className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full text-base font-bold shadow-2xl hover:bg-accent hover:text-white transition-all duration-300 transform group-hover:translate-y-[-5px]">
+                    <Map className="w-5 h-5" />
+                    افتح في خرائط جوجل
+                  </span>
                 </div>
               </div>
-            </motion.div>
+            </motion.a>
 
           </div>
         </div>

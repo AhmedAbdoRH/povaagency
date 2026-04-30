@@ -23,7 +23,7 @@ export default function CompanyValues() {
     target: targetRef,
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], language === 'en' ? ["85%", "0%"] : ["0%", "85%"]);
+  const x = useTransform(scrollYProgress, [0, 1], language === 'en' ? ["0%", "85%"] : ["0%", "85%"]);
 
   return (
     <section ref={targetRef} className="relative h-[300vh] bg-[#f8f9fa]">
