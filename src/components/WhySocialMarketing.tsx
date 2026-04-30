@@ -4,6 +4,7 @@ import { Eye, Handshake, Target, DollarSign, BarChart3, Sparkles } from 'lucide-
 import { useLanguage } from '../hooks/useLanguage';
 
 function Card({ item, index, progress, targetScale }: { item: any; index: number; progress: any; targetScale: number }) {
+  const { language } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

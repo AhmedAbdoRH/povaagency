@@ -4,6 +4,7 @@ import { MessageSquareText, Sparkles, BadgeCheck, Camera, Heart, PlayCircle, Fil
 import { useLanguage } from '../hooks/useLanguage';
 
 function ParallaxCard({ reason, index }: { reason: any; index: number }) {
+  const { language } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -27,13 +28,13 @@ function ParallaxCard({ reason, index }: { reason: any; index: number }) {
     >
         <div className="absolute inset-0 rounded-[2.5rem] md:rounded-full bg-gradient-to-r from-accent/0 via-accent/5 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100 pointer-events-none" />
         
-        <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-right">
+        <div className={`relative z-10 flex flex-col md:flex-row items-center gap-6 ${language === 'ar' ? 'text-center md:text-right' : 'text-center md:text-left'}`}>
             <div className="flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-full bg-accent/20 border border-accent/30 text-accent shadow-[0_0_30px_rgba(238,82,57,0.3)]">
                 <reason.icon className="h-8 w-8 md:h-10 md:w-10" />
             </div>
             
             <div className="flex-1">
-                <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
+                <div className={`flex items-center justify-center ${language === 'ar' ? 'md:justify-start' : 'md:justify-start'} gap-4 mb-2`}>
                     <span className="text-2xl md:text-3xl font-black text-white/10">{reason.id}</span>
                     <h3 className="text-xl md:text-2xl font-bold text-white">{reason.title}</h3>
                 </div>
