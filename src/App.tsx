@@ -2,13 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
-import { CartProvider } from './contexts/CartContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
-import BannerStrip from './components/BannerStrip';
 import Footer from './components/Footer';
-import Testimonials from './components/Testimonials';
 import WhatsAppButton from './components/WhatsAppButton';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -19,9 +16,6 @@ import ServiceDetails from './pages/ServiceDetails';
 import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import DownloadPage from './pages/DownloadPage';
-import Profile from './pages/Profile';
-import Orders from './pages/Orders';
-import Wishlist from './pages/Wishlist';
 import StructuredData from './components/StructuredData';
 import Hero from './components/Hero';
 import CollaborationForm from './components/CollaborationForm';
@@ -38,7 +32,7 @@ import MarketingCoreServices from './components/MarketingCoreServices';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 
-// PrivateRoute component
+// PrivateRoute component for Admin only
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -74,7 +68,6 @@ function App() {
       await fetchStoreSettings();
 
       const { data: bannersData } = await supabase.from('banners').select('*').order('created_at', { ascending: false });
-      // Fetch pages instead of categories for structured data if needed
       const { data: pagesData } = await supabase.from('pages').select('*').order('name');
 
       if (isMounted) {
@@ -132,33 +125,24 @@ function App() {
 
   const Layout = ({ children, banners: layoutBanners }: LayoutProps) => {
     const location = useLocation();
-    
-    // Determine banners for current page
     const isHome = location.pathname === '/';
-    
-    // Extract page ID from path /page/:id
     const pageMatch = location.pathname.match(/^\/page\/([a-zA-Z0-9-]+)$/);
     const currentPageId = pageMatch ? pageMatch[1] : null;
 
     const currentBanners = layoutBanners.filter(banner => {
        if (!banner.is_active || banner.type !== 'image') return false;
-       if (isHome) return false; // No banners on home page
-       if (currentPageId) return banner.page_id === currentPageId; // Specific page banners
+       if (isHome) return false;
+       if (currentPageId) return banner.page_id === currentPageId;
        return false;
     });
-
-    const stripBanners = layoutBanners.filter(banner => banner.type === 'strip' && banner.is_active);
 
     return (
       <div className="min-h-screen font-cairo bg-primary text-white">
         <Header storeSettings={storeSettings} />
         {currentBanners.length > 0 && <BannerSlider banners={currentBanners} />}
-        {/* BannerStrip removed from Home as per request */}
-        
         {isHome && <Hero />}
         {isHome && <MarketingCoreServices />}
         <main>{children}</main>
-        {/* {isHome && <Testimonials />} */}
         <CollaborationForm />
         <Footer storeSettings={storeSettings} />
         <WhatsAppButton />
@@ -169,43 +153,35 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <CartProvider>
-          <Helmet>
-            <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
-            <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
-          </Helmet>
-          <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
-          <Router>
-            <Routes>
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
-              
-              {/* New Routes */}
-              <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
-              <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
-              <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
-              <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
-              
-              {/* Standard Pages */}
-              <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
-              <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
-              <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
-              <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
-              <Route path="/profile" element={<Layout banners={banners}><Profile /></Layout>} />
-              <Route path="/orders" element={<Layout banners={banners}><Orders /></Layout>} />
-              <Route path="/wishlist" element={<Layout banners={banners}><Wishlist /></Layout>} />
-              
-              <Route path="/" element={
-                <Layout banners={banners}>
-                  <StaggeredHome />
-                </Layout>
-              } />
-              
-              {/* Catch all redirect to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Router>
-        </CartProvider>
+        <Helmet>
+          <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
+          <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
+        </Helmet>
+        <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
+        <Router>
+          <Routes>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
+            
+            <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
+            <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
+            <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
+            <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
+            
+            <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
+            <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
+            <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
+            <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
+            
+            <Route path="/" element={
+              <Layout banners={banners}>
+                <StaggeredHome />
+              </Layout>
+            } />
+            
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
       </LanguageProvider>
     </ThemeProvider>
   );

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Phone, MessageCircle, MapPin } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import type { StoreSettings } from '../types/database';
-import UserLogin from './UserLogin';
 
 interface FooterProps {
   storeSettings?: StoreSettings | null;
@@ -103,7 +102,6 @@ export default function Footer({ storeSettings }: FooterProps) {
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col items-center gap-4">
-            <UserLogin />
             <p className="text-gray-500 text-sm">
               © {new Date().getFullYear()} {storeSettings?.store_name || 'POVA Agency'}. {t('footer.rights')}
             </p>

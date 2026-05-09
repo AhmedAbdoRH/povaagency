@@ -34,7 +34,7 @@ export default function SpecializationDetails() {
 
       const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
-        .select('*')
+        .select('*, content:client_content(*)')
         .eq('specialization_id', specializationId)
         .eq('is_active', true)
         .order('display_order', { ascending: true })
@@ -137,15 +137,20 @@ export default function SpecializationDetails() {
               الأعمال داخل هذا القسم
             </h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {clients.map(client => (
-                <ClientCard
-                  key={client.id}
-                  id={client.id}
-                  name={client.name}
-                  description={client.description || ''}
-                  logoUrl={client.logo_url || ''}
-                />
-              ))}
+              {clients.map(client => {
+                const videoContent = client.content?.find(c => c.content_type === 'video');
+                return (
+                  <ClientCard
+                    key={client.id}
+                    id={client.id}
+                    name={client.name}
+                    description={client.description || ''}
+                    logoUrl={client.logo_url || ''}
+                    imageUrl={client.image_url || ''}
+                    videoUrl={videoContent?.video_url || ''}
+                  />
+                );
+              })}
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { ArrowRight, Briefcase, Layers } from 'lucide-react';
 import type { Client, Page } from '../types/database';
 import type { CoreServiceDefinition } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
+import ClientCard from './ClientCard';
 
 export interface SpecializationWithClients {
   id: string;
@@ -181,39 +182,21 @@ export default function CoreServicePageView({
                       لا توجد أعمال داخل هذا القسم حتى الآن.
                     </div>
                   ) : (
-                    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                      {selectedClients.map(client => (
-                        <Link
-                          key={client.id}
-                          to={`/client/${client.id}`}
-                          className="group rounded-[1.5rem] border border-white/10 bg-black/25 p-5 transition-all hover:-translate-y-1 hover:border-accent/40 hover:bg-black/35"
-                        >
-                          <div className="mb-5 flex h-40 items-center justify-center overflow-hidden rounded-2xl bg-white/[0.03]">
-                            {client.logo_url || client.image_url ? (
-                              <img
-                                src={client.logo_url || client.image_url || ''}
-                                alt={client.name}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                              />
-                            ) : (
-                              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-accent/10 text-3xl font-bold text-accent">
-                                {client.name.charAt(0)}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3">
-                            <h4 className="text-xl font-bold text-white">{language === 'en' ? (client.name_en || client.name) : client.name}</h4>
-                            <ArrowRight className="h-5 w-5 text-accent transition-transform group-hover:-translate-x-1" />
-                          </div>
-
-                          {client.description && (
-                            <p className="mt-3 line-clamp-3 text-sm leading-7 text-gray-400">
-                              {language === 'en' ? (client.description_en || client.description) : client.description}
-                            </p>
-                          )}
-                        </Link>
-                      ))}
+                    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                      {selectedClients.map(client => {
+                        const videoContent = (client as any).content?.find((c: any) => c.content_type === 'video');
+                        return (
+                          <ClientCard
+                            key={client.id}
+                            id={client.id}
+                            name={language === 'en' ? (client.name_en || client.name) : client.name}
+                            description={language === 'en' ? (client.description_en || client.description || '') : (client.description || '')}
+                            logoUrl={client.logo_url || ''}
+                            imageUrl={client.image_url || ''}
+                            videoUrl={videoContent?.video_url || ''}
+                          />
+                        );
+                      })}
                     </div>
                   )}
                 </div>

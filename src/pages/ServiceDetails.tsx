@@ -81,7 +81,7 @@ export default function ServiceDetails() {
 
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('specializations')
-        .select('*, clients(*)')
+        .select('*, clients(*, client_content(*))')
         .in('service_id', serviceIds)
         .eq('is_active', true)
         .order('display_order', { ascending: true })
