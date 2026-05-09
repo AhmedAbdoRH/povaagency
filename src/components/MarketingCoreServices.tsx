@@ -126,8 +126,16 @@ export default function MarketingCoreServices() {
                   {language === 'en' ? (service.page?.description_en || service.description) : service.description}
                 </p>
 
-                <div className="mt-6 text-sm text-gray-400">
-                  {service.page ? 'مرتبطة ببيانات جاهزة' : 'بانتظار ربط بياناتها من لوحة التحكم'}
+                <div className="mt-6 flex items-center gap-2 text-sm font-bold text-[#ee5239] transition-colors group-hover:text-white">
+                  <span>شاهد سابقة أعمالنا</span>
+                  <svg
+                    className={`h-4 w-4 ${language === 'ar' ? 'rotate-180' : ''} transition-transform group-hover:translate-x-1`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
                 </div>
               </div>
 

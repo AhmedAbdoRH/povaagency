@@ -24,6 +24,13 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
               allow="autoplay; encrypted-media"
               title={name}
             />
+          ) : videoUrl.includes('vimeo.com') ? (
+            <iframe 
+              src={`https://player.vimeo.com/video/${videoUrl.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]}?background=1&autoplay=1&loop=1&byline=0&title=0`}
+              className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110 scale-[1.5]"
+              allow="autoplay; fullscreen; picture-in-picture"
+              title={name}
+            />
           ) : (
             <video 
               src={videoUrl} 

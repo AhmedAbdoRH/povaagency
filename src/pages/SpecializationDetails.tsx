@@ -110,10 +110,7 @@ export default function SpecializationDetails() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 rounded-full border border-[#ee5239]/20 bg-[#ee5239]/10 px-4 py-2 text-sm font-bold text-[#ee5239]">
-                <Layers size={16} />
-                <span>{clients.length} عمل</span>
-              </div>
+
             </div>
 
             {specialization.description && (

@@ -120,6 +120,13 @@ export default function ClientDetails() {
                             allowFullScreen
                             title={item.title}
                           />
+                        ) : item.video_url?.includes('vimeo.com') ? (
+                          <iframe 
+                            src={`https://player.vimeo.com/video/${item.video_url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]}`}
+                            className="w-full h-full"
+                            allowFullScreen
+                            title={item.title}
+                          />
                         ) : (
                           <video 
                             src={item.video_url || ''} 

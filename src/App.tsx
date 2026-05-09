@@ -32,6 +32,16 @@ import MarketingCoreServices from './components/MarketingCoreServices';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 // PrivateRoute component for Admin only
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -55,6 +65,39 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" replace />;
 }
+
+interface LayoutProps {
+  children: React.ReactNode;
+  banners: Banner[];
+  storeSettings?: StoreSettings | null;
+}
+
+const Layout = ({ children, banners: layoutBanners, storeSettings }: LayoutProps) => {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const pageMatch = location.pathname.match(/^\/page\/([a-zA-Z0-9-]+)$/);
+  const currentPageId = pageMatch ? pageMatch[1] : null;
+
+  const currentBanners = layoutBanners.filter(banner => {
+     if (!banner.is_active || banner.type !== 'image') return false;
+     if (isHome) return false;
+     if (currentPageId) return banner.page_id === currentPageId;
+     return false;
+  });
+
+  return (
+    <div className="min-h-screen font-cairo bg-primary text-white">
+      <Header storeSettings={storeSettings} />
+      {currentBanners.length > 0 && <BannerSlider banners={currentBanners} />}
+      {isHome && <Hero />}
+      {isHome && <MarketingCoreServices />}
+      <main>{children}</main>
+      <CollaborationForm />
+      <Footer storeSettings={storeSettings} />
+      <WhatsAppButton />
+    </div>
+  );
+};
 
 function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
@@ -118,37 +161,6 @@ function App() {
     }
   };
 
-  interface LayoutProps {
-    children: React.ReactNode;
-    banners: Banner[];
-  }
-
-  const Layout = ({ children, banners: layoutBanners }: LayoutProps) => {
-    const location = useLocation();
-    const isHome = location.pathname === '/';
-    const pageMatch = location.pathname.match(/^\/page\/([a-zA-Z0-9-]+)$/);
-    const currentPageId = pageMatch ? pageMatch[1] : null;
-
-    const currentBanners = layoutBanners.filter(banner => {
-       if (!banner.is_active || banner.type !== 'image') return false;
-       if (isHome) return false;
-       if (currentPageId) return banner.page_id === currentPageId;
-       return false;
-    });
-
-    return (
-      <div className="min-h-screen font-cairo bg-primary text-white">
-        <Header storeSettings={storeSettings} />
-        {currentBanners.length > 0 && <BannerSlider banners={currentBanners} />}
-        {isHome && <Hero />}
-        {isHome && <MarketingCoreServices />}
-        <main>{children}</main>
-        <CollaborationForm />
-        <Footer storeSettings={storeSettings} />
-        <WhatsAppButton />
-      </div>
-    );
-  };
 
   return (
     <ThemeProvider>
@@ -159,22 +171,23 @@ function App() {
         </Helmet>
         <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
         <Router>
+          <ScrollToTop />
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
             
-            <Route path="/page/:id" element={<Layout banners={banners}><PageDetails /></Layout>} />
-            <Route path="/specialization/:id" element={<Layout banners={banners}><SpecializationDetails /></Layout>} />
-            <Route path="/client/:id" element={<Layout banners={banners}><ClientDetails /></Layout>} />
-            <Route path="/service/:slug" element={<Layout banners={banners}><ServiceDetails /></Layout>} />
+            <Route path="/page/:id" element={<Layout banners={banners} storeSettings={storeSettings}><PageDetails /></Layout>} />
+            <Route path="/specialization/:id" element={<Layout banners={banners} storeSettings={storeSettings}><SpecializationDetails /></Layout>} />
+            <Route path="/client/:id" element={<Layout banners={banners} storeSettings={storeSettings}><ClientDetails /></Layout>} />
+            <Route path="/service/:slug" element={<Layout banners={banners} storeSettings={storeSettings}><ServiceDetails /></Layout>} />
             
-            <Route path="/about" element={<Layout banners={banners}><AboutUs /></Layout>} />
-            <Route path="/contact" element={<Layout banners={banners}><ContactUs /></Layout>} />
-            <Route path="/download" element={<Layout banners={banners}><DownloadPage /></Layout>} />
-            <Route path="/design-request" element={<Layout banners={banners}><DesignRequest /></Layout>} />
+            <Route path="/about" element={<Layout banners={banners} storeSettings={storeSettings}><AboutUs /></Layout>} />
+            <Route path="/contact" element={<Layout banners={banners} storeSettings={storeSettings}><ContactUs /></Layout>} />
+            <Route path="/download" element={<Layout banners={banners} storeSettings={storeSettings}><DownloadPage /></Layout>} />
+            <Route path="/design-request" element={<Layout banners={banners} storeSettings={storeSettings}><DesignRequest /></Layout>} />
             
             <Route path="/" element={
-              <Layout banners={banners}>
+              <Layout banners={banners} storeSettings={storeSettings}>
                 <StaggeredHome />
               </Layout>
             } />

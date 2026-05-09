@@ -241,18 +241,6 @@ export default function Hero() {
   const glareX = useTransform(smoothMx, [-0.5, 0.5], ['100%', '-100%']);
   const glareY = useTransform(smoothMy, [-0.5, 0.5], ['100%', '-100%']);
 
-  useEffect(() => {
-    // Initial entrance animation - start tilted, then ease to flat
-    smoothMx.set(0.3);
-    smoothMy.set(-0.3);
-
-    const timer = setTimeout(() => {
-      smoothMx.set(0);
-      smoothMy.set(0);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (videoRef.current) {
