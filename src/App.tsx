@@ -104,25 +104,60 @@ const Layout = ({ children, banners: layoutBanners, storeSettings }: LayoutProps
 function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+
   const [categories, setCategories] = useState<any[]>([]);
+  const [isAppLoading, setIsAppLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     async function initApp() {
-      await fetchStoreSettings();
+      try {
+        // Fetch all essential data in parallel for speed and stability
+        const [settingsRes, bannersRes, pagesRes] = await Promise.all([
+          supabase.from('store_settings').select('*').limit(1).maybeSingle(),
+          supabase.from('banners').select('*').order('created_at', { ascending: false }),
+          supabase.from('pages').select('*').order('name')
+        ]);
 
-      const { data: bannersData } = await supabase.from('banners').select('*').order('created_at', { ascending: false });
-      const { data: pagesData } = await supabase.from('pages').select('*').order('name');
+        if (isMounted) {
+          // Handle Store Settings
+          if (settingsRes.data) {
+            setStoreSettings(settingsRes.data);
+          } else {
+            setStoreSettings({
+              id: '00000000-0000-0000-0000-000000000001',
+              store_name: 'POVA Agency',
+              store_description: 'وكالة تسويق رقمي متكاملة',
+              logo_url: '/agency-logo.png',
+              meta_title: 'POVA | وكالة تسويق رقمي',
+              meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
+              theme_settings: {
+                primaryColor: '#000000',
+                secondaryColor: '#1a1a1a',
+                fontFamily: 'Cairo, sans-serif',
+                backgroundColor: '#000000',
+                backgroundGradient: ''
+              }
+            } as StoreSettings);
+          }
 
-      if (isMounted) {
-        setBanners(bannersData || []);
-        setCategories(pagesData || []);
+          // Handle other data
+          setBanners(bannersRes.data || []);
+          setCategories(pagesRes.data || []);
+          
+          // Signal that the app is ready
+          setIsAppLoading(false);
+        }
+      } catch (error) {
+        console.error("Critical error during app initialization:", error);
+        if (isMounted) setIsAppLoading(false);
       }
     }
+    
     initApp();
     return () => { isMounted = false; };
   }, []);
+
 
   useEffect(() => {
     if (storeSettings) {
@@ -135,35 +170,20 @@ function App() {
     }
   }, [storeSettings]);
 
-  const fetchStoreSettings = async () => {
-    try {
-      const { data } = await supabase.from('store_settings').select('*').limit(1).maybeSingle();
 
-      if (data) {
-        setStoreSettings(data);
-      } else {
-        setStoreSettings({
-          id: '00000000-0000-0000-0000-000000000001',
-          store_name: 'POVA Agency',
-          store_description: 'وكالة تسويق رقمي متكاملة',
-          logo_url: '/agency-logo.png',
-          meta_title: 'POVA | وكالة تسويق رقمي',
-          meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
-          theme_settings: {
-            primaryColor: '#000000',
-            secondaryColor: '#1a1a1a',
-            fontFamily: 'Cairo, sans-serif',
-            backgroundColor: '#000000',
-            backgroundGradient: ''
-          }
-        } as StoreSettings);
-      }
-    } catch (error) {
-      console.error("Error fetching settings", error);
-    }
-  };
-
-
+  if (isAppLoading) {
+    return (
+      <div className="min-h-screen bg-[#080c14] flex flex-col items-center justify-center gap-6" dir="rtl">
+        <div className="relative">
+          <div className="w-20 h-20 border-4 border-accent/20 border-t-accent rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent/10 rounded-full animate-pulse" />
+          </div>
+        </div>
+        <p className="text-white/60 font-bold tracking-widest animate-pulse">جاري التحميل...</p>
+      </div>
+    );
+  }
   return (
     <ThemeProvider>
       <LanguageProvider>
@@ -171,12 +191,12 @@ function App() {
           <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
           <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
         </Helmet>
-        <StructuredData type="organization" data={storeSettings || undefined} services={services} categories={categories} />
+        <StructuredData type="organization" data={storeSettings || undefined} services={[]} categories={categories} />
         <Router>
           <ScrollToTop />
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={fetchStoreSettings} /></PrivateRoute>} />
+            <Route path="/admin/dashboard" element={<PrivateRoute><AdminDashboard onSettingsUpdate={() => window.location.reload()} /></PrivateRoute>} />
             
             <Route path="/page/:id" element={<Layout banners={banners} storeSettings={storeSettings}><PageDetails /></Layout>} />
             <Route path="/specialization/:id" element={<Layout banners={banners} storeSettings={storeSettings}><SpecializationDetails /></Layout>} />

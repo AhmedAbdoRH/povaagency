@@ -16,9 +16,9 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
   const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
 
   return (
-    <div ref={containerRef} className="sticky top-0 flex h-screen items-center justify-center pt-24 pb-12">
+    <div ref={containerRef} className="sticky top-0 flex h-screen items-start justify-center pt-[15vh] md:pt-[20vh] pb-12">
       <motion.div
-        style={{ scale, opacity, y, top: `calc(5vh + ${index * 25}px)` }}
+        style={{ scale, opacity, y, top: `calc(2vh + ${index * 20}px)` }}
         className="relative flex w-full max-w-4xl flex-col items-center gap-8 rounded-3xl border border-white/10 bg-[#0a0a0a] p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:flex-row md:p-12"
       >
         <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color}`} />
@@ -83,8 +83,30 @@ export default function WhySocialMarketing() {
 
   return (
     <section ref={containerRef} className="relative bg-[#050505] pb-32">
-      <div className="sticky top-0 z-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 z-0 h-screen w-full overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
+        
+        {/* Persistent Scroll Indicator */}
+        <motion.div
+          style={{ opacity: useTransform(scrollYProgress, [0.8, 1], [1, 0]) }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 text-white/40"
+        >
+          <div className="w-8 h-14 rounded-full border-2 border-white/20 flex justify-center p-1.5">
+            <motion.div
+              animate={{ 
+                y: [0, 28, 0],
+                opacity: [0.4, 1, 0.4]
+              }}
+              transition={{ 
+                duration: 2.5, 
+                times: [0, 0.8, 1],
+                repeat: Infinity, 
+                ease: "easeInOut"
+              }}
+              className="w-2 h-4 bg-accent rounded-full shadow-[0_0_15px_rgba(238,82,57,0.6)]"
+            />
+          </div>
+        </motion.div>
       </div>
 
       <div className="relative z-10 -mt-[100vh]">
