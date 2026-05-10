@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import type { Client, ClientContent } from '../types/database';
 import { ArrowRight, CheckCircle, ExternalLink, Play, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
+import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 
 interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
   specialization?: {
@@ -113,19 +114,13 @@ export default function ClientDetails() {
                   <div key={item.id} className="bg-[#2a2a2a] rounded-2xl overflow-hidden border border-white/5 group relative shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     {item.content_type === 'video' ? (
                       <div className="relative aspect-video bg-black flex items-center justify-center">
-                        {item.video_url?.includes('youtube.com') || item.video_url?.includes('youtu.be') ? (
+                        {isEmbeddable(item.video_url || '') ? (
                           <iframe 
-                            src={`https://www.youtube.com/embed/${item.video_url.includes('v=') ? item.video_url.split('v=')[1]?.split('&')[0] : item.video_url.split('/').pop()}`}
+                            src={getEmbedUrl(item.video_url || '') || ''}
                             className="w-full h-full"
                             allowFullScreen
                             title={item.title}
-                          />
-                        ) : item.video_url?.includes('vimeo.com') ? (
-                          <iframe 
-                            src={`https://player.vimeo.com/video/${item.video_url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]}`}
-                            className="w-full h-full"
-                            allowFullScreen
-                            title={item.title}
+                            allow="autoplay; encrypted-media; fullscreen"
                           />
                         ) : (
                           <video 

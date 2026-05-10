@@ -68,9 +68,7 @@ export default function Footer({ storeSettings }: FooterProps) {
               <li>
                 <Link to="/contact" className="text-gray-400 hover:text-accent transition-colors">{t('header.contactUs')}</Link>
               </li>
-              <li>
-                <Link to="/design-request" className="text-gray-400 hover:text-accent transition-colors">{t('footer.designRequest')}</Link>
-              </li>
+
             </ul>
           </div>
 

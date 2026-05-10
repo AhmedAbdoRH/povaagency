@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 
 interface ClientCardProps {
   id: string;
@@ -17,18 +18,11 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
     >
       <div className="absolute inset-0 bg-black/60 flex items-center justify-center overflow-hidden">
         {videoUrl ? (
-          videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ? (
+          isEmbeddable(videoUrl) ? (
             <iframe 
-              src={`https://www.youtube.com/embed/${videoUrl.includes('v=') ? videoUrl.split('v=')[1]?.split('&')[0] : videoUrl.split('/').pop()}?autoplay=1&mute=1&controls=0&loop=1`}
+              src={getEmbedUrl(videoUrl, { autoplay: true, mute: true, loop: true, controls: false }) || ''}
               className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
-              allow="autoplay; encrypted-media"
-              title={name}
-            />
-          ) : videoUrl.includes('vimeo.com') ? (
-            <iframe 
-              src={`https://player.vimeo.com/video/${videoUrl.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]}?background=1&autoplay=1&loop=1&byline=0&title=0`}
-              className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110 scale-[1.5]"
-              allow="autoplay; fullscreen; picture-in-picture"
+              allow="autoplay; encrypted-media; fullscreen"
               title={name}
             />
           ) : (
