@@ -69,7 +69,7 @@ export default function CoreServicePageView({
       <div className="container mx-auto px-4">
         <div className="mb-4 flex items-center gap-2 text-sm text-gray-400">
           <Link to="/" className="hover:text-white transition-colors">
-            الرئيسية
+            {t('header.home')}
           </Link>
           <span>/</span>
           <span className="text-accent">{pageTitle}</span>
@@ -90,7 +90,7 @@ export default function CoreServicePageView({
             <div className="mb-12">
               <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-200 backdrop-blur-md">
                 <HeroIcon className={`h-4 w-4 ${coreService.iconColor}`} />
-                <span>الخدمة الرئيسية</span>
+                <span>{t('coreServicePage.mainService')}</span>
               </div>
 
               <h1 className="mb-5 text-4xl font-extrabold leading-[1.3] md:text-5xl">
@@ -105,11 +105,11 @@ export default function CoreServicePageView({
             <div className="border-t border-white/10 pt-10">
               {!hasLinkedPage ? (
                 <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center text-gray-300 backdrop-blur-sm">
-                  لم يتم ربط هذه الخدمة ببياناتها في قاعدة البيانات بعد.
+                  {t('coreServicePage.noPageLinked')}
                 </div>
               ) : sections.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center text-gray-300 backdrop-blur-sm">
-                  لا توجد أقسام مضافة لهذه الخدمة حتى الآن.
+                  {t('coreServicePage.noSections')}
                 </div>
               ) : (
                 <>
@@ -145,7 +145,7 @@ export default function CoreServicePageView({
 
                       {selectedClients.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-gray-400">
-                          لا توجد أعمال داخل هذا القسم حتى الآن.
+                          {t('coreServicePage.noWorksInSection')}
                         </div>
                       ) : (
                         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">

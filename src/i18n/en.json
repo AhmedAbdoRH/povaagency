@@ -306,5 +306,34 @@
     "nameEn": "English Name",
     "descriptionAr": "Arabic Description",
     "descriptionEn": "English Description"
+  },
+  "clientDetails": {
+    "notFound": "Client not found",
+    "backToHome": "Back to Home",
+    "backToSpecialization": "Back to Specialization",
+    "noDescription": "No description available for this client.",
+    "completedProject": "Completed Project",
+    "viewLiveProject": "View Live Project",
+    "viewWorks": "View Works",
+    "addingWorksTitle": "Works are being added",
+    "addingWorksDesc": "Details and outcomes of this project will be displayed soon."
+  },
+  "specDetails": {
+    "error": "Could not load specialization.",
+    "notFound": "Specialization not found",
+    "defaultServiceLabel": "Service",
+    "noWorksTitle": "No works found",
+    "noWorksDesc": "No works have been added to this section yet.",
+    "worksInSection": "Works in this section"
+  },
+  "clientCard": {
+    "clickForDetails": "Click to view project details",
+    "viewDetails": "View Details"
+  },
+  "coreServicePage": {
+    "mainService": "Main Service",
+    "noPageLinked": "This service has not been linked to its data in the database yet.",
+    "noSections": "No sections added for this service yet.",
+    "noWorksInSection": "No works within this section yet."
   }
 }

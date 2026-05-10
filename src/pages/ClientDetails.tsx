@@ -17,7 +17,7 @@ interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
 
 export default function ClientDetails() {
   const { id } = useParams<{ id: string }>();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [client, setClient] = useState<ClientWithPartialSpec | null>(null);
   const [contents, setContents] = useState<ClientContent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ export default function ClientDetails() {
   }, [id]);
 
   if (loading) return <div className="min-h-screen pt-24 text-center text-white bg-[#1a1a1a] flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ee5239]"></div></div>;
-  if (!client) return <div className="min-h-screen pt-24 text-center text-white bg-[#1a1a1a] flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">العميل غير موجود</h2><Link to="/" className="text-[#ee5239]">العودة للرئيسية</Link></div>;
+  if (!client) return <div className="min-h-screen pt-24 text-center text-white bg-[#1a1a1a] flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">{t('clientDetails.notFound')}</h2><Link to="/" className="text-[#ee5239]">{t('clientDetails.backToHome')}</Link></div>;
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-[#1a1a1a] text-white font-[Cairo]">
@@ -53,7 +53,7 @@ export default function ClientDetails() {
           {/* Header & Client Info Section */}
           <div className="mb-8">
              <Link to={`/specialization/${client.specialization_id}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-[#ee5239] transition-colors group mb-6">
-                <ArrowRight size={20} className="group-hover:-translate-x-1 transition-transform" /> العودة للتخصص
+                <ArrowRight size={20} className="group-hover:-translate-x-1 transition-transform" /> {t('clientDetails.backToSpecialization')}
              </Link>
              
              <div className="bg-[#2a2a2a] rounded-2xl p-6 md:p-8 shadow-2xl border border-white/5 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
@@ -81,21 +81,20 @@ export default function ClientDetails() {
                    </div>
                    
                    <p className="text-gray-400 leading-relaxed max-w-3xl text-sm md:text-base whitespace-pre-line mb-6">
-                     {language === 'en' ? (client.description_en || client.description) : client.description || 'لا يوجد وصف متاح لهذا العميل.'}
+                     {language === 'en' ? (client.description_en || client.description) : client.description || t('clientDetails.noDescription')}
                    </p>
 
-                   {/* Additional Info / Links */}
-                   <div className="flex flex-wrap items-center gap-4 border-t border-white/10 pt-4">
-                     <div className="flex items-center gap-2 text-gray-400 text-sm">
-                        <CheckCircle size={16} className="text-emerald-500" />
-                        <span>مشروع مكتمل</span>
-                     </div>
-                     {client.project_url && (
-                        <a href={client.project_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#ee5239] hover:text-[#ff6b54] text-sm font-bold transition-colors">
-                           <ExternalLink size={16} />
-                           عرض المشروع الحي
-                        </a>
-                     )}
+                    <div className="flex items-center gap-4 border-t border-white/10 pt-4 flex-wrap">
+                      <div className="flex items-center gap-2 text-gray-400 text-sm">
+                         <CheckCircle size={16} className="text-emerald-500" />
+                         <span>{t('clientDetails.completedProject')}</span>
+                      </div>
+                      {client.project_url && (
+                         <a href={client.project_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#ee5239] hover:text-[#ff6b54] text-sm font-bold transition-colors">
+                            <ExternalLink size={16} />
+                            {t('clientDetails.viewLiveProject')}
+                         </a>
+                      )}
                    </div>
                 </div>
              </div>
@@ -106,7 +105,7 @@ export default function ClientDetails() {
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-white flex items-center gap-3">
                 <span className="w-2 h-8 bg-[#ee5239] rounded-full inline-block"></span>
-                استعراض الأعمال
+                {t('clientDetails.viewWorks')}
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -145,9 +144,13 @@ export default function ClientDetails() {
                     )}
                     
                     <div className="p-5 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/80 to-transparent pt-12 pointer-events-none">
-                      <h4 className="text-lg font-bold text-white mb-1 drop-shadow-md">{item.title}</h4>
-                      {item.description && (
-                        <p className="text-gray-300 text-sm line-clamp-2 drop-shadow-md">{item.description}</p>
+                      <h4 className="text-lg font-bold text-white mb-1 drop-shadow-md">
+                        {language === 'en' ? (item.title_en || item.title) : item.title}
+                      </h4>
+                      {(item.description || item.description_en) && (
+                        <p className="text-gray-300 text-sm line-clamp-2 drop-shadow-md">
+                          {language === 'en' ? (item.description_en || item.description) : item.description}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -159,8 +162,8 @@ export default function ClientDetails() {
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-8 h-8 text-gray-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">جاري إضافة الأعمال</h3>
-              <p className="text-gray-400">سيتم عرض تفاصيل ومخرجات هذا المشروع قريباً.</p>
+              <h3 className="text-xl font-bold text-white mb-2">{t('clientDetails.addingWorksTitle')}</h3>
+              <p className="text-gray-400">{t('clientDetails.addingWorksDesc')}</p>
             </div>
           )}
        </div>

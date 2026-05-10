@@ -7,6 +7,7 @@ import Header from './components/Header';
 import BannerSlider from './components/BannerSlider';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import BackToTop from './components/BackToTop';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PageDetails from './pages/PageDetails';
@@ -95,6 +96,7 @@ const Layout = ({ children, banners: layoutBanners, storeSettings }: LayoutProps
       <CollaborationForm />
       <Footer storeSettings={storeSettings} />
       <WhatsAppButton />
+      <BackToTop />
     </div>
   );
 };

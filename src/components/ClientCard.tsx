@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface ClientCardProps {
   id: string;
@@ -11,6 +12,8 @@ interface ClientCardProps {
 }
 
 export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl }: ClientCardProps) {
+  const { t } = useLanguage();
+
   return (
     <Link 
       to={`/client/${id}`} 
@@ -53,9 +56,9 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
           
           <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
              <div className="overflow-hidden">
-                <p className="text-gray-300 text-sm line-clamp-2 mb-4 leading-relaxed drop-shadow">{description || 'اضغط لعرض تفاصيل المشروع'}</p>
+                <p className="text-gray-300 text-sm line-clamp-2 mb-4 leading-relaxed drop-shadow">{description || t('clientCard.clickForDetails')}</p>
                 <div className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ee5239] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ee5239] shadow-lg">
-                  عرض التفاصيل
+                  {t('clientCard.viewDetails')}
                 </div>
              </div>
           </div>

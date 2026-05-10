@@ -219,7 +219,7 @@ export default function Hero() {
   const { t, language } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const phoneRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(2847);
@@ -242,18 +242,7 @@ export default function Hero() {
   const glareY = useTransform(smoothMy, [-0.5, 0.5], ['100%', '-100%']);
 
 
-  useEffect(() => {
-    if (videoRef.current) {
-      // Use setTimeout to ensure the entrance animation finishes before video plays
-      const playTimer = setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.play().catch(() => setIsPlaying(false));
-        }
-      }, 1800);
 
-      return () => clearTimeout(playTimer);
-    }
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -264,8 +253,16 @@ export default function Hero() {
 
   const togglePlay = () => {
     if (!videoRef.current) return;
-    isPlaying ? videoRef.current.pause() : videoRef.current.play();
-    setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
+      videoRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+    }
   };
 
   const handleLike = () => {
@@ -374,30 +371,7 @@ export default function Hero() {
               </button>
             </motion.div>
 
-            {/* trust row */}
-            <motion.div
-              className={`flex items-center gap-5 mt-8 ${language === 'ar' ? 'sm:justify-end' : 'sm:justify-start'}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.4 }}
-            >
-              <div className="flex -space-x-2 rtl:space-x-reverse">
-                {['#ee5239', '#f8a04a', '#6366f1', '#22d3ee'].map((c, i) => (
-                  <div
-                    key={i}
-                    className="w-7 h-7 rounded-full border-2 border-[#080c14]"
-                    style={{ background: `linear-gradient(135deg, ${c}, ${c}99)` }}
-                  />
-                ))}
-              </div>
-              <p className="text-white/50 text-sm">
-                <span className="text-white font-semibold">+120</span> {t('hero.happyClients')}
-              </p>
-              <div className="w-px h-4 bg-white/10" />
-              <div className="flex items-center gap-1 text-amber-400 text-sm font-semibold">
-                ★★★★★
-              </div>
-            </motion.div>
+
           </motion.div>
 
           {/* ── RIGHT: phone mockup ── */}
@@ -491,7 +465,7 @@ export default function Hero() {
                   <div className="relative overflow-hidden w-full" style={{ aspectRatio: '9/19.5' }}>
                     <video
                       ref={videoRef}
-                      autoPlay={false} playsInline muted
+                      autoPlay={false} playsInline
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                     >
                       <source src="/hero_video.mp4" type="video/mp4" />
@@ -529,7 +503,7 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="إعجاب"
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${liked ? 'bg-red-500/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300`}>
                         <Heart className={`w-3.5 h-3.5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-white drop-shadow-md'}`} />
                       </div>
                       <span className="text-white/90 text-[8px] font-bold drop-shadow-md">
@@ -542,7 +516,7 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="تعليق"
                     >
-                      <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300">
                         <MessageCircle className="w-3.5 h-3.5 text-white drop-shadow-md" />
                       </div>
                       <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
@@ -553,7 +527,7 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="مشاركة"
                     >
-                      <div className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-lg transition-colors group-hover/btn:bg-black/50">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300">
                         <Send className="w-3.5 h-3.5 text-white drop-shadow-md -ml-0.5" />
                       </div>
                       <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
@@ -565,7 +539,7 @@ export default function Hero() {
                       className="flex flex-col items-center gap-1 group/btn"
                       aria-label="حفظ"
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 ${saved ? 'bg-accent/20 backdrop-blur-xl' : 'bg-black/30 backdrop-blur-xl group-hover/btn:bg-black/50'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300`}>
                         <Bookmark className={`w-3.5 h-3.5 transition-all duration-300 ${saved ? 'text-accent fill-accent drop-shadow-[0_0_8px_rgba(238,82,57,0.5)]' : 'text-white drop-shadow-md'}`} />
                       </div>
                     </motion.button>
@@ -576,25 +550,24 @@ export default function Hero() {
                     style={{ translateZ: 30 }}
                     className="absolute bottom-6 left-4 right-16 z-20"
                   >
-                    <div className="flex items-center gap-1.5 mb-2 relative">
-                      <div className="w-6 h-6 rounded-full flex-shrink-0 overflow-hidden border border-white/30 shadow-[0_0_10px_rgba(0,0,0,0.5)]"
-                        style={{ background: 'linear-gradient(135deg, #ee5239, #f8a04a)' }} />
-                      <div className="flex flex-col bg-black/40 backdrop-blur-md rounded-lg px-2 py-0.5 border border-white/5">
-                        <p className="text-white text-[9px] font-bold drop-shadow-md leading-none mb-0.5">pova_agency</p>
-                        <p className="text-accent text-[7px] font-medium">وكالة تسويق رقمي</p>
+                    <div className={`flex items-center justify-between w-full px-0.5 mb-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-2.5 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                        <div className="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden border-2 border-white/20 shadow-lg bg-white flex items-center justify-center p-1">
+                          <img src="/agency-logo.png" alt="Pova Logo" className="w-full h-full object-contain" />
+                        </div>
+                        <div className={`flex flex-col ${language === 'ar' ? 'items-end' : 'items-start'}`}>
+                          <p className="text-white text-[10px] font-black tracking-tight drop-shadow-md leading-none mb-1">pova_agency</p>
+                          <p className="text-accent text-[7px] font-bold uppercase tracking-wider opacity-90">وكالة تسويق رقمي</p>
+                        </div>
                       </div>
-                      <button className="mr-auto text-[7px] font-bold text-white bg-accent/80 hover:bg-accent backdrop-blur-md border border-white/20 rounded-full px-2 py-0.5 transition-colors shadow-lg">
+                      <a 
+                        href="https://www.instagram.com/povaagency" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[8px] font-black text-white px-3 py-1 rounded-full border border-white/20 hover:bg-white/10 transition-all active:scale-95"
+                      >
                         {language === 'ar' ? 'متابعة' : 'Follow'}
-                      </button>
-                    </div>
-                    <div className="bg-black/30 backdrop-blur-md rounded-xl p-2 border border-white/5">
-                      <p className="text-white/90 text-[9px] leading-relaxed line-clamp-2 drop-shadow-md">
-                        {language === 'ar' ? 'استراتيجية + إبداع + تنفيذ دقيق = نمو مستمر لعلامتك 🚀✨' : 'Strategy + Creativity + Execution = Growth for your brand 🚀✨'}
-                      </p>
-                      <div className="flex gap-1.5 mt-1">
-                        <span className="text-[8px] text-accent font-bold drop-shadow-sm">{language === 'ar' ? '#تسويق' : '#Marketing'}</span>
-                        <span className="text-[8px] text-white/80 font-medium">{language === 'ar' ? '#هوية_بصرية' : '#Branding'}</span>
-                      </div>
+                      </a>
                     </div>
                   </motion.div>
 

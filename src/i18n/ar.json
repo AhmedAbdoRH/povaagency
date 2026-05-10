@@ -24,7 +24,7 @@
   },
   "hero": {
     "statusBadge": "حلول تسويق بصياغة تنفيذية احترافية",
-    "title": "نحول الهوية\nحضور رقمي\nيلفت ويبيع",
+    "title": "نحول الهوية\nلحضور رقمي\nيلفت ويبيع",
     "subtitle": "في POVA نبني لك تجربة متكاملة من الفكرة إلى التنفيذ، بمحتوى مدروس وهوية بصرية واضحة تساعدك على تحقيق أهدافك بثقة.",
     "cta": "ابدأ مشروعك الآن",
     "ctaCollaborate": "شاهد سابقة أعمالنا",
@@ -304,7 +304,37 @@
     "saved": "تم الحفظ",
     "nameAr": "الاسم بالعربية",
     "nameEn": "الاسم بالإنجليزية",
+    "descriptionEn": "الاسم بالإنجليزية",
     "descriptionAr": "الوصف بالعربية",
     "descriptionEn": "الوصف بالإنجليزية"
+  },
+  "clientDetails": {
+    "notFound": "العميل غير موجود",
+    "backToHome": "العودة للرئيسية",
+    "backToSpecialization": "العودة للتخصص",
+    "noDescription": "لا يوجد وصف متاح لهذا العميل.",
+    "completedProject": "مشروع مكتمل",
+    "viewLiveProject": "عرض المشروع الحي",
+    "viewWorks": "استعراض الأعمال",
+    "addingWorksTitle": "جاري إضافة الأعمال",
+    "addingWorksDesc": "سيتم عرض تفاصيل ومخرجات هذا المشروع قريباً."
+  },
+  "specDetails": {
+    "error": "تعذر تحميل القسم.",
+    "notFound": "القسم غير موجود",
+    "defaultServiceLabel": "الخدمة",
+    "noWorksTitle": "لا توجد أعمال",
+    "noWorksDesc": "لم يتم إضافة أعمال داخل هذا القسم حتى الآن.",
+    "worksInSection": "الأعمال داخل هذا القسم"
+  },
+  "clientCard": {
+    "clickForDetails": "اضغط لعرض تفاصيل المشروع",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "coreServicePage": {
+    "mainService": "الخدمة الرئيسية",
+    "noPageLinked": "لم يتم ربط هذه الخدمة ببياناتها في قاعدة البيانات بعد.",
+    "noSections": "لا توجد أقسام مضافة لهذه الخدمة حتى الآن.",
+    "noWorksInSection": "لا توجد أعمال داخل هذا القسم حتى الآن."
   }
 }

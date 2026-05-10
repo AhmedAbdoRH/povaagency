@@ -50,7 +50,9 @@ export interface ClientContent {
   id: string;
   client_id: string;
   title: string;
+  title_en: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null;
   video_url: string | null;
   content_type: 'image' | 'video' | 'text';
@@ -106,7 +108,9 @@ export interface Banner {
   id: string;
   type: 'image' | 'text' | 'strip';
   title: string | null;
+  title_en: string | null;
   description: string | null;
+  description_en: string | null;
   image_url: string | null;
   is_active: boolean;
   created_at: string;

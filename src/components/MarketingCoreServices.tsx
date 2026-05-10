@@ -91,7 +91,7 @@ export default function MarketingCoreServices() {
               <Link
                 to={`/service/${service.slug}`}
                 className="absolute inset-0 z-20"
-                aria-label={`الانتقال إلى ${service.title}`}
+                aria-label={language === 'en' ? `Go to ${service.page?.name_en || service.title}` : `الانتقال إلى ${service.title}`}
               />
 
               <div
@@ -127,7 +127,7 @@ export default function MarketingCoreServices() {
                 </p>
 
                 <div className="mt-6 flex items-center gap-2 text-sm font-bold text-[#ee5239] transition-colors group-hover:text-white">
-                  <span>شاهد سابقة أعمالنا</span>
+                  <span>{t('hero.ctaCollaborate')}</span>
                   <svg
                     className={`h-4 w-4 ${language === 'ar' ? 'rotate-180' : ''} transition-transform group-hover:translate-x-1`}
                     fill="none"
