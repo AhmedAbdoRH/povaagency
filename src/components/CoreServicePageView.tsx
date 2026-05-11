@@ -6,6 +6,15 @@ import type { CoreServiceDefinition } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import ClientCard from './ClientCard';
 
+// Default translations fallback
+const defaultTranslations: Record<string, string> = {
+  'header.home': 'الرئيسية',
+  'coreServicePage.mainService': 'الخدمة الرئيسية',
+  'coreServicePage.noPageLinked': 'لا توجد صفحة مرتبطة بهذه الخدمة',
+  'coreServicePage.noSections': 'لا توجد أقسام متاحة',
+  'coreServicePage.noWorksInSection': 'لا توجد أعمال في هذا القسم',
+};
+
 export interface SpecializationWithClients {
   id: string;
   service_id: string;
@@ -38,6 +47,11 @@ export default function CoreServicePageView({
 }: CoreServicePageViewProps) {
   const { language } = useLanguage();
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(sections[0]?.id || null);
+
+  // Translation helper function
+  const t = (key: string): string => {
+    return defaultTranslations[key] || key;
+  };
 
   useEffect(() => {
     setSelectedSectionId(current =>
