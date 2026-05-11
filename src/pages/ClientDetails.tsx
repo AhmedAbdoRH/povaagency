@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Client, ClientContent } from '../types/database';
-import { ArrowRight, CheckCircle, ExternalLink, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink, Play, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 
@@ -80,22 +80,20 @@ export default function ClientDetails() {
                      </span>
                    </div>
                    
-                   <p className="text-gray-400 leading-relaxed max-w-3xl text-sm md:text-base whitespace-pre-line mb-6">
-                     {language === 'en' ? (client.description_en || client.description) : client.description || t('clientDetails.noDescription')}
-                   </p>
+                   {(language === 'en' ? (client.description_en || client.description) : client.description) && (
+                     <p className="text-gray-400 leading-relaxed max-w-3xl text-sm md:text-base whitespace-pre-line mb-6">
+                       {language === 'en' ? (client.description_en || client.description) : client.description}
+                     </p>
+                   )}
 
-                    <div className="flex items-center gap-4 border-t border-white/10 pt-4 flex-wrap">
-                      <div className="flex items-center gap-2 text-gray-400 text-sm">
-                         <CheckCircle size={16} className="text-emerald-500" />
-                         <span>{t('clientDetails.completedProject')}</span>
-                      </div>
-                      {client.project_url && (
+                    {client.project_url && (
+                      <div className="flex items-center gap-4 border-t border-white/10 pt-4 flex-wrap">
                          <a href={client.project_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#ee5239] hover:text-[#ff6b54] text-sm font-bold transition-colors">
                             <ExternalLink size={16} />
                             {t('clientDetails.viewLiveProject')}
                          </a>
-                      )}
-                   </div>
+                      </div>
+                    )}
                 </div>
              </div>
           </div>
