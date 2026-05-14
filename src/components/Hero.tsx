@@ -177,7 +177,7 @@ function InteractiveBackground() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(8, 12, 20, 0.7) 100%)',
+          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(255, 255, 255, 0.8) 100%)',
         }}
       />
     </div>
@@ -280,7 +280,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen bg-[#080c14] overflow-hidden flex items-center pt-0"
+      className="relative min-h-screen bg-primary overflow-hidden flex items-center pt-0"
     >
       {/* ── inject keyframes ── */}
       <style>{heroStyles}</style>
@@ -291,7 +291,7 @@ export default function Hero() {
       {/* subtle top gradient line */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent pointer-events-none z-[1]" />
       {/* Bottom edge glow */}
-      <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#080c14] to-transparent pointer-events-none z-[1]" />
+      <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-primary to-transparent pointer-events-none z-[1]" />
 
       {particles.map((o, i) => <Particle key={i} {...o} />)}
 
@@ -318,7 +318,7 @@ export default function Hero() {
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.1] mb-8 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-gray-900 leading-[1.1] mb-8 tracking-tight">
               {t('hero.title').split('\n').map((text, index, array) => (
                 <motion.span
                   key={index}
@@ -335,7 +335,7 @@ export default function Hero() {
 
             {/* description */}
             <motion.p
-              className="text-white/65 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8"
+              className="text-gray-600 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.55 }}
@@ -352,7 +352,7 @@ export default function Hero() {
             >
               <button
                 onClick={scrollToCollaboration}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#080c14] font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-white/25 hover:-translate-y-1 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-gray-900/25 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
                 {language === 'ar' ? (
@@ -608,13 +608,13 @@ export default function Hero() {
         transition={{ delay: 2.2 }}
         onClick={scrollToCollaboration}
       >
-        <span className="text-white/30 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
+        <span className="text-gray-400 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
         <motion.div
           animate={{ y: [0, 7, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center pt-1.5"
+          className="w-5 h-8 rounded-full border border-gray-300 flex items-start justify-center pt-1.5"
         >
-          <div className="w-1 h-2 rounded-full bg-white/40" />
+          <div className="w-1 h-2 rounded-full bg-gray-400" />
         </motion.div>
       </motion.div>
     </section>

@@ -42,7 +42,7 @@ export default function Stats() {
     ];
 
     return (
-        <section className="relative overflow-hidden bg-black py-32">
+        <section className="relative overflow-hidden bg-white py-32">
             {/* Ambient Lighting Background */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full opacity-30 blur-[150px] pointer-events-none bg-gradient-to-r from-accent via-orange-600 to-purple-600 rounded-[100%]" />
 
@@ -59,13 +59,13 @@ export default function Stats() {
                         >
                             {/* Giant Stroke Text Background */}
                             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl md:text-[9rem] font-black opacity-10 select-none pointer-events-none z-0 transition-opacity duration-500 group-hover:opacity-20"
-                                style={{ WebkitTextStroke: '2px white', color: 'transparent' }}
+                                style={{ WebkitTextStroke: '2px #9ca3af', color: 'transparent' }}
                             >
                                 {stat.value}
                             </div>
                             
                             <div className="relative z-10 flex flex-col items-center justify-center">
-                                <h3 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter drop-shadow-2xl">
+                                <h3 className="text-5xl md:text-7xl font-black text-gray-900 mb-4 tracking-tighter drop-shadow-md">
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix || ''} />
                                 </h3>
                                 <p className="text-xl md:text-2xl font-bold text-accent px-4 py-2 bg-accent/10 border border-accent/20 rounded-full backdrop-blur-sm">

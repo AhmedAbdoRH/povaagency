@@ -5,17 +5,17 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #000000;
-  /* أسود - الخلفية الرئيسية */
-  --color-secondary: #1a1a1a;
-  /* رصاصي غامق - للكروت والعناصر الفرعية */
+  --color-primary: #ffffff;
+  /* أبيض - الخلفية الرئيسية */
+  --color-secondary: #f8f9fa;
+  /* رمادي فاتح - للكروت والعناصر الفرعية */
   --color-accent: #ee5239;
   /* برتقالي محمر - للتميز */
   --color-accent-light: #ff6b52;
   /* درجة أفتح من الأكسنت */
-  --color-header: #1a1a1a;
+  --color-header: #ffffff;
   /* نفس لون السكندري للهيدر */
-  --background-color: #000000;
+  --background-color: #ffffff;
   --font-family: 'Cairo', sans-serif;
 }
 
@@ -36,8 +36,8 @@ html[dir="rtl"] {
 body {
   font-family: var(--font-family, 'Cairo', sans-serif);
   background-color: var(--color-primary);
-  color: #ffffff;
-  /* النص الأساسي أبيض */
+  color: #1a1a1a;
+  /* النص الأساسي رمادي داكن */
   overflow-x: hidden;
 }
 
@@ -71,10 +71,10 @@ html[dir="ltr"] .mr-auto {
 }
 
 .glass {
-  background: rgba(26, 26, 26, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Custom Animations */
@@ -103,11 +103,11 @@ html[dir="ltr"] .mr-auto {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #c1c1c1;
   border-radius: 4px;
 }
 
@@ -124,11 +124,11 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85); /* Slightly softer white for better readability */
+  color: rgba(26, 26, 26, 0.85); /* Slightly softer dark for better readability */
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #ffffff 0%, #a1a1a1 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #666666 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

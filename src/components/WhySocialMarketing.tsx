@@ -19,7 +19,7 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
     <div ref={containerRef} className="sticky top-0 flex h-screen items-start justify-center pt-[15vh] md:pt-[20vh] pb-12">
       <motion.div
         style={{ scale, opacity, y, top: `calc(2vh + ${index * 20}px)` }}
-        className="relative flex w-full max-w-4xl flex-col items-center gap-8 rounded-3xl border border-white/10 bg-[#0a0a0a] p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:flex-row md:p-12"
+        className="relative flex w-full max-w-4xl flex-col items-center gap-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] backdrop-blur-xl md:flex-row md:p-12"
       >
         <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color}`} />
         <div className={`absolute ${language === 'ar' ? '-right-20' : '-left-20'} -top-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-20 ${item.color}`} />
@@ -29,8 +29,8 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
         </div>
 
         <div className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10`}>
-          <h3 className="mb-4 text-3xl font-bold text-white md:text-4xl">{item.title}</h3>
-          <p className="text-lg leading-relaxed text-gray-400 md:text-xl">
+          <h3 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">{item.title}</h3>
+          <p className="text-lg leading-relaxed text-gray-600 md:text-xl">
             {item.description}
           </p>
         </div>
@@ -82,16 +82,16 @@ export default function WhySocialMarketing() {
   });
 
   return (
-    <section ref={containerRef} className="relative bg-[#050505] pb-32">
+    <section ref={containerRef} className="relative bg-white pb-32">
       <div className="sticky top-0 z-0 h-screen w-full overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
         
         {/* Persistent Scroll Indicator */}
         <motion.div
           style={{ opacity: useTransform(scrollYProgress, [0.8, 1], [1, 0]) }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 text-white/40"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 text-gray-400"
         >
-          <div className="w-8 h-14 rounded-full border-2 border-white/20 flex justify-center p-1.5">
+          <div className="w-8 h-14 rounded-full border-2 border-gray-300 flex justify-center p-1.5">
             <motion.div
               animate={{ 
                 y: [0, 28, 0],
@@ -115,7 +115,7 @@ export default function WhySocialMarketing() {
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600 backdrop-blur-sm"
           >
             <Sparkles className="h-4 w-4 text-accent" />
             <span>{t('whySocialMarketing.statusBadge')}</span>
@@ -124,7 +124,7 @@ export default function WhySocialMarketing() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.6] max-w-4xl mx-auto"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.6] max-w-4xl mx-auto"
           >
             {t('whySocialMarketing.heading')}
           </motion.h2>

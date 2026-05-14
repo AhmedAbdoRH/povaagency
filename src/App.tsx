@@ -87,7 +87,7 @@ const Layout = ({ children, banners: layoutBanners, storeSettings }: LayoutProps
   });
 
   return (
-    <div className="min-h-screen font-cairo bg-primary text-white">
+    <div className="min-h-screen font-cairo bg-primary text-gray-900">
       <Header storeSettings={storeSettings} />
       {currentBanners.length > 0 && <BannerSlider banners={currentBanners} />}
       {isHome && <Hero />}
@@ -132,10 +132,10 @@ function App() {
               meta_title: 'POVA | وكالة تسويق رقمي',
               meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
               theme_settings: {
-                primaryColor: '#000000',
-                secondaryColor: '#1a1a1a',
+                primaryColor: '#ffffff',
+                secondaryColor: '#f8f9fa',
                 fontFamily: 'Cairo, sans-serif',
-                backgroundColor: '#000000',
+                backgroundColor: '#ffffff',
                 backgroundGradient: ''
               }
             } as StoreSettings);
@@ -163,8 +163,8 @@ function App() {
     if (storeSettings) {
       const theme = (storeSettings as any).theme_settings || {};
       const root = document.documentElement;
-      root.style.setProperty('--color-primary', theme.primaryColor || '#000000');
-      root.style.setProperty('--color-secondary', theme.secondaryColor || '#1a1a1a');
+      root.style.setProperty('--color-primary', theme.primaryColor || '#ffffff');
+      root.style.setProperty('--color-secondary', theme.secondaryColor || '#f8f9fa');
       root.style.setProperty('--color-accent', '#ee5239');
       root.style.setProperty('--font-family', theme.fontFamily || 'Cairo, sans-serif');
     }
@@ -173,14 +173,14 @@ function App() {
 
   if (isAppLoading) {
     return (
-      <div className="min-h-screen bg-[#080c14] flex flex-col items-center justify-center gap-6" dir="rtl">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6" dir="rtl">
         <div className="relative">
           <div className="w-20 h-20 border-4 border-accent/20 border-t-accent rounded-full animate-spin" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-10 h-10 bg-accent/10 rounded-full animate-pulse" />
           </div>
         </div>
-        <p className="text-white/60 font-bold tracking-widest animate-pulse">جاري التحميل...</p>
+        <p className="text-gray-600 font-bold tracking-widest animate-pulse">جاري التحميل...</p>
       </div>
     );
   }

@@ -21,7 +21,7 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className={`relative group overflow-hidden rounded-3xl border border-white/10 bg-gray-900/50 backdrop-blur-xl p-8 ${feature.className}`}
+            className={`relative group overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 ${feature.className}`}
             onMouseMove={handleMouseMove}
             ref={ref}
         >
@@ -31,7 +31,7 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
                     background: useMotionTemplate`
                         radial-gradient(
                             200px circle at ${mouseX}px ${mouseY}px,
-                            rgba(255, 255, 255, 0.1),
+                            rgba(0, 0, 0, 0.05),
                             transparent
                         )
                     `
@@ -41,8 +41,8 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
                 <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${feature.color} p-4`}>
                     <feature.icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="mb-3 text-2xl font-bold text-white">{feature.title}</h3>
-                <p className="text-gray-400">{feature.description}</p>
+                <h3 className="mb-3 text-2xl font-bold text-gray-900">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
             </div>
         </motion.div>
     );
@@ -83,9 +83,9 @@ export default function Features() {
     ];
 
     return (
-        <section className="relative overflow-hidden bg-black py-32 selection:bg-accent/30">
+        <section className="relative overflow-hidden bg-white py-32 selection:bg-accent/30">
             {/* Background elements */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000010_1px,transparent_1px),linear-gradient(to_bottom,#00000010_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
             <div className="container relative z-10 mx-auto px-4">
                 <div className="mb-20 flex flex-col items-center text-center">
@@ -104,7 +104,7 @@ export default function Features() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="mb-6 text-5xl md:text-6xl font-black tracking-tight text-white lg:text-7xl leading-[1.6]"
+                        className="mb-6 text-5xl md:text-6xl font-black tracking-tight text-gray-900 lg:text-7xl leading-[1.6]"
                     >
                         {t('features.heading')}
                     </motion.h2>
@@ -113,7 +113,7 @@ export default function Features() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="max-w-2xl text-lg text-gray-400 md:text-xl"
+                        className="max-w-2xl text-lg text-gray-600 md:text-xl"
                     >
                         {t('features.description')}
                     </motion.p>
