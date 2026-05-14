@@ -55,7 +55,7 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
 
         <div
             style={{ transform: "translateZ(50px)", transformStyle: "preserve-3d" }}
-            className="h-full bg-white/10 border border-white/20 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden group"
+            className="h-full bg-white/50 border border-gray-200 rounded-3xl p-8 backdrop-blur-xl shadow-lg relative overflow-hidden group"
         >
             <div className={`absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br ${benefit.gradient} rounded-full blur-3xl opacity-20 transition-opacity duration-500 group-hover:opacity-50`} />
 
@@ -68,14 +68,14 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
             
             <h3 
                 style={{ transform: "translateZ(30px)" }}
-                className="text-2xl font-bold mb-4 text-white drop-shadow-md"
+                className="text-2xl font-bold mb-4 text-gray-900 drop-shadow-sm"
             >
                 {benefit.title}
             </h3>
             
             <p 
                 style={{ transform: "translateZ(20px)" }}
-                className="text-gray-300 leading-relaxed font-medium"
+                className="text-gray-600 leading-relaxed font-medium"
             >
                 {benefit.description}
             </p>
@@ -98,7 +98,7 @@ export default function DigitalMarketingBenefits() {
   }));
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#0a0a0a] to-[#000000] py-32 perspective-1000">
+    <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-32 perspective-1000">
         {/* Animated Background Blob */}
         <motion.div 
             animate={{ 
@@ -123,9 +123,9 @@ export default function DigitalMarketingBenefits() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/50 px-4 py-2 text-sm font-medium text-gray-600 backdrop-blur-sm shadow-sm"
             >
-                <Lightbulb className="h-4 w-4 text-yellow-400" />
+                <Lightbulb className="h-4 w-4 text-accent" />
                 <span>{t('digitalMarketingBenefits.statusBadge')}</span>
             </motion.div>
             
@@ -133,7 +133,7 @@ export default function DigitalMarketingBenefits() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-white"
+            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-gray-900"
           >
             {t('digitalMarketingBenefits.heading')}
           </motion.h2>
@@ -142,7 +142,7 @@ export default function DigitalMarketingBenefits() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-400"
+            className="text-xl text-gray-600"
           >
             {t('digitalMarketingBenefits.description')}
           </motion.p>
