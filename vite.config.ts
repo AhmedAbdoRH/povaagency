@@ -35,7 +35,7 @@ export default defineConfig({
   // Enable gzip compression
   server: {
     headers: {
-      'Cache-Control': 'public, max-age=31536000',
+      'Cache-Control': 'no-store',
     },
     watch: {
       usePolling: false,

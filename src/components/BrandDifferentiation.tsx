@@ -35,8 +35,8 @@ export default function BrandDifferentiation() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section ref={containerRef} className="relative bg-[#000000] py-32 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(238,82,57,0.15),transparent_50%)]" />
+    <section ref={containerRef} className="relative bg-white py-32 text-gray-900">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(238,82,57,0.08),transparent_50%)]" />
 
       <div className="container relative z-10 mx-auto px-4">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
@@ -47,7 +47,7 @@ export default function BrandDifferentiation() {
               initial={{ opacity: 0, x: language === 'ar' ? -20 : 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-300 backdrop-blur-sm mb-6"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-bold text-gray-800 shadow-sm mb-6"
             >
               <Sparkles className="h-4 w-4 text-accent" />
               <span>{t('brandDifferentiation.statusBadge')}</span>
@@ -57,7 +57,7 @@ export default function BrandDifferentiation() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-6xl font-black leading-[1.6] mb-6"
+              className="text-4xl md:text-6xl font-black leading-[1.6] text-gray-900 mb-6"
             >
               {t('brandDifferentiation.heading')}
             </motion.h2>
@@ -67,7 +67,7 @@ export default function BrandDifferentiation() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-gray-400 max-w-xl"
+              className="text-lg text-gray-600 max-w-xl font-medium"
             >
               {t('brandDifferentiation.description')}
             </motion.p>
@@ -82,17 +82,17 @@ export default function BrandDifferentiation() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ margin: "-100px", once: false }}
                 transition={{ duration: 0.6 }}
-                className="group relative rounded-3xl bg-[#0a0a0a] p-8 border border-white/5 transition-all hover:border-white/20 hover:bg-[#111111]"
+                className="group relative rounded-[2.5rem] bg-[#f8f9fa] p-8 border border-gray-200/80 transition-all duration-500 hover:border-gray-300 hover:bg-white hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1"
               >
-                <div className={`absolute -inset-px rounded-3xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-20 ${item.color}`} />
+                <div className={`absolute -inset-px rounded-[2.5rem] bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-10 ${item.color}`} />
 
                 <div className="relative z-10">
                   <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br mb-8 shadow-lg transition-transform duration-500 group-hover:scale-110 ${item.color}`}>
                     <item.icon className="h-8 w-8 text-white" />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
-                  <p className="text-gray-400 text-lg leading-relaxed group-hover:text-gray-300 transition-colors">
+                  <h3 className="text-2xl font-black text-gray-900 mb-4">{item.title}</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed font-medium group-hover:text-gray-800 transition-colors">
                     {item.description}
                   </p>
                 </div>

@@ -42,9 +42,9 @@ export default function Stats() {
     ];
 
     return (
-        <section className="relative overflow-hidden bg-white py-32">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#ee5239] via-[#e03d24] to-[#c52d15] py-28 text-white">
             {/* Ambient Lighting Background */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full opacity-30 blur-[150px] pointer-events-none bg-gradient-to-r from-accent via-orange-600 to-purple-600 rounded-[100%]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,transparent_70%)] z-0" />
 
             <div className="container relative z-10 mx-auto px-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-20 text-center">
@@ -58,17 +58,17 @@ export default function Stats() {
                             className="relative group"
                         >
                             {/* Giant Stroke Text Background */}
-                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl md:text-[9rem] font-black opacity-10 select-none pointer-events-none z-0 transition-opacity duration-500 group-hover:opacity-20"
-                                style={{ WebkitTextStroke: '2px #9ca3af', color: 'transparent' }}
+                            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl md:text-[9rem] font-black opacity-10 select-none pointer-events-none z-0 transition-opacity duration-500 group-hover:opacity-25"
+                                style={{ WebkitTextStroke: '2px rgba(255,255,255,0.4)', color: 'transparent' }}
                             >
                                 {stat.value}
                             </div>
                             
                             <div className="relative z-10 flex flex-col items-center justify-center">
-                                <h3 className="text-5xl md:text-7xl font-black text-gray-900 mb-4 tracking-tighter drop-shadow-md">
+                                <h3 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter drop-shadow-lg">
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix || ''} />
                                 </h3>
-                                <p className="text-xl md:text-2xl font-bold text-accent px-4 py-2 bg-accent/10 border border-accent/20 rounded-full backdrop-blur-sm">
+                                <p className="text-xl md:text-2xl font-bold text-white px-5 py-2 bg-white/10 border border-white/20 rounded-full backdrop-blur-md shadow-sm">
                                     {stat.label}
                                 </p>
                             </div>

@@ -74,7 +74,7 @@ function InteractiveBackground() {
         <div
           style={{
             position: 'absolute', width: '130%', height: '130%', top: '-15%', left: '-15%',
-            background: `radial-gradient(ellipse 600px 500px at ${mousePos.x}% ${mousePos.y}%, rgba(238,82,57,0.18) 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse 600px 500px at ${mousePos.x}% ${mousePos.y}%, rgba(255,120,90,0.18) 0%, transparent 70%)`,
             transition: 'background 0.4s ease-out',
           }}
         />
@@ -82,7 +82,7 @@ function InteractiveBackground() {
           style={{
             position: 'absolute', width: '80vw', height: '80vh', top: '10%', left: '5%',
             borderRadius: '50%', filter: 'blur(100px)', opacity: 0.5,
-            background: 'radial-gradient(circle, rgba(238,82,57,0.2) 0%, rgba(248,160,74,0.08) 50%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(220,38,38,0.6) 0%, rgba(185,28,28,0.2) 50%, transparent 70%)',
             animation: 'meshRotate 25s ease-in-out infinite',
           }}
         />
@@ -90,15 +90,15 @@ function InteractiveBackground() {
           style={{
             position: 'absolute', width: '70vw', height: '70vh', bottom: '5%', right: '0%',
             borderRadius: '50%', filter: 'blur(120px)', opacity: 0.35,
-            background: 'radial-gradient(circle, rgba(248,160,74,0.2) 0%, rgba(99,102,241,0.06) 60%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(239,68,68,0.4) 0%, rgba(127,29,29,0.3) 60%, transparent 70%)',
             animation: 'meshRotateReverse 30s ease-in-out infinite',
           }}
         />
         <div
           style={{
             position: 'absolute', width: '50vw', height: '50vh', top: '30%', left: '40%',
-            borderRadius: '50%', filter: 'blur(90px)', opacity: 0.25,
-            background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+            borderRadius: '50%', filter: 'blur(90px)', opacity: 0.2,
+            background: 'radial-gradient(circle, rgba(248,160,74,0.25) 0%, transparent 70%)',
             animation: 'meshRotate 35s ease-in-out infinite reverse',
           }}
         />
@@ -109,8 +109,8 @@ function InteractiveBackground() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
           `,
           backgroundSize: '60px 60px',
           animation: 'pulseGrid 6s ease-in-out infinite',
@@ -121,12 +121,12 @@ function InteractiveBackground() {
 
       {/* Floating geometric shapes */}
       {[
-        { top: '12%', left: '8%', size: 14, border: 'rgba(238,82,57,0.25)', anim: 'floatShape 8s ease-in-out infinite', delay: '0s' },
-        { top: '70%', left: '15%', size: 8, border: 'rgba(248,160,74,0.2)', anim: 'floatShapeSlow 12s ease-in-out infinite', delay: '2s' },
-        { top: '25%', left: '85%', size: 10, border: 'rgba(139,92,246,0.2)', anim: 'floatShape 10s ease-in-out infinite', delay: '4s' },
-        { top: '80%', left: '78%', size: 6, border: 'rgba(238,82,57,0.15)', anim: 'floatShapeSlow 9s ease-in-out infinite', delay: '1s' },
-        { top: '45%', left: '92%', size: 12, border: 'rgba(248,160,74,0.15)', anim: 'floatShape 14s ease-in-out infinite', delay: '3s' },
-        { top: '5%', left: '50%', size: 7, border: 'rgba(255,255,255,0.08)', anim: 'floatShapeSlow 11s ease-in-out infinite', delay: '5s' },
+        { top: '12%', left: '8%', size: 14, border: 'rgba(255,200,180,0.3)', anim: 'floatShape 8s ease-in-out infinite', delay: '0s' },
+        { top: '70%', left: '15%', size: 8, border: 'rgba(248,160,74,0.3)', anim: 'floatShapeSlow 12s ease-in-out infinite', delay: '2s' },
+        { top: '25%', left: '85%', size: 10, border: 'rgba(255,255,255,0.2)', anim: 'floatShape 10s ease-in-out infinite', delay: '4s' },
+        { top: '80%', left: '78%', size: 6, border: 'rgba(255,180,160,0.25)', anim: 'floatShapeSlow 9s ease-in-out infinite', delay: '1s' },
+        { top: '45%', left: '92%', size: 12, border: 'rgba(248,160,74,0.2)', anim: 'floatShape 14s ease-in-out infinite', delay: '3s' },
+        { top: '5%', left: '50%', size: 7, border: 'rgba(255,255,255,0.15)', anim: 'floatShapeSlow 11s ease-in-out infinite', delay: '5s' },
       ].map((s, i) => (
         <div
           key={i}
@@ -142,7 +142,7 @@ function InteractiveBackground() {
 
       {/* Noise texture */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat',
@@ -157,7 +157,7 @@ function InteractiveBackground() {
           width: 500, height: 500,
           left: `${mousePos.x}%`, top: `${mousePos.y}%`,
           transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(238,82,57,0.06) 0%, rgba(248,160,74,0.03) 40%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(255,150,120,0.12) 0%, rgba(248,160,74,0.05) 40%, transparent 70%)',
           transition: 'left 0.5s ease-out, top 0.5s ease-out',
         }}
       />
@@ -167,17 +167,17 @@ function InteractiveBackground() {
         <div
           style={{
             position: 'absolute', top: 0, left: 0, width: '30%', height: '100%',
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.015) 50%, transparent 100%)',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%)',
             animation: 'shimmer 8s ease-in-out infinite',
           }}
         />
       </div>
 
-      {/* Radial vignette */}
+      {/* Radial vignette - dark edges for depth */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(255, 255, 255, 0.8) 100%)',
+          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, rgba(100,0,0,0.6) 100%)',
         }}
       />
     </div>
@@ -205,9 +205,9 @@ const particles = [
   { x: 18, y: 72, size: 3, color: '#f8a04a', dur: 5.2 },
   { x: 83, y: 14, size: 5, color: '#ee5239', dur: 3.6 },
   { x: 76, y: 82, size: 3, color: '#f8a04a', dur: 6.1 },
-  { x: 44, y: 7, size: 2, color: '#ffffff', dur: 4.7 },
+  { x: 44, y: 7, size: 2, color: '#1a1a1a', dur: 4.7 },
   { x: 62, y: 91, size: 3, color: '#ee5239', dur: 5.5 },
-  { x: 29, y: 52, size: 2, color: '#ffffff', dur: 3.1 },
+  { x: 29, y: 52, size: 2, color: '#1a1a1a', dur: 3.1 },
   { x: 91, y: 48, size: 3, color: '#f8a04a', dur: 4.3 },
   { x: 50, y: 35, size: 2, color: '#8b5cf6', dur: 7.2 },
   { x: 72, y: 55, size: 2, color: '#8b5cf6', dur: 5.8 },
@@ -280,7 +280,8 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen bg-primary overflow-hidden flex items-center pt-0"
+      className="relative min-h-screen overflow-hidden flex items-center pt-0"
+      style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 25%, #b91c1c 50%, #9f1919 75%, #6b1212 100%)' }}
     >
       {/* ── inject keyframes ── */}
       <style>{heroStyles}</style>
@@ -289,9 +290,9 @@ export default function Hero() {
       <InteractiveBackground />
 
       {/* subtle top gradient line */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent pointer-events-none z-[1]" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-orange-400/50 to-transparent pointer-events-none z-[1]" />
       {/* Bottom edge glow */}
-      <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-primary to-transparent pointer-events-none z-[1]" />
+      <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none z-[1]" style={{ background: 'linear-gradient(to top, rgba(100,0,0,0.8), transparent)' }} />
 
       {particles.map((o, i) => <Particle key={i} {...o} />)}
 
@@ -311,14 +312,14 @@ export default function Hero() {
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="inline-flex items-center gap-2 bg-accent/10 border border-accent/25 text-accent text-xs sm:text-sm font-semibold rounded-full px-4 py-1.5 mb-6"
+              className="inline-flex items-center gap-2 bg-white/10 border border-white/25 text-white text-xs sm:text-sm font-semibold rounded-full px-4 py-1.5 mb-6"
             >
               <Sparkles className="w-3.5 h-3.5" />
               {t('hero.statusBadge')}
             </motion.div>
 
             {/* headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-gray-900 leading-[1.1] mb-8 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.1] mb-8 tracking-tight">
               {t('hero.title').split('\n').map((text, index, array) => (
                 <motion.span
                   key={index}
@@ -335,7 +336,7 @@ export default function Hero() {
 
             {/* description */}
             <motion.p
-              className="text-gray-600 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8"
+              className="text-white/75 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.55 }}
@@ -352,7 +353,7 @@ export default function Hero() {
             >
               <button
                 onClick={scrollToCollaboration}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-gray-900/25 hover:-translate-y-1 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-red-800 font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:bg-white/90 hover:shadow-white/20 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
                 {language === 'ar' ? (
@@ -364,7 +365,7 @@ export default function Hero() {
 
               <button
                 onClick={scrollToPortfolio}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-accent font-bold text-white text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg shadow-accent/35 transition-all duration-300 hover:bg-accent/90 hover:-translate-y-1 hover:shadow-accent/50 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 font-bold text-white text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:-translate-y-1 active:scale-95 border border-white/30 bg-white/10 hover:bg-white/20 backdrop-blur-sm"
               >
                 <Briefcase className="w-4 h-4" />
                 {t('hero.ctaCollaborate')}
@@ -374,7 +375,7 @@ export default function Hero() {
 
           </motion.div>
 
-          {/* ── RIGHT: phone mockup ── */}
+          {/* ── RIGHT: video (no phone frame) ── */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -383,11 +384,11 @@ export default function Hero() {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
-            {/* glow behind phone */}
+            {/* glow behind video */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div
-                className="w-56 h-[32rem] rounded-full blur-[80px] opacity-40"
-                style={{ background: 'radial-gradient(ellipse, #ee5239 0%, #f8a04a 60%, transparent 100%)' }}
+                className="w-96 h-[40rem] rounded-full blur-[120px] opacity-25"
+                style={{ background: 'radial-gradient(ellipse, rgba(245,158,11,0.2) 0%, rgba(217,119,6,0.1) 60%, transparent 100%)' }}
               />
             </div>
 
@@ -395,85 +396,31 @@ export default function Hero() {
             <motion.div
               ref={phoneRef}
               style={{ rotateX, rotateY, transformPerspective: 1200, transformStyle: 'preserve-3d' }}
-              initial={{ opacity: 0, scale: 0.8, y: 100 }}
+              initial={{ opacity: 0, scale: 0.85, y: 80 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
               className="relative group"
             >
-              {/* ── premium phone shell ── */}
+              {/* ── video card (no phone shell) ── */}
               <div
-                className="relative w-[200px] sm:w-[240px] lg:w-[280px] rounded-[2.2rem] overflow-hidden p-[6px]"
+                className="relative w-[320px] sm:w-[400px] lg:w-[480px] rounded-[2rem] overflow-hidden"
                 style={{
-                  background: 'linear-gradient(145deg, #3a3f58 0%, #1c1f2e 40%, #080a10 100%)',
-                  boxShadow: `
-                    0 0 0 1px rgba(255,255,255,0.1) inset,
-                    0 50px 100px -20px rgba(0,0,0,0.8),
-                    0 30px 60px -30px rgba(238,82,57,0.3)
-                  `,
+                  boxShadow: '0 40px 80px -20px rgba(0,0,0,0.7), 0 20px 40px -10px rgba(245,158,11,0.15)',
                   transform: 'translateZ(20px)'
                 }}
               >
-                {/* inner bezel */}
-                <div className="absolute inset-0 rounded-[2.2rem] pointer-events-none"
-                  style={{
-                    boxShadow: 'inset 0 4px 6px -1px rgba(255, 255, 255, 0.1), inset 0 2px 4px -1px rgba(255, 255, 255, 0.06)'
-                  }}
-                />
-
-                {/* side buttons */}
-                <div
-                  className="absolute -right-1 top-32 w-1 h-16 rounded-l-md pointer-events-none"
-                  style={{ background: 'linear-gradient(90deg, #4a4f68, #2a2f48)', boxShadow: '-1px 0 2px rgba(0,0,0,0.5)' }}
-                />
-                <div
-                  className="absolute -left-1 top-24 w-1 h-10 rounded-r-md pointer-events-none"
-                  style={{ background: 'linear-gradient(-90deg, #4a4f68, #2a2f48)', boxShadow: '1px 0 2px rgba(0,0,0,0.5)' }}
-                />
-                <div
-                  className="absolute -left-1 top-40 w-1 h-12 rounded-r-md pointer-events-none"
-                  style={{ background: 'linear-gradient(-90deg, #4a4f68, #2a2f48)', boxShadow: '1px 0 2px rgba(0,0,0,0.5)' }}
-                />
-
-                {/* ── screen container ── */}
-                <div className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black isolation-isolate z-10" style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)' }}>
-
-                  {/* dynamic island */}
-                  <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[50px] h-[14px] bg-black rounded-full z-50 flex items-center justify-between px-2">
-                    {/* camera lens */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#111] border border-white/5 flex items-center justify-center">
-                      <div className="w-0.5 h-0.5 rounded-full bg-blue-500/30 blur-[1px]" />
-                    </div>
-                    {/* sensor */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#111]" />
-                  </div>
-
-                  {/* ── status bar ── */}
-                  <div className="absolute top-0 inset-x-0 flex items-center justify-between px-6 pt-2.5 pb-2 z-40 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-                    <span className="text-white/90 text-[8px] font-medium tracking-wide">9:41</span>
-                    <div className="flex items-center gap-1.5">
-                      <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                      </svg>
-                      <div className="w-[14px] h-[7px] rounded-[1px] border border-white/60 flex items-center px-0.5 relative">
-                        <div className="bg-white h-[4px] w-4/5 rounded-[1px]" />
-                        <div className="absolute -right-[2px] top-1/2 -translate-y-1/2 w-[1px] h-[3px] bg-white/60 rounded-r-sm" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── video area ── */}
-                  <div className="relative overflow-hidden w-full" style={{ aspectRatio: '9/19.5' }}>
-                    <video
-                      ref={videoRef}
-                      autoPlay={false} playsInline
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                    >
-                      <source src="/hero_video.mp4" type="video/mp4" />
-                    </video>
-                  </div>
+                {/* ── video area ── */}
+                <div className="relative overflow-hidden w-full group" style={{ aspectRatio: '9/16' }}>
+                  <video
+                    ref={videoRef}
+                    autoPlay={false} playsInline
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                  >
+                    <source src="/hero_video.mp4" type="video/mp4" />
+                  </video>
 
                   {/* scrim */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-black/25 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20 pointer-events-none" />
 
                   {/* play/pause tap zone */}
                   <button
@@ -485,112 +432,80 @@ export default function Hero() {
                       <motion.div
                         initial={{ scale: 0.6, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center"
+                        className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center"
                       >
-                        <Play className="w-7 h-7 text-white fill-white ms-1" />
+                        <Play className="w-9 h-9 text-white fill-white ms-1" />
                       </motion.div>
                     )}
                   </button>
 
                   {/* ── right-side action bar ── */}
-                  <motion.div
-                    style={{ translateZ: 40 }}
-                    className="absolute bottom-20 right-3 flex flex-col items-center gap-4 z-20"
-                  >
+                  <div className="absolute bottom-24 right-4 flex flex-col items-center gap-5 z-20">
                     <motion.button
                       whileTap={{ scale: 0.85 }}
                       onClick={handleLike}
-                      className="flex flex-col items-center gap-1 group/btn"
+                      className="flex flex-col items-center gap-1"
                       aria-label="إعجاب"
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300`}>
-                        <Heart className={`w-3.5 h-3.5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-white drop-shadow-md'}`} />
+                      <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                        <Heart className={`w-5 h-5 transition-all duration-300 ${liked ? 'text-red-500 fill-red-500 scale-110' : 'text-white'}`} />
                       </div>
-                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">
+                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">
                         {language === 'ar' ? likeCount.toLocaleString('ar-EG') : likeCount.toLocaleString('en-US')}
                       </span>
                     </motion.button>
 
-                    <motion.button
-                      whileTap={{ scale: 0.85 }}
-                      className="flex flex-col items-center gap-1 group/btn"
-                      aria-label="تعليق"
-                    >
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300">
-                        <MessageCircle className="w-3.5 h-3.5 text-white drop-shadow-md" />
+                    <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1" aria-label="تعليق">
+                      <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
+                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? '٢٣١' : '231'}</span>
                     </motion.button>
 
-                    <motion.button
-                      whileTap={{ scale: 0.85 }}
-                      className="flex flex-col items-center gap-1 group/btn"
-                      aria-label="مشاركة"
-                    >
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300">
-                        <Send className="w-3.5 h-3.5 text-white drop-shadow-md -ml-0.5" />
+                    <motion.button whileTap={{ scale: 0.85 }} className="flex flex-col items-center gap-1" aria-label="مشاركة">
+                      <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                        <Send className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-white/90 text-[8px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
+                      <span className="text-white/90 text-[10px] font-bold drop-shadow-md">{language === 'ar' ? 'شارك' : 'Share'}</span>
                     </motion.button>
 
                     <motion.button
                       whileTap={{ scale: 0.85 }}
                       onClick={() => setSaved(v => !v)}
-                      className="flex flex-col items-center gap-1 group/btn"
+                      className="flex flex-col items-center gap-1"
                       aria-label="حفظ"
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300`}>
-                        <Bookmark className={`w-3.5 h-3.5 transition-all duration-300 ${saved ? 'text-accent fill-accent drop-shadow-[0_0_8px_rgba(238,82,57,0.5)]' : 'text-white drop-shadow-md'}`} />
+                      <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                        <Bookmark className={`w-5 h-5 transition-all duration-300 ${saved ? 'text-amber-400 fill-amber-400' : 'text-white'}`} />
                       </div>
                     </motion.button>
-                  </motion.div>
+                  </div>
 
                   {/* ── bottom info ── */}
-                  <motion.div
-                    style={{ translateZ: 30 }}
-                    className="absolute bottom-6 left-4 right-16 z-20"
-                  >
-                    <div className={`flex items-center justify-between w-full px-0.5 mb-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`flex items-center gap-2.5 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                        <div className="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden border-2 border-white/20 shadow-lg bg-white flex items-center justify-center p-1">
-                          <img src="/agency-logo.png" alt="Pova Logo" className="w-full h-full object-contain" />
-                        </div>
-                        <div className={`flex flex-col ${language === 'ar' ? 'items-end' : 'items-start'}`}>
-                          <p className="text-white text-[10px] font-black tracking-tight drop-shadow-md leading-none mb-1">pova_agency</p>
-                          <p className="text-accent text-[7px] font-bold uppercase tracking-wider opacity-90">وكالة تسويق رقمي</p>
-                        </div>
+                  <div className="absolute bottom-5 left-4 right-16 z-20">
+                    <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden border-2 border-white/30 shadow-lg bg-white flex items-center justify-center p-1">
+                        <img src="/agency-logo.png" alt="Pova Logo" className="w-full h-full object-contain" />
                       </div>
-                      <a 
-                        href="https://www.instagram.com/povaagency" 
-                        target="_blank" 
+                      <div className={`flex flex-col flex-1 ${language === 'ar' ? 'items-end' : 'items-start'}`}>
+                        <p className="text-white text-xs font-black tracking-tight drop-shadow-md">pova_agency</p>
+                        <p className="text-amber-300 text-[9px] font-bold uppercase tracking-wider">وكالة تسويق رقمي</p>
+                      </div>
+                      <a
+                        href="https://www.instagram.com/povaagency"
+                        target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[8px] font-black text-white px-3 py-1 rounded-full border border-white/20 hover:bg-white/10 transition-all active:scale-95"
+                        className="text-[10px] font-black text-white px-3 py-1.5 rounded-full border border-white/30 hover:bg-white/15 transition-all active:scale-95 backdrop-blur-sm"
                       >
                         {language === 'ar' ? 'متابعة' : 'Follow'}
                       </a>
                     </div>
-                  </motion.div>
+                  </div>
 
-                  {/* bottom home indicator */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1/3 h-[2px] bg-white/50 backdrop-blur-sm rounded-full z-40 shadow-[0_1px_3px_rgba(0,0,0,0.5)]" />
-
-                  {/* dynamic light reflection (glare) */}
-                  <motion.div
-                    className="absolute inset-0 z-50 pointer-events-none rounded-[1.8rem]"
-                    style={{
-                      background: 'radial-gradient(circle at var(--x) var(--y), rgba(255,255,255,0.15) 0%, transparent 60%)',
-                      // @ts-ignore
-                      '--x': glareX,
-                      '--y': glareY,
-                    }}
-                  />
-
-                  {/* static ambient reflection */}
+                  {/* ambient reflection */}
                   <div
-                    className="absolute inset-0 rounded-[1.8rem] pointer-events-none z-30"
-                    style={{
-                      background: 'linear-gradient(105deg, rgba(255,255,255,0.08) 0%, transparent 35%, transparent 65%, rgba(255,255,255,0.03) 100%)',
-                    }}
+                    className="absolute inset-0 rounded-3xl pointer-events-none z-30"
+                    style={{ background: 'linear-gradient(105deg, rgba(255,255,255,0.06) 0%, transparent 40%)' }}
                   />
                 </div>
               </div>
@@ -608,13 +523,13 @@ export default function Hero() {
         transition={{ delay: 2.2 }}
         onClick={scrollToCollaboration}
       >
-        <span className="text-gray-400 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
+        <span className="text-white/50 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
         <motion.div
           animate={{ y: [0, 7, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-5 h-8 rounded-full border border-gray-300 flex items-start justify-center pt-1.5"
+          className="w-5 h-8 rounded-full border border-white/30 flex items-start justify-center pt-1.5"
         >
-          <div className="w-1 h-2 rounded-full bg-gray-400" />
+          <div className="w-1 h-2 rounded-full bg-white/50" />
         </motion.div>
       </motion.div>
     </section>

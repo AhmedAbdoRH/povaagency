@@ -16,7 +16,7 @@ function Card({ item, index, progress, targetScale }: { item: any; index: number
   const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
 
   return (
-    <div ref={containerRef} className="sticky top-0 flex h-screen items-start justify-center pt-[15vh] md:pt-[20vh] pb-12">
+    <div ref={containerRef} className="sticky top-24 flex h-[80vh] items-start justify-center pt-[5vh] pb-12">
       <motion.div
         style={{ scale, opacity, y, top: `calc(2vh + ${index * 20}px)` }}
         className="relative flex w-full max-w-4xl flex-col items-center gap-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] backdrop-blur-xl md:flex-row md:p-12"
@@ -83,34 +83,12 @@ export default function WhySocialMarketing() {
 
   return (
     <section ref={containerRef} className="relative bg-white pb-32">
-      <div className="sticky top-0 z-0 h-screen w-full overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
-        
-        {/* Persistent Scroll Indicator */}
-        <motion.div
-          style={{ opacity: useTransform(scrollYProgress, [0.8, 1], [1, 0]) }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 text-gray-400"
-        >
-          <div className="w-8 h-14 rounded-full border-2 border-gray-300 flex justify-center p-1.5">
-            <motion.div
-              animate={{ 
-                y: [0, 28, 0],
-                opacity: [0.4, 1, 0.4]
-              }}
-              transition={{ 
-                duration: 2.5, 
-                times: [0, 0.8, 1],
-                repeat: Infinity, 
-                ease: "easeInOut"
-              }}
-              className="w-2 h-4 bg-accent rounded-full shadow-[0_0_15px_rgba(238,82,57,0.6)]"
-            />
-          </div>
-        </motion.div>
       </div>
 
-      <div className="relative z-10 -mt-[100vh]">
-        <div className="container mx-auto px-4 py-32 text-center">
+      <div className="relative z-10">
+        <div className="container mx-auto px-4 py-20 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}

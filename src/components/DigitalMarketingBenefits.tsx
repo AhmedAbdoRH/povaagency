@@ -55,9 +55,9 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
 
         <div
             style={{ transform: "translateZ(50px)", transformStyle: "preserve-3d" }}
-            className="h-full bg-white/50 border border-gray-200 rounded-3xl p-8 backdrop-blur-xl shadow-lg relative overflow-hidden group"
+            className="h-full bg-white/10 border border-white/20 rounded-3xl p-8 backdrop-blur-xl shadow-lg relative overflow-hidden group"
         >
-            <div className={`absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br ${benefit.gradient} rounded-full blur-3xl opacity-20 transition-opacity duration-500 group-hover:opacity-50`} />
+            <div className={`absolute -right-20 -top-20 w-40 h-40 bg-gradient-to-br ${benefit.gradient} rounded-full blur-3xl opacity-30 transition-opacity duration-500 group-hover:opacity-60`} />
 
             <div 
                 style={{ transform: "translateZ(40px)" }}
@@ -68,14 +68,14 @@ function TiltCard({ benefit, index }: { benefit: any, index: number }) {
             
             <h3 
                 style={{ transform: "translateZ(30px)" }}
-                className="text-2xl font-bold mb-4 text-gray-900 drop-shadow-sm"
+                className="text-2xl font-black mb-4 text-white drop-shadow-sm"
             >
                 {benefit.title}
             </h3>
             
             <p 
                 style={{ transform: "translateZ(20px)" }}
-                className="text-gray-600 leading-relaxed font-medium"
+                className="text-white/75 leading-relaxed font-medium"
             >
                 {benefit.description}
             </p>
@@ -98,15 +98,15 @@ export default function DigitalMarketingBenefits() {
   }));
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-32 perspective-1000">
-        {/* Animated Background Blob */}
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#c52d15] via-[#e03d24] to-[#ee5239] py-32 perspective-1000">
+        {/* Animated Background Blobs */}
         <motion.div 
             animate={{ 
                 rotate: [0, 360], 
                 scale: [1, 1.2, 1],
             }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-tr from-accent/20 to-purple-600/20 blur-[150px] opacity-50 mix-blend-screen pointer-events-none" 
+            className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-white/5 blur-[150px] pointer-events-none" 
         />
         <motion.div 
             animate={{ 
@@ -114,8 +114,9 @@ export default function DigitalMarketingBenefits() {
                 scale: [1, 1.5, 1],
             }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tl from-blue-600/20 to-teal-500/20 blur-[150px] opacity-50 mix-blend-screen pointer-events-none" 
+            className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-black/10 blur-[150px] pointer-events-none" 
         />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.06),transparent_60%)]" />
 
       <div className="container relative z-10 mx-auto px-4">
         <div className="text-center max-w-4xl mx-auto mb-20">
@@ -123,7 +124,7 @@ export default function DigitalMarketingBenefits() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/50 px-4 py-2 text-sm font-medium text-gray-600 backdrop-blur-sm shadow-sm"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm shadow-sm"
             >
                 <Lightbulb className="h-4 w-4 text-accent" />
                 <span>{t('digitalMarketingBenefits.statusBadge')}</span>
@@ -133,7 +134,7 @@ export default function DigitalMarketingBenefits() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-gray-900"
+            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-white"
           >
             {t('digitalMarketingBenefits.heading')}
           </motion.h2>
@@ -142,7 +143,7 @@ export default function DigitalMarketingBenefits() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-600"
+            className="text-xl text-white/80 font-medium"
           >
             {t('digitalMarketingBenefits.description')}
           </motion.p>

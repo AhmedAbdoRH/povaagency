@@ -61,7 +61,6 @@ export default function MarketingCoreServices() {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className="mb-6 text-4xl font-extrabold leading-[1.5] text-white md:text-5xl lg:text-6xl"
-            style={{ textShadow: '0 0 30px rgba(238,82,57,0.3)' }}
           >
             {t('marketingCoreServices.heading')}
           </motion.h2>

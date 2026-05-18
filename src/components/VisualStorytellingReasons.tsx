@@ -24,21 +24,21 @@ function ParallaxCard({ reason, index }: { reason: any; index: number }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6 }}
-      className={`relative w-full max-w-lg rounded-[2.5rem] md:rounded-full bg-white/5 border border-white/10 p-6 md:p-8 backdrop-blur-md transition-colors hover:bg-white/10 ${isEven ? 'md:mr-auto' : 'md:ml-auto md:mr-0'}`}
+      className={`relative w-full max-w-lg rounded-[2.5rem] md:rounded-full bg-white/95 border border-white/30 p-6 md:p-8 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] transition-all duration-500 hover:bg-white hover:shadow-[0_30px_80px_rgba(0,0,0,0.2)] hover:-translate-y-1 ${isEven ? 'md:mr-auto' : 'md:ml-auto md:mr-0'}`}
     >
-        <div className="absolute inset-0 rounded-[2.5rem] md:rounded-full bg-gradient-to-r from-accent/0 via-accent/5 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100 pointer-events-none" />
+        <div className="absolute inset-0 rounded-[2.5rem] md:rounded-full bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100 pointer-events-none" />
         
         <div className={`relative z-10 flex flex-col md:flex-row items-center gap-6 ${language === 'ar' ? 'text-center md:text-right' : 'text-center md:text-left'}`}>
-            <div className="flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-full bg-accent/20 border border-accent/30 text-accent shadow-[0_0_30px_rgba(238,82,57,0.3)]">
+            <div className="flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-full bg-[#ee5239] border border-[#ee5239]/50 text-white shadow-[0_0_30px_rgba(238,82,57,0.5)]">
                 <reason.icon className="h-8 w-8 md:h-10 md:w-10" />
             </div>
             
             <div className="flex-1">
                 <div className={`flex items-center justify-center ${language === 'ar' ? 'md:justify-start' : 'md:justify-start'} gap-4 mb-2`}>
-                    <span className="text-2xl md:text-3xl font-black text-white/10">{reason.id}</span>
-                    <h3 className="text-xl md:text-2xl font-bold text-white">{reason.title}</h3>
+                    <span className="text-2xl md:text-3xl font-black text-[#ee5239]/40">{reason.id}</span>
+                    <h3 className="text-xl md:text-2xl font-black text-gray-900">{reason.title}</h3>
                 </div>
-                <p className="text-sm md:text-base text-gray-400 leading-relaxed">{reason.description}</p>
+                <p className="text-sm md:text-base text-gray-600 font-medium leading-relaxed">{reason.description}</p>
             </div>
         </div>
     </motion.div>
@@ -60,10 +60,11 @@ export default function VisualStorytellingReasons() {
   }));
 
   return (
-    <section className="relative overflow-hidden bg-[#0a0a0a] py-32">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#ee5239] via-[#e03d24] to-[#b82815] py-32">
       {/* Abstract Background Shapes */}
-      <div className="absolute top-1/4 -right-1/4 h-96 w-96 rounded-full bg-accent/10 blur-[120px]" />
-      <div className="absolute bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-orange-500/10 blur-[120px]" />
+      <div className="absolute top-1/4 -right-1/4 h-96 w-96 rounded-full bg-white/10 blur-[120px]" />
+      <div className="absolute bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-black/10 blur-[120px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.08),transparent_60%)]" />
 
       <div className="container relative z-10 mx-auto px-4">
         <div className="mb-24 text-center">
@@ -71,7 +72,7 @@ export default function VisualStorytellingReasons() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-medium text-accent backdrop-blur-sm"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm shadow-sm"
             >
                 <Film className="h-4 w-4" />
                 <span>{t('visualStorytellingReasons.statusBadge')}</span>
@@ -90,7 +91,7 @@ export default function VisualStorytellingReasons() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-lg text-gray-400 max-w-2xl mx-auto"
+            className="text-lg text-white/80 font-medium max-w-2xl mx-auto"
           >
             {t('visualStorytellingReasons.description')}
           </motion.p>
