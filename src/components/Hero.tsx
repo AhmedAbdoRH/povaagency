@@ -515,23 +515,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── scroll cue ── */}
-      <motion.div
-        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20 cursor-pointer"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2 }}
-        onClick={scrollToCollaboration}
-      >
-        <span className="text-white/50 text-[10px] tracking-widest uppercase mb-1">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-5 h-8 rounded-full border border-white/30 flex items-start justify-center pt-1.5"
-        >
-          <div className="w-1 h-2 rounded-full bg-white/50" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

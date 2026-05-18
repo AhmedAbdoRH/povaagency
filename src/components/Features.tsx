@@ -39,7 +39,7 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
             />
             <div className="relative z-10">
                 <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${feature.color} p-4`}>
-                    <feature.icon className="h-6 w-6 text-white" />
+                    <feature.icon className="h-6 w-6 text-gray-900" />
                 </div>
                 <h3 className="mb-3 text-2xl font-bold text-gray-900">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
