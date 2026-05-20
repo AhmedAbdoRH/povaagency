@@ -98,7 +98,7 @@ export default function DigitalMarketingBenefits() {
   }));
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#c52d15] via-[#e03d24] to-[#ee5239] py-32 perspective-1000">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#c52d15] via-[#e03d24] to-[#ec533a] py-32 perspective-1000">
         {/* Animated Background Blobs */}
         <motion.div 
             animate={{ 

@@ -9,12 +9,24 @@
   /* أبيض - الخلفية الرئيسية */
   --color-secondary: #f8f9fa;
   /* رمادي فاتح - للكروت والعناصر الفرعية */
-  --color-accent: #ee5239;
+  --color-accent: #ec533a;
   /* برتقالي محمر - للتميز */
-  --color-accent-light: #ff6b52;
+  --color-accent-light: #f56b52;
   /* درجة أفتح من الأكسنت */
   --color-header: #ffffff;
   /* نفس لون السكندري للهيدر */
+  --color-brown-dark: #2c1810;
+  /* بني غامق - للصفحات الخدمية */
+  --color-brown-darker: #1a0e08;
+  /* بني أعمق - للخلفيات */
+  --color-brown-light: #4e342e;
+  /* بني فاتح - للعناصر الفرعية */
+  --color-dark-bg: #162341;
+  /* كحلي داكن - الخلفية الداكنة */
+  --color-dark-card: #203158;
+  /* كحلي متوسط - للكروت */
+  --color-dark-deep: #0c1426;
+  /* كحلي غامق جداً - للخلفيات العميقة */
   --background-color: #ffffff;
   --font-family: 'Cairo', sans-serif;
 }
@@ -36,8 +48,8 @@ html[dir="rtl"] {
 body {
   font-family: var(--font-family, 'Cairo', sans-serif);
   background-color: var(--color-primary);
-  color: #1a1a1a;
-  /* النص الأساسي رمادي داكن */
+  color: #162341;
+  /* النص الأساسي كحلي داكن بدلاً من الأسود */
   overflow-x: hidden;
 }
 
@@ -112,7 +124,7 @@ html[dir="ltr"] .mr-auto {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ee5239;
+  background: #ec533a;
 }
 
 /* Typography Enhancements */
@@ -124,11 +136,11 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
   line-height: 1.7;
-  color: rgba(26, 26, 26, 0.85); /* Slightly softer dark for better readability */
+  color: rgba(22, 35, 65, 0.85); /* Slightly softer dark navy for better readability */
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #1a1a1a 0%, #666666 100%);
+  background: linear-gradient(135deg, #162341 0%, #666666 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

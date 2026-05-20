@@ -63,17 +63,17 @@ export default function SpecializationDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1a1a1a] pt-24">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#ee5239]" />
+      <div className="flex min-h-screen items-center justify-center bg-[#162341] pt-24">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#ec533a]" />
       </div>
     );
   }
 
   if (error || !specialization) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#1a1a1a] pt-24 text-white">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#162341] pt-24 text-white">
         <div className="text-xl text-red-400">{error || t('specDetails.notFound')}</div>
-        <Link to="/" className="rounded-lg bg-[#ee5239] px-6 py-2 text-white transition-colors hover:bg-[#d63d2a]">
+        <Link to="/" className="rounded-lg bg-[#ec533a] px-6 py-2 text-white transition-colors hover:bg-[#d63d2a]">
           {t('header.home')}
         </Link>
       </div>
@@ -92,27 +92,27 @@ export default function SpecializationDetails() {
   const specDesc = language === 'en' ? (specialization.description_en || specialization.description) : specialization.description;
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] pb-16 pt-24 text-white font-[Cairo]">
+    <div className="min-h-screen bg-[#162341] pb-16 pt-24 text-white font-[Cairo]">
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center gap-2 text-sm text-gray-400">
-          <Link to="/" className="transition-colors hover:text-[#ee5239]">
+          <Link to="/" className="transition-colors hover:text-[#ec533a]">
             {t('header.home')}
           </Link>
           <span className="text-gray-600">/</span>
-          <Link to={parentRoute} className="transition-colors hover:text-[#ee5239]">
+          <Link to={parentRoute} className="transition-colors hover:text-[#ec533a]">
             {parentLabel}
           </Link>
           <span className="text-gray-600">/</span>
           <span className="font-medium text-white">{specName}</span>
         </div>
 
-        <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/5 bg-[#2a2a2a]/50 p-8 shadow-2xl backdrop-blur-md">
-          <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ee5239]/10 blur-3xl" />
+        <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/5 bg-[#203158]/50 p-8 shadow-2xl backdrop-blur-md">
+          <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ec533a]/10 blur-3xl" />
 
           <div className="relative z-10">
             <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h1 className="mb-2 text-4xl font-bold text-[#ee5239]">{specName}</h1>
+                <h1 className="mb-2 text-4xl font-bold text-[#ec533a]">{specName}</h1>
                 {specialization.service?.name && (
                   <h2 className="text-xl font-medium text-gray-500">
                     {language === 'en' ? (specialization.service.name_en || specialization.service.name) : specialization.service.name}
@@ -124,7 +124,7 @@ export default function SpecializationDetails() {
             </div>
 
             {specDesc && (
-              <p className={`max-w-3xl ${language === 'ar' ? 'border-r-4 pr-4' : 'border-l-4 pl-4'} border-[#ee5239] text-lg leading-relaxed text-gray-300`}>
+              <p className={`max-w-3xl ${language === 'ar' ? 'border-r-4 pr-4' : 'border-l-4 pl-4'} border-[#ec533a] text-lg leading-relaxed text-gray-300`}>
                 {specDesc}
               </p>
             )}
@@ -132,7 +132,7 @@ export default function SpecializationDetails() {
         </div>
 
         {clients.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/5 bg-[#2a2a2a]/30 py-20 text-center">
+          <div className="rounded-2xl border border-dashed border-white/5 bg-[#203158]/30 py-20 text-center">
             <Users className="mx-auto mb-6 h-20 w-20 text-gray-700" />
             <h3 className="mb-2 text-2xl font-bold text-gray-500">{t('specDetails.noWorksTitle')}</h3>
             <p className="text-lg text-gray-600">{t('specDetails.noWorksDesc')}</p>
@@ -140,7 +140,7 @@ export default function SpecializationDetails() {
         ) : (
           <div>
             <h2 className="mb-8 flex items-center gap-3 border-b border-white/10 pb-4 text-2xl font-bold">
-              <span className="block h-8 w-2 rounded-full bg-[#ee5239]" />
+              <span className="block h-8 w-2 rounded-full bg-[#ec533a]" />
               {t('specDetails.worksInSection')}
             </h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

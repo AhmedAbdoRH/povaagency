@@ -97,14 +97,14 @@ export default function Wishlist() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
+      <div className="flex min-h-screen items-center justify-center bg-[#0c1426]">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black pb-20 pt-32">
+    <div className="min-h-screen bg-[#0c1426] pb-20 pt-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center gap-4">
@@ -137,9 +137,9 @@ export default function Wishlist() {
                 return (
                   <div
                     key={item.id}
-                    className="group overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]"
+                    className="group overflow-hidden rounded-2xl border border-white/10 bg-[#162341]"
                   >
-                    <div className="relative aspect-[4/3] bg-[#2a2a2a]">
+                    <div className="relative aspect-[4/3] bg-[#203158]">
                       {item.services.image_url ? (
                         <img
                           src={item.services.image_url}

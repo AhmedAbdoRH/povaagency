@@ -184,7 +184,7 @@ export default function ProductDetails() {
                       href={`https://wa.me/201503600455?text=${encodeURIComponent(`أريد طلب المنتج: ${service.title}\n${window.location.href}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full bg-gradient-to-r from-[#ee5239] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      className="w-full bg-gradient-to-r from-[#ec533a] to-[#d63d2a] text-white py-4 px-6 rounded-lg font-bold hover:from-[#d63d2a] hover:to-[#c02e1a] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                       style={{ textDecoration: 'none' }}
                     >
                       <MessageSquare className="h-6 w-6" />
@@ -196,7 +196,7 @@ export default function ProductDetails() {
                           href={service.dst_file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-[#ee5239] hover:bg-[#d63d2a] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+                          className="bg-[#ec533a] hover:bg-[#d63d2a] text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
                           title="تحميل الملف بصيغة .dst"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-2">

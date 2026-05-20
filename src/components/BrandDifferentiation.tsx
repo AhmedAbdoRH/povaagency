@@ -11,7 +11,7 @@ export default function BrandDifferentiation() {
       title: t('brandDifferentiation.aspects.0.title'),
       description: t('brandDifferentiation.aspects.0.description'),
       icon: BarChart4,
-      color: 'from-[#ee5239] to-[#ff7a64]'
+      color: 'from-[#ec533a] to-[#ff7a64]'
     },
     {
       title: t('brandDifferentiation.aspects.1.title'),

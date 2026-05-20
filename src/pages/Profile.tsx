@@ -99,7 +99,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-[#0c1426]">
         <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -107,7 +107,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-[#0c1426]">
         <div className="text-white text-center">
           <p>يجب تسجيل الدخول أولاً</p>
           <button 
@@ -122,12 +122,12 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-32 pb-20">
+    <div className="min-h-screen bg-[#0c1426] pt-32 pb-20">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold text-white mb-8">الملف الشخصي</h1>
 
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-8">
+          <div className="bg-[#162341] border border-white/10 rounded-2xl p-8">
             {/* Profile Header */}
             <div className="flex items-center gap-6 mb-8">
               {user.avatar_url ? (

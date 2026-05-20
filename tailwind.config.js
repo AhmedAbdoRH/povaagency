@@ -10,6 +10,7 @@ export default {
         'accent-light': 'var(--color-accent-light)',
         header: 'var(--color-header)',
         'gold-dark': 'var(--color-accent)',
+        black: '#162341',
       },
       fontFamily: {
         cairo: ['Cairo', 'sans-serif'],

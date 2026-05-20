@@ -97,7 +97,7 @@ const DesignRequest = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-[#1a1a1a] rounded-2xl p-8 mb-8 border border-gray-800"
+              className="bg-[#162341] rounded-2xl p-8 mb-8 border border-gray-800"
             >
               <h2 className="text-2xl font-bold text-white mb-6 text-center">سابقة أعمالنا</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -116,7 +116,7 @@ const DesignRequest = () => {
                     transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
                     className="group cursor-pointer"
                   >
-                    <div className="aspect-[4/3] bg-[#2a2a2a] rounded-xl overflow-hidden mb-4">
+                    <div className="aspect-[4/3] bg-[#203158] rounded-xl overflow-hidden mb-4">
                       <img 
                         src={work.image} 
                         alt={work.title}

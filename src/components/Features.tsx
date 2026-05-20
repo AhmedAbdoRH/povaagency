@@ -39,10 +39,10 @@ function BentoCard({ feature, index }: { feature: any; index: number }) {
             />
             <div className="relative z-10">
                 <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${feature.color} p-4`}>
-                    <feature.icon className="h-6 w-6 text-gray-900" />
+                    <feature.icon className="h-6 w-6 text-[#ec533a]" />
                 </div>
-                <h3 className="mb-3 text-2xl font-bold text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="mb-3 text-2xl font-bold text-[#162341]">{feature.title}</h3>
+                <p className="text-[#162341]">{feature.description}</p>
             </div>
         </motion.div>
     );
@@ -64,21 +64,21 @@ export default function Features() {
             title: t('features.items.1.title'),
             description: t('features.items.1.description'),
             className: "md:col-span-1 md:row-span-2",
-            color: "from-blue-500/20 to-transparent",
+            color: "from-orange-500/20 to-transparent",
         },
         {
             icon: TrendingUp,
             title: t('features.items.2.title'),
             description: t('features.items.2.description'),
             className: "md:col-span-1 md:row-span-1",
-            color: "from-green-500/20 to-transparent",
+            color: "from-orange-500/20 to-transparent",
         },
         {
             icon: Users,
             title: t('features.items.3.title'),
             description: t('features.items.3.description'),
             className: "md:col-span-1 md:row-span-1",
-            color: "from-purple-500/20 to-transparent",
+            color: "from-orange-500/20 to-transparent",
         }
     ];
 
@@ -104,7 +104,7 @@ export default function Features() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="mb-6 text-5xl md:text-6xl font-black tracking-tight text-gray-900 lg:text-7xl leading-[1.6]"
+                        className="mb-6 text-5xl md:text-6xl font-black tracking-tight text-[#162341] lg:text-7xl leading-[1.6]"
                     >
                         {t('features.heading')}
                     </motion.h2>
@@ -113,7 +113,7 @@ export default function Features() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="max-w-2xl text-lg text-gray-600 md:text-xl"
+                        className="max-w-2xl text-lg text-[#162341] md:text-xl"
                     >
                         {t('features.description')}
                     </motion.p>

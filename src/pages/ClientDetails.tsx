@@ -44,24 +44,24 @@ export default function ClientDetails() {
     }
   }, [id]);
 
-  if (loading) return <div className="min-h-screen pt-24 text-center text-white bg-[#1a1a1a] flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ee5239]"></div></div>;
-  if (!client) return <div className="min-h-screen pt-24 text-center text-white bg-[#1a1a1a] flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">{t('clientDetails.notFound')}</h2><Link to="/" className="text-[#ee5239]">{t('clientDetails.backToHome')}</Link></div>;
+  if (loading) return <div className="min-h-screen pt-24 text-center text-white bg-[#162341] flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ec533a]"></div></div>;
+  if (!client) return <div className="min-h-screen pt-24 text-center text-white bg-[#162341] flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">{t('clientDetails.notFound')}</h2><Link to="/" className="text-[#ec533a]">{t('clientDetails.backToHome')}</Link></div>;
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-[#1a1a1a] text-white font-[Cairo]">
+    <div className="min-h-screen pt-24 pb-16 bg-[#162341] text-white font-[Cairo]">
        <div className="container mx-auto px-4 max-w-6xl">
           {/* Header & Client Info Section */}
           <div className="mb-8">
-             <Link to={`/specialization/${client.specialization_id}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-[#ee5239] transition-colors group mb-6">
+             <Link to={`/specialization/${client.specialization_id}`} className="inline-flex items-center gap-2 text-gray-400 hover:text-[#ec533a] transition-colors group mb-6">
                 <ArrowRight size={20} className="group-hover:-translate-x-1 transition-transform" /> {t('clientDetails.backToSpecialization')}
              </Link>
              
-             <div className="bg-[#2a2a2a] rounded-2xl p-6 md:p-8 shadow-2xl border border-white/5 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
+             <div className="bg-[#203158] rounded-2xl p-6 md:p-8 shadow-2xl border border-white/5 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
                 {/* Background Accent */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#ee5239]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#ec533a]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                 {/* Client Logo - Small & on the side */}
-                <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 bg-[#1a1a1a] rounded-2xl border border-white/10 flex items-center justify-center p-3 shadow-lg relative z-10">
+                <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 bg-[#162341] rounded-2xl border border-white/10 flex items-center justify-center p-3 shadow-lg relative z-10">
                    {(client.logo_url || client.image_url) ? (
                        <img src={client.logo_url || client.image_url!} alt={client.name} className="w-full h-full object-contain" />
                    ) : (
@@ -75,7 +75,7 @@ export default function ClientDetails() {
                      <h1 className="text-3xl md:text-4xl font-black text-white">
                         {language === 'en' ? (client.name_en || client.name) : client.name}
                      </h1>
-                     <span className="bg-[#ee5239]/10 text-[#ee5239] border border-[#ee5239]/20 px-3 py-1 rounded-full text-sm font-bold">
+                     <span className="bg-[#ec533a]/10 text-[#ec533a] border border-[#ec533a]/20 px-3 py-1 rounded-full text-sm font-bold">
                         {language === 'en' ? (client.specialization?.name_en || client.specialization?.name) : client.specialization?.name}
                      </span>
                    </div>
@@ -88,7 +88,7 @@ export default function ClientDetails() {
 
                     {client.project_url && (
                       <div className="flex items-center gap-4 border-t border-white/10 pt-4 flex-wrap">
-                         <a href={client.project_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#ee5239] hover:text-[#ff6b54] text-sm font-bold transition-colors">
+                         <a href={client.project_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#ec533a] hover:text-[#ff6b54] text-sm font-bold transition-colors">
                             <ExternalLink size={16} />
                             {t('clientDetails.viewLiveProject')}
                          </a>
@@ -102,13 +102,13 @@ export default function ClientDetails() {
           {contents.length > 0 ? (
             <div className="space-y-6">
               <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                <span className="w-2 h-8 bg-[#ee5239] rounded-full inline-block"></span>
+                <span className="w-2 h-8 bg-[#ec533a] rounded-full inline-block"></span>
                 {t('clientDetails.viewWorks')}
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {contents.map((item) => (
-                  <div key={item.id} className="bg-[#2a2a2a] rounded-2xl overflow-hidden border border-white/5 group relative shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                  <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group relative shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     {item.content_type === 'video' ? (
                       <div className="relative aspect-video bg-black flex items-center justify-center">
                         {isEmbeddable(item.video_url || '') ? (
@@ -137,11 +137,11 @@ export default function ClientDetails() {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                           />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1426] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
                       </div>
                     )}
                     
-                    <div className="p-5 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/80 to-transparent pt-12 pointer-events-none">
+                    <div className="p-5 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0c1426] via-[#162341]/80 to-transparent pt-12 pointer-events-none">
                       <h4 className="text-lg font-bold text-white mb-1 drop-shadow-md">
                         {language === 'en' ? (item.title_en || item.title) : item.title}
                       </h4>
@@ -156,7 +156,7 @@ export default function ClientDetails() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-20 bg-[#2a2a2a] rounded-2xl border border-white/5">
+            <div className="text-center py-20 bg-[#203158] rounded-2xl border border-white/5">
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-8 h-8 text-gray-500" />
               </div>

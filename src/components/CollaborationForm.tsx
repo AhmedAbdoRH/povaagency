@@ -90,7 +90,7 @@ export default function CollaborationForm() {
   };
 
   return (
-    <section id="collaboration-form" className="relative py-24 bg-[#080c14] overflow-hidden">
+    <section id="collaboration-form" className="relative py-24 bg-[#0c1426] overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 blur-[120px] rounded-full" />

@@ -30,6 +30,7 @@ import CompanyValues from './components/CompanyValues';
 import DigitalMarketingBenefits from './components/DigitalMarketingBenefits';
 import BrandDifferentiation from './components/BrandDifferentiation';
 import MarketingCoreServices from './components/MarketingCoreServices';
+import LoadingScreen from './components/LoadingScreenNew';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 
@@ -165,7 +166,7 @@ function App() {
       const root = document.documentElement;
       root.style.setProperty('--color-primary', theme.primaryColor || '#ffffff');
       root.style.setProperty('--color-secondary', theme.secondaryColor || '#f8f9fa');
-      root.style.setProperty('--color-accent', '#ee5239');
+      root.style.setProperty('--color-accent', '#ec533a');
       root.style.setProperty('--font-family', theme.fontFamily || 'Cairo, sans-serif');
     }
   }, [storeSettings]);
@@ -173,15 +174,7 @@ function App() {
 
   if (isAppLoading) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6" dir="rtl">
-        <div className="relative">
-          <div className="w-20 h-20 border-4 border-accent/20 border-t-accent rounded-full animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-10 h-10 bg-accent/10 rounded-full animate-pulse" />
-          </div>
-        </div>
-        <p className="text-gray-600 font-bold tracking-widest animate-pulse">جاري التحميل...</p>
-      </div>
+      <LoadingScreen logoUrl={storeSettings?.logo_url || '/agency-logo.png'} />
     );
   }
   return (

@@ -46,7 +46,7 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
             </>
           ) : (
-            <div className="w-full h-full flex flex-col justify-center items-center bg-[#1a1a1a] relative overflow-hidden">
+            <div className="w-full h-full flex flex-col justify-center items-center bg-[#162341] relative overflow-hidden">
               <div className="absolute inset-0 bg-accent/5 blur-3xl"></div>
               <div className="relative z-10 p-8 text-center max-w-4xl">
                 {banners[current].title && (

@@ -82,7 +82,7 @@ function InteractiveBackground() {
           style={{
             position: 'absolute', width: '80vw', height: '80vh', top: '10%', left: '5%',
             borderRadius: '50%', filter: 'blur(100px)', opacity: 0.5,
-            background: 'radial-gradient(circle, rgba(220,38,38,0.6) 0%, rgba(185,28,28,0.2) 50%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(236,83,58,0.6) 0%, rgba(190,48,24,0.2) 50%, transparent 70%)',
             animation: 'meshRotate 25s ease-in-out infinite',
           }}
         />
@@ -90,7 +90,7 @@ function InteractiveBackground() {
           style={{
             position: 'absolute', width: '70vw', height: '70vh', bottom: '5%', right: '0%',
             borderRadius: '50%', filter: 'blur(120px)', opacity: 0.35,
-            background: 'radial-gradient(circle, rgba(239,68,68,0.4) 0%, rgba(127,29,29,0.3) 60%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(236,83,58,0.4) 0%, rgba(176,44,22,0.3) 60%, transparent 70%)',
             animation: 'meshRotateReverse 30s ease-in-out infinite',
           }}
         />
@@ -177,7 +177,7 @@ function InteractiveBackground() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, rgba(100,0,0,0.6) 100%)',
+          background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, rgba(140,30,10,0.65) 100%)',
         }}
       />
     </div>
@@ -201,17 +201,17 @@ function Particle({ x, y, size, color, dur }: { x: number; y: number; size: numb
 }
 
 const particles = [
-  { x: 6, y: 20, size: 4, color: '#ee5239', dur: 4 },
+  { x: 6, y: 20, size: 4, color: '#ec533a', dur: 4 },
   { x: 18, y: 72, size: 3, color: '#f8a04a', dur: 5.2 },
-  { x: 83, y: 14, size: 5, color: '#ee5239', dur: 3.6 },
+  { x: 83, y: 14, size: 5, color: '#ec533a', dur: 3.6 },
   { x: 76, y: 82, size: 3, color: '#f8a04a', dur: 6.1 },
-  { x: 44, y: 7, size: 2, color: '#1a1a1a', dur: 4.7 },
-  { x: 62, y: 91, size: 3, color: '#ee5239', dur: 5.5 },
-  { x: 29, y: 52, size: 2, color: '#1a1a1a', dur: 3.1 },
+  { x: 44, y: 7, size: 2, color: '#162341', dur: 4.7 },
+  { x: 62, y: 91, size: 3, color: '#ec533a', dur: 5.5 },
+  { x: 29, y: 52, size: 2, color: '#162341', dur: 3.1 },
   { x: 91, y: 48, size: 3, color: '#f8a04a', dur: 4.3 },
   { x: 50, y: 35, size: 2, color: '#8b5cf6', dur: 7.2 },
   { x: 72, y: 55, size: 2, color: '#8b5cf6', dur: 5.8 },
-  { x: 35, y: 88, size: 3, color: '#ee5239', dur: 4.5 },
+  { x: 35, y: 88, size: 3, color: '#ec533a', dur: 4.5 },
   { x: 15, y: 40, size: 2, color: '#f8a04a', dur: 6.3 },
 ];
 
@@ -281,7 +281,7 @@ export default function Hero() {
   return (
     <section
       className="relative min-h-screen overflow-hidden flex items-center pt-0"
-      style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 25%, #b91c1c 50%, #9f1919 75%, #6b1212 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #ec533a 0%, #d4402a 25%, #c03320 50%, #d04228 75%, #b52e18 100%)' }}
     >
       {/* ── inject keyframes ── */}
       <style>{heroStyles}</style>
@@ -292,7 +292,7 @@ export default function Hero() {
       {/* subtle top gradient line */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-orange-400/50 to-transparent pointer-events-none z-[1]" />
       {/* Bottom edge glow */}
-      <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none z-[1]" style={{ background: 'linear-gradient(to top, rgba(100,0,0,0.8), transparent)' }} />
+      <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none z-[1]" style={{ background: 'linear-gradient(to top, rgba(140,30,10,0.85), transparent)' }} />
 
       {particles.map((o, i) => <Particle key={i} {...o} />)}
 
@@ -324,7 +324,7 @@ export default function Hero() {
                 <motion.span
                   key={index}
                   className={`block py-1 ${index === 1 && array.length === 3 ? 'text-transparent bg-clip-text' : ''}`}
-                  style={index === 1 && array.length === 3 ? { backgroundImage: 'linear-gradient(95deg, #ee5239 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
+                  style={index === 1 && array.length === 3 ? { backgroundImage: 'linear-gradient(95deg, #ec533a 10%, #f8a04a 90%)', paddingBottom: '0.1em' } : {}}
                   initial={{ opacity: 0, y: 32 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.15, duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -353,7 +353,7 @@ export default function Hero() {
             >
               <button
                 onClick={scrollToCollaboration}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-red-800 font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:bg-white/90 hover:shadow-white/20 hover:-translate-y-1 active:scale-95"
+                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 bg-white text-[#b02818] font-bold text-sm sm:text-base px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl shadow-lg transition-all duration-300 hover:bg-white/90 hover:shadow-white/20 hover:-translate-y-1 active:scale-95"
               >
                 {t('hero.cta')}
                 {language === 'ar' ? (

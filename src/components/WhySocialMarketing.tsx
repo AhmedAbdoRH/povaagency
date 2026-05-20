@@ -102,9 +102,11 @@ export default function WhySocialMarketing() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.6] max-w-4xl mx-auto"
+            className="text-3xl md:text-5xl lg:text-6xl font-black text-gray-900 max-w-3xl mx-auto px-6"
           >
-            {t('whySocialMarketing.heading')}
+            {(t('whySocialMarketing.heading').split('\n')).map((line, i) => (
+              <span key={i} className="block mb-4 last:mb-0">{line}</span>
+            ))}
           </motion.h2>
         </div>
 

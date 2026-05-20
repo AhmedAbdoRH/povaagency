@@ -89,15 +89,15 @@ export default function Services() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05, duration: 0.3 }}
                 viewport={{ once: true }}
-                className="cursor-pointer overflow-hidden rounded-2xl border border-white/5 bg-secondary/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105"
+                className="cursor-pointer overflow-hidden rounded-2xl border border-white/5 bg-[#162341]/80 transition-transform duration-300 hover:scale-105"
                 onClick={() => navigate(routeByPageId.get(page.id) || `/page/${page.id}`)}
               >
                 <div className="relative aspect-square">
                   {page.image_url ? (
                     <img src={page.image_url} alt={page.name} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent/20 to-accent/10">
-                      <Layers className="h-16 w-16 text-accent" />
+                    <div className="flex h-full w-full items-center justify-center bg-[#0f1a33]">
+                      <Layers className="h-16 w-16 text-accent/60" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-black/0 transition-all duration-300 hover:bg-black/20" />

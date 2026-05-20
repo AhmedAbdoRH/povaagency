@@ -29,13 +29,13 @@ function ParallaxCard({ reason, index }: { reason: any; index: number }) {
         <div className="absolute inset-0 rounded-[2.5rem] md:rounded-full bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100 pointer-events-none" />
         
         <div className={`relative z-10 flex flex-col md:flex-row items-center gap-6 ${language === 'ar' ? 'text-center md:text-right' : 'text-center md:text-left'}`}>
-            <div className="flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-full bg-[#ee5239] border border-[#ee5239]/50 text-white shadow-[0_0_30px_rgba(238,82,57,0.5)]">
+            <div className="flex h-16 w-16 md:h-20 md:w-20 shrink-0 items-center justify-center rounded-full bg-[#ec533a] border border-[#ec533a]/50 text-white shadow-[0_0_30px_rgba(238,82,57,0.5)]">
                 <reason.icon className="h-8 w-8 md:h-10 md:w-10" />
             </div>
             
             <div className="flex-1">
                 <div className={`flex items-center justify-center ${language === 'ar' ? 'md:justify-start' : 'md:justify-start'} gap-4 mb-2`}>
-                    <span className="text-2xl md:text-3xl font-black text-[#ee5239]/40">{reason.id}</span>
+                    <span className="text-2xl md:text-3xl font-black text-[#ec533a]/40">{reason.id}</span>
                     <h3 className="text-xl md:text-2xl font-black text-gray-900">{reason.title}</h3>
                 </div>
                 <p className="text-sm md:text-base text-gray-600 font-medium leading-relaxed">{reason.description}</p>
@@ -60,7 +60,7 @@ export default function VisualStorytellingReasons() {
   }));
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#ee5239] via-[#e03d24] to-[#b82815] py-32">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#ec533a] via-[#e03d24] to-[#b82815] py-32">
       {/* Abstract Background Shapes */}
       <div className="absolute top-1/4 -right-1/4 h-96 w-96 rounded-full bg-white/10 blur-[120px]" />
       <div className="absolute bottom-1/4 -left-1/4 h-96 w-96 rounded-full bg-black/10 blur-[120px]" />

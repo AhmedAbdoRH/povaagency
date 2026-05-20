@@ -108,7 +108,7 @@ export default function UserLogin() {
 
         {/* User Menu */}
         {showUserMenu && (
-          <div className="absolute top-full left-0 mt-2 w-64 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl overflow-hidden">
+          <div className="absolute top-full left-0 mt-2 w-64 bg-[#162341] border border-white/10 rounded-xl shadow-xl overflow-hidden">
             <div className="p-4 border-b border-white/10">
               <div className="flex items-center gap-3">
                 {user.avatar_url ? (
@@ -183,7 +183,7 @@ export default function UserLogin() {
       {/* Login Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+          <div className="bg-[#162341] border border-white/10 rounded-2xl p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">تسجيل الدخول</h3>
               <button

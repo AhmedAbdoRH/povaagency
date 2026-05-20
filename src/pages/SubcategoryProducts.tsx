@@ -82,7 +82,7 @@ export default function SubcategoryProducts() {
     <div
       className="min-h-screen pt-24 flex items-center justify-center"
       style={{
-        background: '#2a2a2a !important',
+        background: '#0c1426 !important',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
@@ -98,7 +98,7 @@ export default function SubcategoryProducts() {
     <div
       className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4"
       style={{
-        background: '#2a2a2a !important',
+        background: '#0c1426 !important',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
@@ -119,7 +119,7 @@ export default function SubcategoryProducts() {
     <div
       className="min-h-screen pt-24"
       style={{
-        background: '#2a2a2a !important',
+        background: '#0c1426 !important',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',

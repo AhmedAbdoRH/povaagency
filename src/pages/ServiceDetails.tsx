@@ -111,7 +111,7 @@ export default function ServiceDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black pt-24">
+      <div className="flex min-h-screen items-center justify-center bg-[#0c1426] pt-24">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent border-t-transparent" />
       </div>
     );
@@ -119,7 +119,7 @@ export default function ServiceDetails() {
 
   if (error || !coreService) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black px-4 pt-24 text-center text-white">
+      <div className="flex min-h-screen items-center justify-center bg-[#0c1426] px-4 pt-24 text-center text-white">
         <div className="text-2xl font-bold">{error || 'الخدمة المطلوبة غير موجودة.'}</div>
       </div>
     );

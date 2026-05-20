@@ -31,8 +31,8 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
       transition={{ duration: 0.5 }}
     >
       <div className="relative">
-        {/* Logo Container with Glass/Metallic Shine Effect */}
-        <div className="relative inline-block">
+        {/* Logo Container with Dark Navy Border/Frame */}
+        <div className="relative inline-block p-6 md:p-8 rounded-3xl border-4 border-[#162341] bg-white shadow-2xl">
           <img
             src={logoUrl && !logoUrl.includes('supabase.co') ? logoUrl : '/agency-logo.png'}
             alt="Logo"
@@ -44,7 +44,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
 
           {/* Metallic/Glass Shine Overlay */}
           <motion.div
-            className="absolute inset-0 z-20 pointer-events-none"
+            className="absolute inset-0 z-20 pointer-events-none rounded-[1.5rem]"
             style={{
               background: 'linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.8) 50%, transparent 60%)',
               mixBlendMode: 'overlay',
@@ -62,7 +62,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
 
           {/* Secondary Shine Effect */}
           <motion.div
-            className="absolute inset-0 z-20 pointer-events-none"
+            className="absolute inset-0 z-20 pointer-events-none rounded-[1.5rem]"
             style={{
               background: 'linear-gradient(120deg, transparent 45%, rgba(255, 255, 255, 0.6) 50%, transparent 55%)',
               mixBlendMode: 'soft-light',
@@ -80,7 +80,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
 
           {/* Subtle Glow Effect */}
           <motion.div
-            className="absolute inset-0 z-0"
+            className="absolute inset-0 z-0 rounded-[1.5rem]"
             style={{
               background: 'radial-gradient(circle, rgba(0, 0, 0, 0.05) 0%, transparent 70%)',
               filter: 'blur(20px)',

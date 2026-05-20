@@ -236,7 +236,7 @@ export default function AdminDashboard() {
     return (
       <div
         key={item.slug}
-        className={`group relative overflow-hidden rounded-3xl border bg-[#0d0d0d] p-8 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-[#151515] hover:shadow-2xl cursor-pointer ${item.borderColor}`}
+        className={`group relative overflow-hidden rounded-3xl border bg-[#0c1426] p-8 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-[#203158] hover:shadow-2xl cursor-pointer ${item.borderColor}`}
       >
         <button
           onClick={() => {

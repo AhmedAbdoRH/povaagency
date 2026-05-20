@@ -45,13 +45,8 @@ export default function CoreServicePageView({
   page,
   sections,
 }: CoreServicePageViewProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(sections[0]?.id || null);
-
-  // Translation helper function
-  const t = (key: string): string => {
-    return defaultTranslations[key] || key;
-  };
 
   useEffect(() => {
     setSelectedSectionId(current =>
@@ -79,7 +74,7 @@ export default function CoreServicePageView({
   const hasLinkedPage = Boolean(page);
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-20 pb-20 text-white">
+    <div className="min-h-screen bg-[#040810] pt-20 pb-20 text-white">
       <div className="container mx-auto px-4">
         <div className="mb-4 flex items-center gap-2 text-sm text-gray-400">
           <Link to="/" className="hover:text-white transition-colors">
@@ -89,20 +84,20 @@ export default function CoreServicePageView({
           <span className="text-accent">{pageTitle}</span>
         </div>
 
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#101010] shadow-[0_20px_80px_rgba(0,0,0,0.45)]">
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-[#060b14] shadow-[0_20px_80px_rgba(0,0,0,0.7)]">
           {heroImage && (
             <div className="absolute inset-0">
-              <img src={heroImage} alt={coreService.title} className="h-full w-full object-cover opacity-25" />
+              <img src={heroImage} alt={coreService.title} className="h-full w-full object-cover opacity-20" />
               <div className="absolute inset-0 bg-gradient-to-l from-black via-black/85 to-black/60" />
             </div>
           )}
           {!heroImage && (
-            <div className={`absolute inset-0 bg-gradient-to-br ${coreService.bgGradient} opacity-100`} />
+            <div className={`absolute inset-0 bg-gradient-to-br ${coreService.bgGradient} opacity-60`} />
           )}
 
           <div className="relative z-10 p-8 md:p-10">
             <div className="mb-12">
-              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-200 backdrop-blur-md">
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-[#0a1121]/80 px-4 py-2 text-sm text-gray-200 backdrop-blur-md">
                 <HeroIcon className={`h-4 w-4 ${coreService.iconColor}`} />
                 <span>{t('coreServicePage.mainService')}</span>
               </div>
@@ -118,11 +113,11 @@ export default function CoreServicePageView({
 
             <div className="border-t border-white/10 pt-10">
               {!hasLinkedPage ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center text-gray-300 backdrop-blur-sm">
+                <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                   {t('coreServicePage.noPageLinked')}
                 </div>
               ) : sections.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-8 text-center text-gray-300 backdrop-blur-sm">
+                <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                   {t('coreServicePage.noSections')}
                 </div>
               ) : (
@@ -136,7 +131,7 @@ export default function CoreServicePageView({
                         className={`rounded-2xl border px-5 py-3 text-right transition-all backdrop-blur-md ${
                           selectedSectionId === section.id
                             ? 'border-accent bg-accent text-white shadow-lg shadow-accent/20'
-                            : 'border-white/10 bg-white/5 text-gray-200 hover:border-white/20 hover:bg-white/10'
+                            : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
                         }`}
                       >
                         <div className="font-bold">{language === 'en' ? (section.name_en || section.name) : section.name}</div>
@@ -145,7 +140,7 @@ export default function CoreServicePageView({
                   </div>
 
                   {selectedSection && (
-                    <div className="rounded-[1.5rem] border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
+                    <div className="rounded-[1.5rem] border border-white/10 bg-[#040810]/90 p-6">
                       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <h3 className="text-2xl font-bold text-white">{language === 'en' ? (selectedSection.name_en || selectedSection.name) : selectedSection.name}</h3>
@@ -158,7 +153,7 @@ export default function CoreServicePageView({
                       </div>
 
                       {selectedClients.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center text-gray-400">
+                        <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                           {t('coreServicePage.noWorksInSection')}
                         </div>
                       ) : (

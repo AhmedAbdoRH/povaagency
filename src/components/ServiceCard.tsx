@@ -56,7 +56,7 @@ export default function ServiceCard({ title, description, imageUrl, price, saleP
   };
 
   return (
-    <div className="group relative bg-[#1a1a1a] rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-accent/10 hover:border-accent/30">
+    <div className="group relative bg-[#162341] rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-accent/10 hover:border-accent/30">
       <Link to={`/service/${id}`} className="block">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           {allImages.length > 0 ? (
@@ -95,7 +95,7 @@ export default function ServiceCard({ title, description, imageUrl, price, saleP
               ))}
             </Swiper>
           ) : (
-            <div className="w-full h-full bg-[#222] flex items-center justify-center">
+            <div className="w-full h-full bg-[#203158] flex items-center justify-center">
               <span className="text-gray-600">لا توجد صورة</span>
             </div>
           )}

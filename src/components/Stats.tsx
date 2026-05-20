@@ -42,7 +42,7 @@ export default function Stats() {
     ];
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#ee5239] via-[#e03d24] to-[#c52d15] py-28 text-white">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#ec533a] via-[#e03d24] to-[#c52d15] py-28 text-white">
             {/* Ambient Lighting Background */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15)_0%,transparent_70%)] z-0" />
 

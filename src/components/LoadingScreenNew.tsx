@@ -34,15 +34,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{
-        background: `
-          radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
-          radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
-          linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0e1a2e 100%)
-        `,
-      }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0c1426]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -150,7 +142,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               <motion.div
                 className="absolute inset-4 border-2 border-transparent rounded-full"
                 style={{
-                  borderLeftColor: '#ee5239',
+                  borderLeftColor: '#ec533a',
                   borderBottomColor: 'rgba(238, 82, 57, 0.5)',
                 }}
                 animate={{ rotate: -360 }}
@@ -162,7 +154,7 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
               />
               {/* Center dot */}
               <motion.div
-                className="absolute top-1/2 left-1/2 w-3 h-3 -mt-1.5 -ml-1.5 rounded-full bg-gradient-to-r from-[#c7a17a] to-[#ee5239]"
+                className="absolute top-1/2 left-1/2 w-3 h-3 -mt-1.5 -ml-1.5 rounded-full bg-gradient-to-r from-[#c7a17a] to-[#ec533a]"
                 animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.7, 1, 0.7]
@@ -177,27 +169,6 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           )}
         </motion.div>
 
-        {/* Progress bar */}
-        <motion.div
-          className="w-80 h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#c7a17a] via-[#ee5239] to-[#ee5239]"
-            style={{
-              boxShadow: '0 0 15px rgba(199, 161, 122, 0.6)',
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{
-              duration: 0.4,
-              ease: "easeOut"
-            }}
-          />
-        </motion.div>
-
         {/* Loading text */}
         <motion.div
           className="text-center space-y-3"
@@ -206,14 +177,14 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
           transition={{ delay: 0.8, duration: 0.6 }}
         >
           <motion.h2
-            className="text-white text-xl font-semibold tracking-wide"
+            className="text-white/90 text-xl font-semibold tracking-wide"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             جارٍ التحميل...
           </motion.h2>
           <motion.p
-            className="text-white/70 text-sm font-light"
+            className="text-white/60 text-sm font-light"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.8, 0] }}
             transition={{ duration: 3, repeat: Infinity, delay: 1 }}

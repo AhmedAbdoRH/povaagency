@@ -29,7 +29,7 @@ export default function VisionMission() {
     },
   ];
   return (
-    <section className="relative min-h-[800px] flex items-center py-32 bg-gradient-to-br from-[#ee5239] via-[#e03d24] to-[#c52d15] text-white overflow-hidden">
+    <section className="relative min-h-[800px] flex items-center py-32 bg-gradient-to-br from-[#ec533a] via-[#e03d24] to-[#c52d15] text-white overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 z-0">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.1),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.05),transparent_50%)] z-10" />
@@ -55,7 +55,7 @@ export default function VisionMission() {
 
                         <div className="relative z-10 text-gray-900">
                             <div className="w-20 h-20 mb-8 rounded-3xl bg-gray-50 backdrop-blur-xl border border-gray-200 flex items-center justify-center shadow-lg transform -rotate-6 transition-transform duration-500 group-hover:rotate-0">
-                                <item.icon className="w-10 h-10 text-[#ee5239]" />
+                                <item.icon className="w-10 h-10 text-[#ec533a]" />
                             </div>
                             
                             <h2 className="text-4xl md:text-5xl font-black mb-8 leading-[1.6] text-gray-900">

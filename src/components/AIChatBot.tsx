@@ -250,7 +250,7 @@ export default function AIChatBot() {
                         initial={{ opacity: 0, scale: 0.8, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                        className="fixed bottom-24 left-6 w-80 sm:w-96 h-[500px] bg-[#1a1a1a]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 z-50 flex flex-col overflow-hidden"
+                        className="fixed bottom-24 left-6 w-80 sm:w-96 h-[500px] bg-[#162341]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 z-50 flex flex-col overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-accent/10 to-transparent">
@@ -291,7 +291,7 @@ export default function AIChatBot() {
                                         <div className={`flex flex-col gap-1 ${message.isUser ? 'items-end' : 'items-start'}`}>
                                             <div className={`rounded-2xl px-4 py-3 text-sm shadow-sm ${message.isUser
                                                     ? 'bg-white text-black rounded-br-none'
-                                                    : 'bg-[#2a2a2a] text-gray-200 border border-white/5 rounded-bl-none'
+                                                    : 'bg-[#203158] text-gray-200 border border-white/5 rounded-bl-none'
                                                 }`}>
                                                 <RenderMessageWithLinks text={message.text} />
 
@@ -321,7 +321,7 @@ export default function AIChatBot() {
                                         <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
                                             <Bot className="h-4 w-4 text-accent" />
                                         </div>
-                                        <div className="bg-[#2a2a2a] rounded-2xl rounded-bl-none px-4 py-3 border border-white/5">
+                                        <div className="bg-[#203158] rounded-2xl rounded-bl-none px-4 py-3 border border-white/5">
                                             <div className="flex items-center gap-1">
                                                 <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
                                                 <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100"></div>
@@ -334,7 +334,7 @@ export default function AIChatBot() {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 border-t border-white/10 bg-[#1a1a1a]">
+                        <div className="p-4 border-t border-white/10 bg-[#162341]">
                             <div className="flex gap-2 relative">
                                 <input
                                     ref={inputRef}
@@ -344,7 +344,7 @@ export default function AIChatBot() {
                                     onKeyPress={handleKeyPress}
                                     placeholder="اكتب استفسارك هنا..."
                                     disabled={isLoading}
-                                    className="flex-1 bg-[#2a2a2a] text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 border border-white/5 disabled:opacity-50 transition-all"
+                                    className="flex-1 bg-[#203158] text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 border border-white/5 disabled:opacity-50 transition-all"
                                 />
                                 <button
                                     onClick={handleSendMessage}

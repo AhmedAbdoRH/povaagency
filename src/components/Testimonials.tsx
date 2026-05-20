@@ -157,7 +157,7 @@ export default function Testimonials() {
                     zIndex: zIndex,
                   }}
                 >
-                  <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group hover:border-accent/30 transition-colors duration-300">
+                  <div className="bg-[#162341] border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group hover:border-accent/30 transition-colors duration-300">
                     <div className="absolute top-0 right-0 p-6 opacity-10">
                       <Quote className="w-24 h-24 text-white transform rotate-180" />
                     </div>
