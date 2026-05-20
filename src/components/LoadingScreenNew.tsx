@@ -168,31 +168,6 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
             </div>
           )}
         </motion.div>
-
-        {/* Loading text */}
-        <motion.div
-          className="text-center space-y-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-        >
-          <motion.h2
-            className="text-white/90 text-xl font-semibold tracking-wide"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            جارٍ التحميل...
-          </motion.h2>
-          <motion.p
-            className="text-white/60 text-sm font-light"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.8, 0] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-          >
-            يرجى الانتظار قليلاً، نحن نعد المحتوى لك
-          </motion.p>
-        </motion.div>
-
         {/* Decorative floating elements */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(8)].map((_, i) => (

@@ -57,7 +57,7 @@ export default function Header({ storeSettings }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-black/90 backdrop-blur-md text-white sticky top-0 z-50 border-b border-white/10">
+      <header className="bg-black/95 backdrop-blur-md text-white sticky top-0 z-50 border-b border-white/10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
 

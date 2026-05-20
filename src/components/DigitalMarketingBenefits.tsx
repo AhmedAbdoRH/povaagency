@@ -130,13 +130,17 @@ export default function DigitalMarketingBenefits() {
                 <span>{t('digitalMarketingBenefits.statusBadge')}</span>
             </motion.div>
             
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.6] text-white"
+            className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 text-white"
           >
-            {t('digitalMarketingBenefits.heading')}
+            {t('digitalMarketingBenefits.heading').split('\n').map((line, i, arr) => (
+              <div key={i} className="block mb-4">
+                {line}
+              </div>
+            ))}
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
