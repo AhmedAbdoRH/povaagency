@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Testimonial } from '../types/database';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Quote } from 'lucide-react';
 
 // Constants for styling and animation
 const VISIBLE_CARDS = 3;
@@ -46,36 +46,18 @@ export default function Testimonials() {
   const testimonialsWithImages = testimonials; // Use all testimonials, even if image is missing (we can use placeholder)
   const totalTestimonials = testimonialsWithImages.length;
 
-  const handleNavigation = useCallback((direction: 'next' | 'prev') => {
-    if (isAnimating || totalTestimonials <= 1) return;
-    setIsAnimating(true);
 
-    setCurrentIndex((prevIndex) => {
-      if (direction === 'next') {
-        return (prevIndex + 1) % totalTestimonials;
-      } else {
-        return (prevIndex - 1 + totalTestimonials) % totalTestimonials;
-      }
-    });
-
-    setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
-  }, [isAnimating, totalTestimonials]);
-
-  const nextTestimonial = useCallback(() => handleNavigation('next'), [handleNavigation]);
-  const prevTestimonial = useCallback(() => handleNavigation('prev'), [handleNavigation]);
-
-  const goToTestimonial = useCallback((index: number) => {
-    if (isAnimating || index === currentIndex || totalTestimonials <= 1) return;
-    setIsAnimating(true);
-    setCurrentIndex(index);
-    setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
-  }, [isAnimating, currentIndex, totalTestimonials]);
-
-  useEffect(() => {
+useEffect(() => {
     if (totalTestimonials <= 1) return;
-    const timer = setInterval(nextTestimonial, 5000);
+    const timer = setInterval(() => {
+      if (!isAnimating) {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % totalTestimonials);
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), ANIMATION_DURATION);
+      }
+    }, 5000);
     return () => clearInterval(timer);
-  }, [totalTestimonials, nextTestimonial]);
+  }, [totalTestimonials, isAnimating]);
 
   if (loading) {
     return (
@@ -196,41 +178,6 @@ export default function Testimonials() {
             })}
           </div>
 
-          {/* Navigation Controls */}
-          {totalTestimonials > 1 && (
-            <div className="flex justify-center items-center mt-8 space-x-4 rtl:space-x-reverse">
-              <button
-                onClick={prevTestimonial}
-                className="w-12 h-12 rounded-full bg-white/5 hover:bg-accent text-white flex items-center justify-center transition-all duration-300 hover:scale-110 border border-white/10"
-                aria-label="السابق"
-                disabled={isAnimating}
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-
-              <div className="flex space-x-2 rtl:space-x-reverse">
-                {testimonialsWithImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToTestimonial(index)}
-                    disabled={isAnimating}
-                    className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-accent w-8' : 'bg-white/20 w-2 hover:bg-white/40'
-                      }`}
-                    aria-label={`انتقل إلى ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={nextTestimonial}
-                className="w-12 h-12 rounded-full bg-white/5 hover:bg-accent text-white flex items-center justify-center transition-all duration-300 hover:scale-110 border border-white/10"
-                aria-label="التالي"
-                disabled={isAnimating}
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </section>

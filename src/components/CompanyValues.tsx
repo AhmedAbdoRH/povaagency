@@ -48,9 +48,9 @@ export default function CompanyValues() {
 
         <div className="overflow-hidden">
           <motion.div
-            initial={{ x: 0 }}
-            animate={isInView ? { x: ['100%', '0%', '100%'] } : { x: 0 }}
-            transition={{ duration: 180, ease: "linear", repeat: Infinity }}
+            initial={{ x: "25%" }}
+            animate={isInView ? { x: "75%" } : { x: "25%" }}
+            transition={{ duration: 90, ease: "linear", repeat: Infinity, repeatType: "loop" }}
             className="flex gap-8 w-max pl-8"
           >
             {[...values, ...values].map((value, index) => {

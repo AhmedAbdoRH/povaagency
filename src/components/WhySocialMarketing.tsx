@@ -101,19 +101,7 @@ export default function WhySocialMarketing() {
     return () => clearInterval(timer);
   }, [highlights.length]);
 
-  const handleCardClick = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const handlePrevCard = () => {
-    setCurrentIndex((prev) => (prev - 1 + highlights.length) % highlights.length);
-  };
-
-  const handleNextCard = () => {
-    setCurrentIndex((prev) => (prev + 1) % highlights.length);
-  };
-
-  return (
+return (
     <section className="relative bg-white py-20">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
@@ -149,14 +137,6 @@ export default function WhySocialMarketing() {
               {highlights.map((item, index) => (
                 <motion.div
                   key={index}
-                  onClick={() => handleCardClick(index)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleCardClick(index);
-                    }
-                  }}
                   className="cursor-pointer"
                 >
                   <Card
@@ -167,43 +147,6 @@ export default function WhySocialMarketing() {
                 </motion.div>
               ))}
             </div>
-          </div>
-
-          {/* Navigation Buttons and Indicators */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <button
-              onClick={handlePrevCard}
-              className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
-              aria-label="Previous card"
-            >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            {/* Indicator Dots */}
-            <div className="flex gap-2">
-              {highlights.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleCardClick(index)}
-                  className={`h-3 w-3 rounded-full transition-all ${
-                    index === currentIndex ? 'bg-blue-600 w-8' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                  aria-label={`Go to card ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={handleNextCard}
-              className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
-              aria-label="Next card"
-            >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
         </div>
       </div>
