@@ -10,6 +10,7 @@ import ClientCard from './ClientCard';
 const defaultTranslations: Record<string, string> = {
   'header.home': 'الرئيسية',
   'coreServicePage.mainService': 'الخدمة الرئيسية',
+  'coreServicePage.all': 'الكل',
   'coreServicePage.noPageLinked': 'لا توجد صفحة مرتبطة بهذه الخدمة',
   'coreServicePage.noSections': 'لا توجد أقسام متاحة',
   'coreServicePage.noWorksInSection': 'لا توجد أعمال في هذا القسم',
@@ -40,28 +41,86 @@ interface CoreServicePageViewProps {
   sections: SpecializationWithClients[];
 }
 
+type SectionLike = Pick<
+  SpecializationWithClients,
+  'id' | 'name' | 'name_en' | 'description' | 'description_en' | 'clients'
+>;
+
+const ALL_SECTION_ID = '__all__';
+
+function mulberry32(seed: number) {
+  return function () {
+    let t = (seed += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffleWithSeed<T>(items: T[], seed: number): T[] {
+  const rng = mulberry32(seed);
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export default function CoreServicePageView({
   coreService,
   page,
   sections,
 }: CoreServicePageViewProps) {
   const { language, t } = useLanguage();
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(sections[0]?.id || null);
+  const [shuffleSeed] = useState(() => Math.floor(Math.random() * 2 ** 32));
+
+  const sectionsWithAll = useMemo<SectionLike[]>(() => {
+    if (sections.length === 0) return [];
+
+    const uniqueClientsById = new Map<string, Client>();
+    sections.forEach(section => {
+      section.clients?.forEach(client => {
+        if (!uniqueClientsById.has(client.id)) uniqueClientsById.set(client.id, client);
+      });
+    });
+
+    const allSection: SectionLike = {
+      id: ALL_SECTION_ID,
+      name: t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل',
+      name_en: 'All',
+      description: null,
+      description_en: null,
+      clients: Array.from(uniqueClientsById.values()),
+    };
+
+    return [allSection, ...sections];
+  }, [sections, t]);
+
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(
+    sectionsWithAll.length > 0 ? ALL_SECTION_ID : null
+  );
 
   useEffect(() => {
-    setSelectedSectionId(current =>
-      sections.some(section => section.id === current) ? current : sections[0]?.id || null
-    );
-  }, [sections]);
+    setSelectedSectionId(current => {
+      const isValid = sectionsWithAll.some(section => section.id === current);
+      if (isValid) return current;
+      return sectionsWithAll.length > 0 ? ALL_SECTION_ID : null;
+    });
+  }, [sectionsWithAll]);
 
   const selectedSection = useMemo(
-    () => sections.find(section => section.id === selectedSectionId) || null,
-    [sections, selectedSectionId]
+    () => sectionsWithAll.find(section => section.id === selectedSectionId) || null,
+    [sectionsWithAll, selectedSectionId]
   );
 
-  const selectedClients = [...(selectedSection?.clients || [])].sort(
-    (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)
-  );
+  const selectedClients = useMemo(() => {
+    const clients = selectedSection?.clients || [];
+    if (selectedSection?.id === ALL_SECTION_ID) {
+      return shuffleWithSeed(clients, shuffleSeed);
+    }
+    return [...clients].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  }, [selectedSection, shuffleSeed]);
 
   const HeroIcon = coreService.icon;
   const heroImage = page?.banner_url || page?.image_url || null;
@@ -116,14 +175,14 @@ export default function CoreServicePageView({
                 <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                   {t('coreServicePage.noPageLinked')}
                 </div>
-              ) : sections.length === 0 ? (
+              ) : sectionsWithAll.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                   {t('coreServicePage.noSections')}
                 </div>
               ) : (
                 <>
                   <div className="mb-8 flex flex-wrap gap-3">
-                    {sections.map(section => (
+                    {sectionsWithAll.map(section => (
                       <button
                         key={section.id}
                         type="button"
@@ -134,7 +193,13 @@ export default function CoreServicePageView({
                             : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
                         }`}
                       >
-                        <div className="font-bold">{language === 'en' ? (section.name_en || section.name) : section.name}</div>
+                        <div className="font-bold">
+                          {section.id === ALL_SECTION_ID
+                            ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
+                            : language === 'en'
+                              ? (section.name_en || section.name)
+                              : section.name}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -143,7 +208,13 @@ export default function CoreServicePageView({
                     <div className="rounded-[1.5rem] border border-white/10 bg-[#040810]/90 p-6">
                       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
-                          <h3 className="text-2xl font-bold text-white">{language === 'en' ? (selectedSection.name_en || selectedSection.name) : selectedSection.name}</h3>
+                          <h3 className="text-2xl font-bold text-white">
+                            {selectedSection.id === ALL_SECTION_ID
+                              ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
+                              : language === 'en'
+                                ? (selectedSection.name_en || selectedSection.name)
+                                : selectedSection.name}
+                          </h3>
                           {selectedSection.description && (
                             <p className="mt-3 max-w-3xl leading-8 text-gray-300">
                               {language === 'en' ? (selectedSection.description_en || selectedSection.description) : selectedSection.description}

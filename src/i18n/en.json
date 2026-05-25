@@ -332,6 +332,7 @@
   },
   "coreServicePage": {
     "mainService": "Main Service",
+    "all": "All",
     "noPageLinked": "This service has not been linked to its data in the database yet.",
     "noSections": "No sections added for this service yet.",
     "noWorksInSection": "No works within this section yet."
