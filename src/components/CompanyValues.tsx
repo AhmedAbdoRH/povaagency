@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Palette, Landmark, Brain, Users, TrendingUp, ShieldCheck, RefreshCcw, SunMedium, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
@@ -18,11 +17,8 @@ export default function CompanyValues() {
     bg: valueBgs[index]
   }));
 
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
-
   return (
-    <section ref={sectionRef} className="relative bg-[#f8f9fa] py-24">
+    <section className="relative bg-[#f8f9fa] py-24">
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
 
       <div className="container relative z-10 mx-auto px-4 w-full">
@@ -49,7 +45,8 @@ export default function CompanyValues() {
         <div className="overflow-hidden">
           <motion.div
             initial={{ x: "25%" }}
-            animate={isInView ? { x: "75%" } : { x: "25%" }}
+            whileInView={{ x: "75%" }}
+            viewport={{ once: false, amount: 0.05, margin: "-50px" }}
             transition={{ duration: 90, ease: "linear", repeat: Infinity, repeatType: "loop" }}
             className="flex gap-8 w-max pl-8"
           >
