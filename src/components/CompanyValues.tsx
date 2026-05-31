@@ -3,7 +3,7 @@ import { Palette, Landmark, Brain, Users, TrendingUp, ShieldCheck, RefreshCcw, S
 import { useLanguage } from '../hooks/useLanguage';
 
 export default function CompanyValues() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const valueIcons = [Palette, Landmark, Brain, Users, TrendingUp, ShieldCheck, RefreshCcw, SunMedium];
   const valueColors = ['text-pink-500', 'text-amber-500', 'text-blue-500', 'text-green-500', 'text-emerald-500', 'text-indigo-500', 'text-cyan-500', 'text-orange-500'];
@@ -16,6 +16,10 @@ export default function CompanyValues() {
     color: valueColors[index],
     bg: valueBgs[index]
   }));
+
+  const isRtl = language === 'ar';
+  const initialX = isRtl ? "25%" : "-25%";
+  const animateX = isRtl ? "75%" : "-75%";
 
   return (
     <section className="relative bg-[#f8f9fa] py-24">
@@ -44,8 +48,8 @@ export default function CompanyValues() {
 
         <div className="overflow-hidden">
           <motion.div
-            initial={{ x: "25%" }}
-            whileInView={{ x: "75%" }}
+            initial={{ x: initialX }}
+            whileInView={{ x: animateX }}
             viewport={{ once: false, amount: 0.05, margin: "-50px" }}
             transition={{ duration: 90, ease: "linear", repeat: Infinity, repeatType: "loop" }}
             className="flex gap-8 w-max pl-8"
