@@ -18,8 +18,8 @@ export default function CompanyValues() {
   }));
 
   const isRtl = language === 'ar';
-  const initialX = isRtl ? "25%" : "-25%";
-  const animateX = isRtl ? "75%" : "-75%";
+  const initialX = "0%";
+  const animateX = isRtl ? "50%" : "-50%";
 
   return (
     <section className="relative bg-[#f8f9fa] py-24">
