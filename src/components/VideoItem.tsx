@@ -117,88 +117,17 @@ export default function VideoItem({
 
   if (isEmbeddable(videoUrl)) {
     return (
-      <div className="w-full">
-        <div
-          className={`relative w-full bg-black ${className}`}
-          style={containerStyle ?? { aspectRatio: '16 / 9' }}
-        >
-          <iframe
-            ref={videoRef as any}
-            src={getEmbedUrl(videoUrl, { autoplay: false, mute: muted, loop: loop, controls: controls }) || ''}
-            className="absolute inset-0 w-full h-full"
-            allowFullScreen
-            title={title || 'Video'}
-            allow="autoplay; encrypted-media; fullscreen"
-          />
-
-          {/* Custom Play Overlay for Embedded Videos */}
-          <AnimatePresence>
-            {!isPlaying && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 bg-black/30 flex items-center justify-center z-10 cursor-pointer"
-                onClick={() => {
-                  setIsPlaying(true);
-                  setShowTitle(false);
-                  // Update iframe src to start autoplay
-                  const iframe = videoRef.current as HTMLIFrameElement;
-                  if (iframe) {
-                    const newSrc = getEmbedUrl(videoUrl, { autoplay: true, mute: false, loop: loop, controls: controls });
-                    if (newSrc) iframe.src = newSrc;
-                  }
-                }}
-              >
-                {/* Red Play Button */}
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
-                >
-                  <Play className="w-8 h-8 md:w-10 md:h-10 ml-1" fill="white" />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Video Title on Desktop */}
-          <AnimatePresence>
-            {title && showTitle && !isPlaying && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="hidden md:block absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent p-6 pointer-events-none z-20"
-              >
-                <h3 className="text-white text-lg md:text-xl font-bold drop-shadow-lg">
-                  {title}
-                </h3>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Video Title on Mobile - Below Video */}
-        {title && (
-          <AnimatePresence>
-            {showTitle && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden mt-4 px-2"
-              >
-                <h3 className="text-gray-900 dark:text-white text-base font-bold leading-snug">
-                  {title}
-                </h3>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
+      <div
+        className={`relative w-full bg-black ${className}`}
+        style={containerStyle ?? { aspectRatio: '16 / 9' }}
+      >
+        <iframe
+          src={getEmbedUrl(videoUrl, { autoplay: autoPlay, mute: muted, loop: loop, controls: controls }) || ''}
+          className="absolute inset-0 w-full h-full"
+          allowFullScreen
+          title={title || 'Video'}
+          allow="autoplay; encrypted-media; fullscreen"
+        />
       </div>
     );
   }
