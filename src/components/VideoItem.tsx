@@ -36,12 +36,14 @@ export default function VideoItem({
   const [showControls, setShowControls] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // نستخدم المقاس الأصلي للفيديو متى توفر، أو نسبة 9:16 إذا كان محدداً يدوياً بأنه طولي
-  const containerStyle: React.CSSProperties | undefined = isVerticalVideo
-    ? { aspectRatio: '9 / 16' }
-    : aspectRatio
-      ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
-      : undefined;
+  // عكس المنطق: افتراضي طولي، إلا إذا كان محدد كعرضي
+  // isVerticalVideo = false يعني عرضي (استثناء)
+  // isVerticalVideo = true أو undefined يعني طولي (افتراضي)
+  const isHorizontalVideo = isVerticalVideo === false; // عرضي فقط لو false صريح
+  
+  const containerStyle: React.CSSProperties | undefined = isHorizontalVideo
+    ? (aspectRatio ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` } : { aspectRatio: '16 / 9' })
+    : { aspectRatio: '9 / 16' }; // طولي افتراضي
 
   // Handle play/pause
   const togglePlay = () => {

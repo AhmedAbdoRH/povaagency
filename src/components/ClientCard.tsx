@@ -21,15 +21,20 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   const showVideoAtNaturalRatio = hasVideo && aspectRatio !== null;
   const isVideoEmbed = hasVideo && isEmbeddable(videoUrl!);
 
-  const mediaStyle: React.CSSProperties | undefined = isVerticalVideo
-    ? { aspectRatio: '9 / 16' }
-    : showVideoAtNaturalRatio
-      ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
-      : isVideoEmbed
-        ? { aspectRatio: '16 / 9' }
-        : hasVideo
-          ? undefined
-          : { aspectRatio: '1 / 1' };
+  // عكس المنطق: افتراضي طولي، إلا إذا كان محدد كعرضي
+  // isVerticalVideo = false يعني عرضي (استثناء)
+  // isVerticalVideo = true أو undefined يعني طولي (افتراضي)
+  const isHorizontalVideo = isVerticalVideo === false;
+
+  const mediaStyle: React.CSSProperties | undefined = isHorizontalVideo
+    ? (showVideoAtNaturalRatio
+        ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
+        : isVideoEmbed
+          ? { aspectRatio: '16 / 9' }
+          : hasVideo
+            ? undefined
+            : { aspectRatio: '1 / 1' })
+    : { aspectRatio: '9 / 16' }; // طولي افتراضي
 
   return (
     <Link
