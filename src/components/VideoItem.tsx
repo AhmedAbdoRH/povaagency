@@ -85,8 +85,8 @@ export default function VideoItem({
             position: absolute;
             left: 0;
             width: 100%;
-            height: 120%;
-            top: -3rem;
+            height: 130%;
+            top: -4rem;
             transform: scale(1.02);
             transform-origin: top center;
             border: none;
@@ -97,11 +97,22 @@ export default function VideoItem({
             left: 0;
             right: 0;
             bottom: 0;
-            height: 4.5rem;
-            background: linear-gradient(180deg, rgba(0,0,0,0.98), transparent);
+            height: 6rem;
+            background: rgba(0,0,0,0.96);
             pointer-events: none;
             z-index: 18;
             animation: driveHideControls 1.3s ease 1s forwards;
+          }
+
+          @media (max-width: 768px) {
+            .video-embed-container.drive-google-drive .drive-iframe-wrapper iframe {
+              height: 150%;
+              top: -5rem;
+            }
+
+            .video-embed-container.drive-google-drive .drive-control-shield {
+              height: 8rem;
+            }
           }
 
           @keyframes driveHideControls {
