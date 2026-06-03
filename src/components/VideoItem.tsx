@@ -30,12 +30,12 @@ export default function VideoItem({
 
   // عكس المنطق: افتراضي طولي، إلا إذا كان محدد كعرضي
   const isHorizontalVideo = isVerticalVideo === false;
-  const verticalAspectRatio = aspectRatio && !isHorizontalVideo && aspectRatio.width / aspectRatio.height < 0.625
-    ? { width: 10, height: aspectRatio.height }
+  const verticalAspectRatio = aspectRatio && !isHorizontalVideo && aspectRatio.width / aspectRatio.height < 0.75
+    ? { width: 12, height: aspectRatio.height }
     : aspectRatio;
   const containerStyle: React.CSSProperties | undefined = isHorizontalVideo
     ? (aspectRatio ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` } : { aspectRatio: '16 / 9' })
-    : (verticalAspectRatio ? { aspectRatio: `${verticalAspectRatio.width} / ${verticalAspectRatio.height}` } : { aspectRatio: '10 / 16' });
+    : (verticalAspectRatio ? { aspectRatio: `${verticalAspectRatio.width} / ${verticalAspectRatio.height}` } : { aspectRatio: '12 / 16' });
 
   // جميع الفيديوهات مضمنة - عرض بسيط بدون عناصر تحكم مخصصة
   if (isEmbeddable(videoUrl)) {
