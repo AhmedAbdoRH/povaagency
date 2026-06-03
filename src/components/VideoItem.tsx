@@ -1,5 +1,6 @@
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
+import { useRef } from 'react';
 
 // Updated: 19:29 - Removed all custom controls, clean embedded videos only
 
@@ -30,10 +31,22 @@ export default function VideoItem({
 
   // عكس المنطق: افتراضي طولي، إلا إذا كان محدد كعرضي
   const isHorizontalVideo = isVerticalVideo === false;
-  
+  const driveContainerRef = useRef<HTMLDivElement>(null);
+
   const containerStyle: React.CSSProperties | undefined = isHorizontalVideo
     ? (aspectRatio ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` } : { aspectRatio: '16 / 9' })
     : { aspectRatio: '9 / 16' }; // طولي افتراضي
+
+  const handleDriveFullscreen = async () => {
+    const el = driveContainerRef.current;
+    if (!el) return;
+
+    if (document.fullscreenElement === el) {
+      await document.exitFullscreen?.();
+    } else {
+      await el.requestFullscreen?.();
+    }
+  };
 
   // جميع الفيديوهات مضمنة - عرض بسيط بدون عناصر تحكم مخصصة
   if (isEmbeddable(videoUrl)) {
@@ -73,19 +86,60 @@ export default function VideoItem({
             left: 0;
             width: 100%;
             height: 120%;
-            top: -2.5rem;
+            top: -3rem;
             transform: scale(1.02);
             transform-origin: top center;
             border: none;
           }
 
-          .video-embed-container.drive-google-drive .google-drive-overlay {
-            display: none;
+          .video-embed-container.drive-google-drive .drive-control-shield {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 4.5rem;
+            background: linear-gradient(180deg, rgba(0,0,0,0.98), transparent);
+            pointer-events: none;
+            z-index: 18;
+            animation: driveHideControls 1.3s ease 1s forwards;
+          }
+
+          @keyframes driveHideControls {
+            from {
+              opacity: 1;
+              visibility: visible;
+            }
+            to {
+              opacity: 0;
+              visibility: hidden;
+            }
+          }
+
+          .video-embed-container.drive-google-drive .drive-fullscreen-btn {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 9999px;
+            background: rgba(0,0,0,0.65);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            cursor: pointer;
+            z-index: 20;
+          }
+
+          .video-embed-container.drive-google-drive .drive-fullscreen-btn:hover {
+            background: rgba(0,0,0,0.85);
           }
         `}</style>
         <div
           className={`relative w-full bg-black ${className} overflow-hidden`}
           style={containerStyle ?? { aspectRatio: '16 / 9' }}
+          ref={videoUrl.includes('drive.google.com') ? driveContainerRef : undefined}
         >
           <div className={videoUrl.includes('drive.google.com') ? 'drive-iframe-wrapper' : ''}>
             <iframe
@@ -104,7 +158,26 @@ export default function VideoItem({
               allow="autoplay; encrypted-media; fullscreen"
               style={{ border: 'none' }}
             />
+            {videoUrl.includes('drive.google.com') && (
+              <div className="drive-control-shield" />
+            )}
           </div>
+
+          {videoUrl.includes('drive.google.com') && (
+            <button
+              type="button"
+              className="drive-fullscreen-btn"
+              onClick={handleDriveFullscreen}
+              aria-label="تكبير الشاشة"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+              </svg>
+            </button>
+          )}
         </div>
         
         {/* Video Title - تحت الفيديو */}
