@@ -68,10 +68,39 @@ export default function VideoItem({
             visibility: hidden !important;
           }
           
-          /* تصغير حجم عناصر التحكم */
+          /* تصغير حجم عناصر التحكم بشكل كبير */
           .video-embed-container .ytp-chrome-bottom {
-            transform: scale(0.8);
-            transform-origin: bottom;
+            transform: scale(0.5) !important;
+            transform-origin: bottom center !important;
+            padding: 1px 4px !important;
+          }
+          
+          /* تصغير الأزرار */
+          .video-embed-container .ytp-button {
+            transform: scale(0.6) !important;
+          }
+          
+          /* تصغير شريط التقدم */
+          .video-embed-container .ytp-progress-bar-container {
+            height: 1px !important;
+          }
+          
+          /* إخفاء زر التكبير في جميع المنصات */
+          .video-embed-container .ytp-fullscreen-button,
+          .video-embed-container .ytp-size-button,
+          .video-embed-container button[data-title="Fullscreen"],
+          .video-embed-container button[aria-label*="fullscreen"],
+          .video-embed-container button[aria-label*="Fullscreen"],
+          .video-embed-container button[title*="fullscreen"],
+          .video-embed-container button[title*="Fullscreen"],
+          .video-embed-container .vp-controls-fullscreen,
+          .video-embed-container .vp-fullscreen,
+          .video-embed-container [class*="fullscreen"],
+          .video-embed-container [class*="Fullscreen"] {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
           }
 
           /* رفع شريط Google Drive السفلي خارج العرض */
