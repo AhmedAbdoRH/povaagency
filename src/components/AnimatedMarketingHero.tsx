@@ -185,41 +185,133 @@ export default function AnimatedMarketingHero() {
             </motion.div>
           </motion.div>
 
-          {/* Animated statistics */}
+          {/* Animated statistics with 3D effect */}
           <motion.div
             variants={itemVariants}
-            className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 perspective-1000"
           >
             {[
-              { number: '87%', label: 'زيادة المبيعات • Sales Increase' },
-              { number: '3.5x', label: 'عائد الاستثمار • ROI' },
-              { number: '95%', label: 'رضا العملاء • Client Satisfaction' },
+              { number: '87%', label: 'زيادة المبيعات • Sales Increase', icon: '📈', color: 'from-blue-500 to-cyan-500' },
+              { number: '3.5x', label: 'عائد الاستثمار • ROI', icon: '💰', color: 'from-indigo-500 to-purple-500' },
+              { number: '95%', label: 'رضا العملاء • Client Satisfaction', icon: '⭐', color: 'from-purple-500 to-pink-500' },
             ].map((stat, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
-                animate={slideVariants.animate}
-                transition={{
-                  ...slideVariants.animate.transition,
-                  delay: index * 0.2,
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  rotateY: [0, 5, 0, -5, 0],
                 }}
-                className="p-6 bg-white/60 backdrop-blur-md rounded-2xl border border-white/80 shadow-lg"
+                whileHover={{
+                  scale: 1.05,
+                  rotateY: 10,
+                  rotateX: 5,
+                  z: 50,
+                  transition: { duration: 0.3 }
+                }}
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                  opacity: { duration: 0.5, delay: index * 0.2 },
+                  y: { duration: 0.5, delay: index * 0.2 },
+                  rotateY: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: index * 0.5,
+                  }
+                }}
+                style={{
+                  transformStyle: 'preserve-3d',
+                  transformPerspective: 1000,
+                }}
+                className="relative p-8 bg-gradient-to-br from-white via-white to-gray-50 backdrop-blur-md rounded-2xl border border-white/80 shadow-2xl overflow-hidden cursor-pointer group"
               >
+                {/* 3D Shadow layer */}
+                <div className="absolute inset-0 bg-gradient-to-br from-black/5 to-black/10 rounded-2xl transform translate-z-[-10px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Gradient overlay on hover */}
+                <motion.div 
+                  className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl`}
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 0.1 }}
+                />
+
+                {/* Animated corner accent */}
                 <motion.div
+                  className={`absolute top-0 ${language === 'ar' ? 'left-0' : 'right-0'} w-20 h-20 bg-gradient-to-br ${stat.color} opacity-20 blur-2xl rounded-full`}
                   animate={{
-                    scale: [1, 1.1, 1],
+                    scale: [1, 1.5, 1],
+                    opacity: [0.2, 0.4, 0.2],
                   }}
                   transition={{
-                    duration: 2,
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: index * 0.4,
+                  }}
+                />
+
+                {/* Icon with floating animation */}
+                <motion.div
+                  className="text-5xl mb-4 filter drop-shadow-lg"
+                  animate={{
+                    y: [0, -10, 0],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
                     repeat: Infinity,
                     ease: 'easeInOut',
                     delay: index * 0.3,
                   }}
-                  className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2"
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    transform: 'translateZ(30px)',
+                  }}
                 >
-                  {stat.number}
+                  {stat.icon}
                 </motion.div>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
+
+                {/* Number with 3D text effect */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.08, 1],
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: index * 0.4,
+                  }}
+                  className="text-5xl md:text-6xl font-black mb-3 relative"
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    transform: 'translateZ(20px)',
+                  }}
+                >
+                  <span className={`bg-gradient-to-r ${stat.color} bg-clip-text text-transparent drop-shadow-2xl relative z-10`}>
+                    {stat.number}
+                  </span>
+                  {/* 3D text shadow layers */}
+                  <span className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-400 bg-clip-text text-transparent blur-sm opacity-30 transform translate-x-1 translate-y-1" aria-hidden="true">
+                    {stat.number}
+                  </span>
+                </motion.div>
+
+                {/* Label */}
+                <p className="text-gray-700 font-semibold text-sm md:text-base leading-relaxed relative z-10" style={{ transform: 'translateZ(10px)' }}>
+                  {stat.label}
+                </p>
+
+                {/* Bottom shine effect */}
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-60"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
               </motion.div>
             ))}
           </motion.div>

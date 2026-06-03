@@ -160,3 +160,69 @@ p {
 .dir-ltr {
   direction: ltr !important;
 }
+
+/* 3D Card Effects */
+.perspective-1000 {
+  perspective: 1000px;
+  perspective-origin: center;
+}
+
+@layer utilities {
+  .transform-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .translate-z-10 {
+    transform: translateZ(10px);
+  }
+  
+  .translate-z-20 {
+    transform: translateZ(20px);
+  }
+  
+  .translate-z-30 {
+    transform: translateZ(30px);
+  }
+  
+  .translate-z-minus-10 {
+    transform: translateZ(-10px);
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* Enhanced 3D Card Hover Effects */
+@keyframes float-3d {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0px);
+  }
+  50% {
+    transform: translateY(-10px) translateZ(20px);
+  }
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-3d:hover {
+  transform: translateY(-8px) rotateX(5deg) rotateY(5deg) scale(1.02);
+}
+
+/* Responsive 3D Effects - Disable on mobile for performance */
+@media (max-width: 768px) {
+  .perspective-1000 {
+    perspective: none;
+  }
+  
+  .card-3d:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+  
+  .transform-3d {
+    transform-style: flat;
+  }
+}

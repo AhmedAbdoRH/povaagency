@@ -82,44 +82,191 @@ function Card({
         ref={ref}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative flex w-full flex-col items-center gap-8 rounded-3xl border-2 bg-white p-8 backdrop-blur-xl md:flex-row md:p-12"
+        className="relative flex w-full flex-col items-center gap-8 rounded-3xl border-2 bg-white p-8 backdrop-blur-xl md:flex-row md:p-12 overflow-hidden group"
         style={{
           borderColor: isActive ? 'rgb(229, 231, 235)' : 'rgb(243, 244, 246)',
           boxShadow: isActive
-            ? '0 30px 60px -15px rgba(0,0,0,0.15), 0 15px 25px -5px rgba(0,0,0,0.06)'
+            ? '0 40px 80px -20px rgba(0,0,0,0.25), 0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)'
             : '0 10px 30px -10px rgba(0,0,0,0.1)',
           rotateX: isActive && !isMobile ? rotateX : 0,
           rotateY: isActive && !isMobile ? rotateY : 0,
           transformStyle: 'preserve-3d',
         }}
-        whileHover={isActive ? { scale: 1.02 } : {}}
+        whileHover={isActive ? { 
+          scale: 1.03,
+          boxShadow: '0 50px 100px -25px rgba(0,0,0,0.3), 0 30px 60px -15px rgba(0,0,0,0.15)'
+        } : {}}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
       >
+        {/* 3D Background Layers */}
         <div 
-          className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color}`} 
+          className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color} transition-opacity duration-300 group-hover:opacity-10`} 
           style={{ transform: "translateZ(-20px)" }}
         />
-        <div 
+        
+        {/* Animated Glow */}
+        <motion.div 
           className={`absolute ${language === 'ar' ? '-right-20' : '-left-20'} -top-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-20 ${item.color}`} 
           style={{ transform: "translateZ(-40px)" }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.35, 0.2],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         />
 
+        {/* Glass Reflection Effect */}
         <div 
-          className={`flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br shadow-xl ${item.color}`}
-          style={{ transform: "translateZ(50px)" }}
+          className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+          style={{ transform: "translateZ(5px)" }}
+        />
+
+        {/* Bottom Glow */}
+        <motion.div 
+          className={`absolute ${language === 'ar' ? '-left-20' : '-right-20'} -bottom-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-15 ${item.color}`} 
+          style={{ transform: "translateZ(-40px)" }}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.3, 0.15],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+        />
+
+        {/* Shine Effect */}
+        <motion.div
+          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100"
+          style={{
+            background: `linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)`,
+            transform: "translateZ(10px)",
+          }}
+          initial={{ x: '-100%', opacity: 0 }}
+          whileHover={{ x: '100%', opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        />
+
+        {/* 3D Border Accent */}
+        <div 
+          className={`absolute inset-0 rounded-3xl border-2 opacity-0 group-hover:opacity-30 transition-opacity duration-300 ${item.color.replace('from-', 'border-').replace(' to-red-500', '').replace(' to-indigo-500', '').replace(' to-emerald-500', '').replace(' to-fuchsia-500', '').replace(' to-rose-500', '')}`}
+          style={{ transform: "translateZ(15px)" }}
+        />
+
+        {/* Icon Container with Enhanced 3D */}
+        <motion.div 
+          className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br shadow-2xl ${item.color}`}
+          style={{ transform: "translateZ(60px)" }}
+          animate={{
+            rotateY: [0, 10, 0, -10, 0],
+            scale: [1, 1.05, 1],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          whileHover={{
+            scale: 1.1,
+            rotateZ: 5,
+            transition: { duration: 0.3 }
+          }}
         >
-          <item.icon className="h-10 w-10 text-white" />
+          {/* Icon Glow */}
+          <div className="absolute inset-0 rounded-3xl bg-white/20 blur-md" style={{ transform: "translateZ(-5px)" }} />
+          
+          {/* Animated Icon */}
+          <motion.div
+            animate={{
+              y: [0, -5, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <item.icon className="h-10 w-10 text-white drop-shadow-lg relative z-10" />
+          </motion.div>
+
+          {/* Sparkle Effect */}
+          <motion.div
+            className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full"
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </motion.div>
+
+        {/* Content with 3D Depth */}
+        <div 
+          className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10 relative`}
+          style={{ transform: "translateZ(40px)" }}
+        >
+          {/* Title with Text Shadow */}
+          <motion.h3 
+            className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl relative"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <span className="relative z-10 drop-shadow-sm">{item.title}</span>
+            {/* 3D Text Layer */}
+            <span 
+              className="absolute inset-0 text-gray-400 opacity-20 blur-[1px]" 
+              style={{ transform: "translate(2px, 2px)" }}
+              aria-hidden="true"
+            >
+              {item.title}
+            </span>
+          </motion.h3>
+          
+          {/* Description with subtle animation */}
+          <motion.p 
+            className="text-lg leading-relaxed text-gray-600 md:text-xl relative"
+            initial={{ opacity: 0.8 }}
+            whileHover={{ opacity: 1 }}
+          >
+            {item.description}
+          </motion.p>
+
+          {/* Decorative Corner Elements */}
+          <motion.div
+            className={`absolute ${language === 'ar' ? 'right-0' : 'left-0'} bottom-0 w-16 h-16 opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+            style={{
+              background: `radial-gradient(circle at ${language === 'ar' ? 'bottom right' : 'bottom left'}, currentColor 0%, transparent 70%)`,
+              transform: "translateZ(20px)",
+            }}
+          />
         </div>
 
-        <div 
-          className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10`}
-          style={{ transform: "translateZ(30px)" }}
-        >
-          <h3 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">{item.title}</h3>
-          <p className="text-lg leading-relaxed text-gray-600 md:text-xl">
-            {item.description}
-          </p>
-        </div>
+        {/* Pulse Effect on Active Card */}
+        {isActive && (
+          <motion.div
+            className="absolute inset-0 rounded-3xl border-2 border-white/50"
+            animate={{
+              scale: [1, 1.02, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{ transform: "translateZ(25px)" }}
+          />
+        )}
       </motion.div>
     </motion.div>
   );
