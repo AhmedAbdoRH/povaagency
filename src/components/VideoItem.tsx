@@ -1,6 +1,8 @@
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
 
+// Updated: 19:29 - Removed all custom controls, clean embedded videos only
+
 interface VideoItemProps {
   videoUrl: string;
   title?: string;
