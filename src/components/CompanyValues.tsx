@@ -51,7 +51,7 @@ export default function CompanyValues() {
             initial={{ x: initialX }}
             whileInView={{ x: animateX }}
             viewport={{ once: false, amount: 0.05, margin: "-50px" }}
-            transition={{ duration: 90, ease: "linear", repeat: Infinity, repeatType: "loop" }}
+            transition={{ duration: 40, ease: "linear", repeat: Infinity, repeatType: "loop" }}
             className="flex gap-8 w-max pl-8"
           >
             {[...values, ...values].map((value, index) => {
