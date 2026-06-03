@@ -55,6 +55,7 @@ export interface ClientContent {
   description_en: string | null;
   image_url: string | null;
   video_url: string | null;
+  is_vertical_video?: boolean;
   content_type: 'image' | 'video' | 'text';
   display_order: number;
   is_active: boolean;

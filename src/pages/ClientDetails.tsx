@@ -5,6 +5,8 @@ import type { Client, ClientContent } from '../types/database';
 import { ArrowRight, ExternalLink, Play, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
+import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
+import VideoItem from '../components/VideoItem';
 
 interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
   specialization?: {
@@ -110,24 +112,12 @@ export default function ClientDetails() {
                 {contents.map((item) => (
                   <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group relative shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                     {item.content_type === 'video' ? (
-                      <div className="relative aspect-video bg-black flex items-center justify-center">
-                        {isEmbeddable(item.video_url || '') ? (
-                          <iframe 
-                            src={getEmbedUrl(item.video_url || '') || ''}
-                            className="w-full h-full"
-                            allowFullScreen
-                            title={item.title}
-                            allow="autoplay; encrypted-media; fullscreen"
-                          />
-                        ) : (
-                          <video 
-                            src={item.video_url || ''} 
-                            controls 
-                            className="w-full h-full object-cover"
-                            poster={item.image_url || undefined}
-                          />
-                        )}
-                      </div>
+                      <VideoItem 
+                        videoUrl={item.video_url || ''} 
+                        title={item.title} 
+                        poster={item.image_url || undefined} 
+                        isVerticalVideo={item.is_vertical_video}
+                      />
                     ) : (
                       <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
                         {item.image_url && (

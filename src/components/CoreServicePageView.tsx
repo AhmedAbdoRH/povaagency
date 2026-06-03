@@ -240,6 +240,7 @@ export default function CoreServicePageView({
                                 logoUrl={client.logo_url || ''}
                                 imageUrl={client.image_url || ''}
                                 videoUrl={videoContent?.video_url || ''}
+                                isVerticalVideo={videoContent?.is_vertical_video}
                               />
                             );
                           })}
