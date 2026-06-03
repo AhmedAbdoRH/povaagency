@@ -8,12 +8,15 @@ interface EmbedOptions {
   mute?: boolean;
   loop?: boolean;
   controls?: boolean;
+  modestbranding?: number;
+  showinfo?: number;
+  rel?: number;
 }
 
 export function getEmbedUrl(url: string, options: EmbedOptions = {}): string | null {
   if (!url) return null;
 
-  const { autoplay, mute, loop, controls = true } = options;
+  const { autoplay, mute, loop, controls = true, modestbranding, showinfo, rel } = options;
 
   // YouTube
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -26,6 +29,13 @@ export function getEmbedUrl(url: string, options: EmbedOptions = {}): string | n
     if (mute) embedUrl += 'mute=1&';
     if (loop) embedUrl += `loop=1&playlist=${videoId}&`;
     if (!controls) embedUrl += 'controls=0&';
+    if (modestbranding !== undefined) embedUrl += `modestbranding=${modestbranding}&`;
+    if (showinfo !== undefined) embedUrl += `showinfo=${showinfo}&`;
+    if (rel !== undefined) embedUrl += `rel=${rel}&`;
+    
+    // إخفاء عنوان الفيديو والشعار
+    embedUrl += 'iv_load_policy=3&'; // إخفاء الشروحات
+    embedUrl += 'fs=1&'; // السماح بملء الشاشة
     
     return embedUrl;
   }

@@ -38,13 +38,43 @@ export default function VideoItem({
   // جميع الفيديوهات مضمنة - عرض بسيط بدون عناصر تحكم مخصصة
   if (isEmbeddable(videoUrl)) {
     return (
-      <div className="w-full">
+      <div className="w-full video-embed-container">
+        <style>{`
+          /* إخفاء/تصغير عناصر تحكم YouTube */
+          .video-embed-container iframe {
+            border: none;
+          }
+          
+          /* محاولة إخفاء عناصر YouTube الزجاجية */
+          .video-embed-container .ytp-chrome-top,
+          .video-embed-container .ytp-gradient-top,
+          .video-embed-container .ytp-title,
+          .video-embed-container .ytp-title-text {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+          }
+          
+          /* تصغير حجم عناصر التحكم */
+          .video-embed-container .ytp-chrome-bottom {
+            transform: scale(0.8);
+            transform-origin: bottom;
+          }
+        `}</style>
         <div
           className={`relative w-full bg-black ${className}`}
           style={containerStyle ?? { aspectRatio: '16 / 9' }}
         >
           <iframe
-            src={getEmbedUrl(videoUrl, { autoplay: autoPlay, mute: muted, loop: loop, controls: controls }) || ''}
+            src={getEmbedUrl(videoUrl, { 
+              autoplay: autoPlay, 
+              mute: muted, 
+              loop: loop, 
+              controls: controls,
+              modestbranding: 1, // إخفاء شعار YouTube
+              showinfo: 0, // إخفاء معلومات الفيديو
+              rel: 0 // عدم إظهار فيديوهات مقترحة
+            }) || ''}
             className="absolute inset-0 w-full h-full"
             allowFullScreen
             title={title || 'Video'}
