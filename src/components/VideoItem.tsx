@@ -84,11 +84,10 @@ export default function VideoItem({
           .video-embed-container.drive-google-drive .drive-iframe-wrapper iframe {
             position: absolute;
             left: 0;
+            top: 0;
             width: 100%;
-            height: 130%;
-            top: -4rem;
-            transform: scale(1.02);
-            transform-origin: top center;
+            height: 100%;
+            transform: none;
             border: none;
           }
 
@@ -97,7 +96,7 @@ export default function VideoItem({
             left: 0;
             right: 0;
             bottom: 0;
-            height: 6rem;
+            height: 5rem;
             background: rgba(0,0,0,0.96);
             pointer-events: none;
             z-index: 18;
@@ -105,11 +104,6 @@ export default function VideoItem({
           }
 
           @media (max-width: 768px) {
-            .video-embed-container.drive-google-drive .drive-iframe-wrapper iframe {
-              height: 150%;
-              top: -5rem;
-            }
-
             .video-embed-container.drive-google-drive .drive-control-shield {
               height: 8rem;
             }
