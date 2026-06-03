@@ -3,7 +3,17 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Eye, Handshake, Target, DollarSign, BarChart3, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
-function Card({ item, index, activeIndex }: { item: any; index: number; activeIndex: number }) {
+function Card({
+  item,
+  index,
+  activeIndex,
+  isMobile,
+}: {
+  item: any;
+  index: number;
+  activeIndex: number;
+  isMobile: boolean;
+}) {
   const { language } = useLanguage();
   const isActive = index === activeIndex;
   const offset = index - activeIndex;
@@ -50,20 +60,20 @@ function Card({ item, index, activeIndex }: { item: any; index: number; activeIn
       initial={false}
       animate={{
         zIndex: isActive ? 10 : Math.max(0, 10 - Math.abs(offset)),
-        x: isActive ? 0 : (language === 'ar' ? offset * -120 : offset * 120),
-        y: isActive ? 0 : Math.abs(offset) * 15,
-        z: isActive ? 0 : Math.abs(offset) * -80,
-        rotateY: isActive ? 0 : (language === 'ar' ? (offset > 0 ? 25 : -25) : (offset > 0 ? -25 : 25)),
-        rotateX: isActive ? 0 : 5,
+        x: isActive ? 0 : (language === 'ar' ? offset * (isMobile ? -18 : -120) : offset * (isMobile ? 18 : 120)),
+        y: isActive ? 0 : Math.abs(offset) * (isMobile ? 10 : 15),
+        z: isActive ? 0 : Math.abs(offset) * (isMobile ? -20 : -80),
+        rotateY: isActive ? 0 : (isMobile ? 0 : (language === 'ar' ? (offset > 0 ? 25 : -25) : (offset > 0 ? -25 : 25))),
+        rotateX: isActive ? 0 : (isMobile ? 0 : 5),
         opacity: isActive ? 1 : Math.max(0, 1 - Math.abs(offset) * 0.3),
-        scale: isActive ? 1 : 0.85,
+        scale: isActive ? 1 : (isMobile ? 0.96 : 0.85),
       }}
       transition={{
         duration: 0.6,
         ease: [0.32, 0.72, 0, 1], // easeOutBack for smoother 3D transition
       }}
       style={{
-        perspective: '1500px',
+        perspective: isMobile ? '900px' : '1500px',
         transformStyle: 'preserve-3d',
         transformOrigin: 'center center',
       }}
@@ -78,8 +88,8 @@ function Card({ item, index, activeIndex }: { item: any; index: number; activeIn
           boxShadow: isActive
             ? '0 30px 60px -15px rgba(0,0,0,0.15), 0 15px 25px -5px rgba(0,0,0,0.06)'
             : '0 10px 30px -10px rgba(0,0,0,0.1)',
-          rotateX: isActive ? rotateX : 0,
-          rotateY: isActive ? rotateY : 0,
+          rotateX: isActive && !isMobile ? rotateX : 0,
+          rotateY: isActive && !isMobile ? rotateY : 0,
           transformStyle: 'preserve-3d',
         }}
         whileHover={isActive ? { scale: 1.02 } : {}}
@@ -118,6 +128,7 @@ function Card({ item, index, activeIndex }: { item: any; index: number; activeIn
 export default function WhySocialMarketing() {
   const { t, language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
   const highlights = [
     {
@@ -160,8 +171,18 @@ export default function WhySocialMarketing() {
     return () => clearInterval(timer);
   }, [highlights.length]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 767px)');
+    const updateIsMobile = () => setIsMobile(mediaQuery.matches);
+
+    updateIsMobile();
+    mediaQuery.addEventListener('change', updateIsMobile);
+
+    return () => mediaQuery.removeEventListener('change', updateIsMobile);
+  }, []);
+
 return (
-    <section className="relative bg-white py-20">
+    <section className="relative overflow-hidden bg-white py-20">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
       </div>
@@ -190,9 +211,9 @@ return (
         </div>
 
         {/* Stacked Cards Container */}
-        <div className="container mx-auto px-4">
-          <div className="relative h-[500px] md:h-[450px] flex items-center justify-center">
-            <div className="relative w-full max-w-4xl h-full">
+        <div className="container mx-auto overflow-hidden px-4">
+          <div className="relative flex h-[500px] items-center justify-center overflow-hidden md:h-[450px]">
+            <div className="relative h-full w-full max-w-4xl overflow-hidden">
               {highlights.map((item, index) => (
                 <motion.div
                   key={index}
@@ -202,6 +223,7 @@ return (
                     item={item}
                     index={index}
                     activeIndex={currentIndex}
+                    isMobile={isMobile}
                   />
                 </motion.div>
               ))}
