@@ -1,6 +1,5 @@
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
-import { useRef } from 'react';
 
 // Updated: 19:29 - Removed all custom controls, clean embedded videos only
 
@@ -31,22 +30,9 @@ export default function VideoItem({
 
   // عكس المنطق: افتراضي طولي، إلا إذا كان محدد كعرضي
   const isHorizontalVideo = isVerticalVideo === false;
-  const driveContainerRef = useRef<HTMLDivElement>(null);
-
   const containerStyle: React.CSSProperties | undefined = isHorizontalVideo
     ? (aspectRatio ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` } : { aspectRatio: '16 / 9' })
     : { aspectRatio: '9 / 16' }; // طولي افتراضي
-
-  const handleDriveFullscreen = async () => {
-    const el = driveContainerRef.current;
-    if (!el) return;
-
-    if (document.fullscreenElement === el) {
-      await document.exitFullscreen?.();
-    } else {
-      await el.requestFullscreen?.();
-    }
-  };
 
   // جميع الفيديوهات مضمنة - عرض بسيط بدون عناصر تحكم مخصصة
   if (isEmbeddable(videoUrl)) {
@@ -68,21 +54,29 @@ export default function VideoItem({
             visibility: hidden !important;
           }
           
-          /* تصغير حجم عناصر التحكم بشكل كبير */
+          /* تصغير حجم عناصر التحكم بشكل كبير جداً */
           .video-embed-container .ytp-chrome-bottom {
-            transform: scale(0.5) !important;
+            transform: scale(0.35) !important;
             transform-origin: bottom center !important;
-            padding: 1px 4px !important;
+            padding: 0px 2px !important;
+            height: 24px !important;
           }
           
-          /* تصغير الأزرار */
+          /* تصغير الأزرار بشكل أكبر */
           .video-embed-container .ytp-button {
-            transform: scale(0.6) !important;
+            transform: scale(0.5) !important;
+            width: 24px !important;
+            height: 24px !important;
           }
           
-          /* تصغير شريط التقدم */
+          /* تصغير شريط التقدم جداً */
           .video-embed-container .ytp-progress-bar-container {
-            height: 1px !important;
+            height: 0.5px !important;
+          }
+          
+          /* تصغير الوقت والنصوص */
+          .video-embed-container .ytp-time-display {
+            font-size: 8px !important;
           }
           
           /* إخفاء زر التكبير في جميع المنصات */
@@ -120,24 +114,6 @@ export default function VideoItem({
             border: none;
           }
 
-          .video-embed-container.drive-google-drive .drive-control-shield {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 5rem;
-            background: rgba(0,0,0,0.96);
-            pointer-events: none;
-            z-index: 18;
-            animation: driveHideControls 1.3s ease 1s forwards;
-          }
-
-          @media (max-width: 768px) {
-            .video-embed-container.drive-google-drive .drive-control-shield {
-              height: 8rem;
-            }
-          }
-
           @keyframes driveHideControls {
             from {
               opacity: 1;
@@ -149,31 +125,32 @@ export default function VideoItem({
             }
           }
 
-          .video-embed-container.drive-google-drive .drive-fullscreen-btn {
+          .video-embed-container.drive-google-drive .drive-control-mask {
             position: absolute;
-            bottom: 0.75rem;
-            right: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 9999px;
-            background: rgba(0,0,0,0.65);
-            border: 1px solid rgba(255,255,255,0.18);
-            color: #fff;
-            cursor: pointer;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 8rem;
+            background: linear-gradient(180deg, rgba(0,0,0,0.98), transparent);
+            pointer-events: none;
             z-index: 20;
+            animation: driveHideControls 0.6s ease 1s forwards;
           }
 
-          .video-embed-container.drive-google-drive .drive-fullscreen-btn:hover {
-            background: rgba(0,0,0,0.85);
+          .video-embed-container.drive-google-drive .drive-control-mask::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            pointer-events: none;
           }
         `}</style>
         <div
           className={`relative w-full bg-black ${className} overflow-hidden`}
           style={containerStyle ?? { aspectRatio: '16 / 9' }}
-          ref={videoUrl.includes('drive.google.com') ? driveContainerRef : undefined}
         >
           <div className={videoUrl.includes('drive.google.com') ? 'drive-iframe-wrapper' : ''}>
             <iframe
@@ -193,25 +170,9 @@ export default function VideoItem({
               style={{ border: 'none' }}
             />
             {videoUrl.includes('drive.google.com') && (
-              <div className="drive-control-shield" />
+              <div className="drive-control-mask" />
             )}
           </div>
-
-          {videoUrl.includes('drive.google.com') && (
-            <button
-              type="button"
-              className="drive-fullscreen-btn"
-              onClick={handleDriveFullscreen}
-              aria-label="تكبير الشاشة"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                <path d="M16 3h3a2 2 0 0 1 2 2v3" />
-                <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
-                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-              </svg>
-            </button>
-          )}
         </div>
         
         {/* Video Title - تحت الفيديو */}
