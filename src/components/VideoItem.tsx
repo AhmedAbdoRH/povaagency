@@ -132,110 +132,131 @@ export default function VideoItem({
 
   // Direct video file with custom controls
   const VideoWithCustomControls = (
-    <div 
-      ref={containerRef}
-      className={`relative w-full bg-black group ${className}`} 
-      style={containerStyle}
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-    >
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        controls={false} // إخفاء عناصر التحكم الأصلية
-        autoPlay={autoPlay}
-        muted={muted}
-        loop={loop}
-        playsInline
-        className="absolute inset-0 w-full h-full object-contain"
-        poster={poster}
-        onClick={togglePlay}
-      />
+    <div className="w-full">
+      <div 
+        ref={containerRef}
+        className={`relative w-full bg-black group ${className}`} 
+        style={containerStyle}
+        onMouseEnter={() => setShowControls(true)}
+        onMouseLeave={() => setShowControls(false)}
+      >
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          controls={false} // إخفاء عناصر التحكم الأصلية
+          autoPlay={autoPlay}
+          muted={muted}
+          loop={loop}
+          playsInline
+          className="absolute inset-0 w-full h-full object-contain"
+          poster={poster}
+          onClick={togglePlay}
+        />
 
-      {/* Video Title - يختفي أثناء التشغيل */}
-      <AnimatePresence>
-        {title && showTitle && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent p-6 pointer-events-none z-20"
-          >
-            <h3 className="text-white text-lg md:text-xl font-bold drop-shadow-lg">
-              {title}
-            </h3>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Custom Controls - يختفي تماماً أثناء التشغيل */}
-      <AnimatePresence>
-        {!isPlaying && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 bg-black/20 flex items-center justify-center z-10"
-          >
-            {/* Play Button - كبير في المنتصف */}
-            <motion.button
-              onClick={togglePlay}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
-              aria-label="Play"
+        {/* Video Title - على Desktop فقط في الأعلى */}
+        <AnimatePresence>
+          {title && showTitle && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="hidden md:block absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent p-6 pointer-events-none z-20"
             >
-              <Play className="w-8 h-8 md:w-10 md:h-10 ml-1" fill="white" />
-            </motion.button>
+              <h3 className="text-white text-lg md:text-xl font-bold drop-shadow-lg">
+                {title}
+              </h3>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* Bottom Controls Bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex items-center justify-end gap-2">
-              {/* Fullscreen Button */}
+        {/* Custom Controls - على Desktop فقط عند التوقف */}
+        <AnimatePresence>
+          {!isPlaying && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 bg-black/20 flex items-center justify-center z-10"
+            >
+              {/* Play Button - كبير في المنتصف */}
               <motion.button
-                onClick={toggleFullscreen}
+                onClick={togglePlay}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-lg transition-colors duration-200"
-                aria-label="Fullscreen"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
+                aria-label="Play"
               >
-                <Maximize className="w-5 h-5 md:w-6 md:h-6" />
+                <Play className="w-8 h-8 md:w-10 md:h-10 ml-1" fill="white" />
               </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Pause overlay - يظهر فقط عند hover أثناء التشغيل */}
-      <AnimatePresence>
-        {isPlaying && showControls && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/10 flex items-center justify-center z-10"
-          >
-            {/* Pause Button - يظهر عند hover */}
-            <motion.button
-              onClick={togglePlay}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
-              aria-label="Pause"
+              {/* Bottom Controls Bar - Desktop only */}
+              <div className="hidden md:flex absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 items-center justify-end gap-2">
+                {/* Fullscreen Button */}
+                <motion.button
+                  onClick={toggleFullscreen}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-lg transition-colors duration-200"
+                  aria-label="Fullscreen"
+                >
+                  <Maximize className="w-5 h-5 md:w-6 md:h-6" />
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Pause overlay - Desktop only عند hover أثناء التشغيل */}
+        <AnimatePresence>
+          {isPlaying && showControls && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="hidden md:flex absolute inset-0 bg-black/10 items-center justify-center z-10"
             >
-              <Pause className="w-8 h-8 md:w-10 md:h-10" fill="white" />
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {/* Pause Button - يظهر عند hover */}
+              <motion.button
+                onClick={togglePlay}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
+                aria-label="Pause"
+              >
+                <Pause className="w-8 h-8 md:w-10 md:h-10" fill="white" />
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Click overlay to play/pause */}
-      <div 
-        className="absolute inset-0 cursor-pointer z-0"
-        onClick={togglePlay}
-      />
+        {/* Click overlay to play/pause */}
+        <div 
+          className="absolute inset-0 cursor-pointer z-0"
+          onClick={togglePlay}
+        />
+      </div>
+
+      {/* Video Title - على Mobile تحت الفيديو */}
+      {title && (
+        <AnimatePresence>
+          {showTitle && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden mt-4 px-2"
+            >
+              <h3 className="text-gray-900 dark:text-white text-base font-bold leading-snug">
+                {title}
+              </h3>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 
@@ -245,98 +266,122 @@ export default function VideoItem({
 
   // While the natural dimensions are loading
   return (
-    <div className={`relative w-full bg-black ${className}`}>
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        controls={false}
-        autoPlay={autoPlay}
-        muted={muted}
-        loop={loop}
-        playsInline
-        className="w-full h-auto object-contain"
-        poster={poster}
-        onClick={togglePlay}
-      />
-      
-      {/* العنوان - يظهر فقط عند التوقف */}
-      <AnimatePresence>
-        {title && showTitle && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent p-6 pointer-events-none z-20"
-          >
-            <h3 className="text-white text-lg md:text-xl font-bold drop-shadow-lg">
-              {title}
-            </h3>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* عناصر التحكم - عند التوقف فقط */}
-      <AnimatePresence>
-        {!isPlaying && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 bg-black/20 flex items-center justify-center z-10"
-          >
-            <motion.button
-              onClick={togglePlay}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
-            >
-              <Play className="w-8 h-8 md:w-10 md:h-10 ml-1" fill="white" />
-            </motion.button>
-
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 flex items-center justify-end gap-2">
-              <motion.button
-                onClick={toggleFullscreen}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-lg transition-colors duration-200"
-              >
-                <Maximize className="w-5 h-5 md:w-6 md:h-6" />
-              </motion.button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* زر الإيقاف - يظهر عند hover أثناء التشغيل */}
-      <AnimatePresence>
-        {isPlaying && showControls && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/10 flex items-center justify-center z-10"
-          >
-            <motion.button
-              onClick={togglePlay}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
-            >
-              <Pause className="w-8 h-8 md:w-10 md:h-10" fill="white" />
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="w-full">
       <div 
-        className="absolute inset-0 cursor-pointer z-0"
-        onClick={togglePlay}
+        ref={containerRef}
+        className={`relative w-full bg-black ${className}`}
         onMouseEnter={() => setShowControls(true)}
         onMouseLeave={() => setShowControls(false)}
-      />
+      >
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          controls={false}
+          autoPlay={autoPlay}
+          muted={muted}
+          loop={loop}
+          playsInline
+          className="w-full h-auto object-contain"
+          poster={poster}
+          onClick={togglePlay}
+        />
+        
+        {/* العنوان - Desktop فقط في الأعلى */}
+        <AnimatePresence>
+          {title && showTitle && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="hidden md:block absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent p-6 pointer-events-none z-20"
+            >
+              <h3 className="text-white text-lg md:text-xl font-bold drop-shadow-lg">
+                {title}
+              </h3>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* عناصر التحكم - Desktop فقط عند التوقف */}
+        <AnimatePresence>
+          {!isPlaying && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 bg-black/20 flex items-center justify-center z-10"
+            >
+              <motion.button
+                onClick={togglePlay}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
+              >
+                <Play className="w-8 h-8 md:w-10 md:h-10 ml-1" fill="white" />
+              </motion.button>
+
+              <div className="hidden md:flex absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 items-center justify-end gap-2">
+                <motion.button
+                  onClick={toggleFullscreen}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-lg transition-colors duration-200"
+                >
+                  <Maximize className="w-5 h-5 md:w-6 md:h-6" />
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* زر الإيقاف - Desktop فقط عند hover أثناء التشغيل */}
+        <AnimatePresence>
+          {isPlaying && showControls && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="hidden md:flex absolute inset-0 bg-black/10 items-center justify-center z-10"
+            >
+              <motion.button
+                onClick={togglePlay}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#ec533a] hover:bg-[#f56b52] text-white flex items-center justify-center shadow-2xl transition-colors duration-200"
+              >
+                <Pause className="w-8 h-8 md:w-10 md:h-10" fill="white" />
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div 
+          className="absolute inset-0 cursor-pointer z-0"
+          onClick={togglePlay}
+        />
+      </div>
+
+      {/* العنوان - Mobile تحت الفيديو */}
+      {title && (
+        <AnimatePresence>
+          {showTitle && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden mt-4 px-2"
+            >
+              <h3 className="text-gray-900 dark:text-white text-base font-bold leading-snug">
+                {title}
+              </h3>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 }

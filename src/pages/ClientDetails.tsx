@@ -110,33 +110,36 @@ export default function ClientDetails() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {contents.map((item) => (
-                  <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group relative shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                    {item.content_type === 'video' ? (
-                      <VideoItem 
-                        videoUrl={item.video_url || ''} 
-                        title={item.title} 
-                        poster={item.image_url || undefined} 
-                        isVerticalVideo={item.is_vertical_video}
-                      />
-                    ) : (
-                      <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
-                        {item.image_url && (
-                          <img 
-                            src={item.image_url} 
-                            alt={item.title} 
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c1426] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                      </div>
-                    )}
+                  <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                    {/* الميديا - فيديو أو صورة */}
+                    <div className="relative overflow-hidden">
+                      {item.content_type === 'video' ? (
+                        <VideoItem 
+                          videoUrl={item.video_url || ''} 
+                          title="" 
+                          poster={item.image_url || undefined} 
+                          isVerticalVideo={item.is_vertical_video}
+                        />
+                      ) : (
+                        <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
+                          {item.image_url && (
+                            <img 
+                              src={item.image_url} 
+                              alt={item.title} 
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
                     
-                    <div className="p-5 absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0c1426] via-[#162341]/80 to-transparent pt-12 pointer-events-none">
-                      <h4 className="text-lg font-bold text-white mb-1 drop-shadow-md">
+                    {/* المحتوى النصي - تحت الميديا */}
+                    <div className="p-5 bg-[#203158]">
+                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
                         {language === 'en' ? (item.title_en || item.title) : item.title}
                       </h4>
                       {(item.description || item.description_en) && (
-                        <p className="text-gray-300 text-sm line-clamp-2 drop-shadow-md">
+                        <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
                           {language === 'en' ? (item.description_en || item.description) : item.description}
                         </p>
                       )}

@@ -34,7 +34,7 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   return (
     <Link
       to={`/client/${id}`}
-      className="block relative bg-[#060b14] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 group hover:border-[#ec533a]/50 hover:-translate-y-2"
+      className="flex flex-col bg-[#060b14] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 group hover:border-[#ec533a]/50 hover:-translate-y-2"
     >
       {/* Media Content */}
       <div
@@ -81,21 +81,22 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
         )}
       </div>
 
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#040810] via-[#060b14]/80 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500 pointer-events-none"></div>
+      {/* Text Content - تحت الميديا */}
+      <div className="relative p-6 bg-[#060b14] flex flex-col">
+        {/* اسم العمل */}
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
+          {name}
+        </h3>
 
-      {/* Text Content */}
-      <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
-        <div className="transform translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-          <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors drop-shadow-md">{name}</h3>
-
-          <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
-             <div className="overflow-hidden">
-                <p className="text-gray-300 text-sm line-clamp-2 mb-4 leading-relaxed drop-shadow">{description || t('clientCard.clickForDetails')}</p>
-                <div className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg">
-                  {t('clientCard.viewDetails')}
-                </div>
-             </div>
+        {/* الوصف - يظهر عند hover */}
+        <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
+          <div className="overflow-hidden">
+            <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-2">
+              {description || t('clientCard.clickForDetails')}
+            </p>
+            <div className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg">
+              {t('clientCard.viewDetails')}
+            </div>
           </div>
         </div>
       </div>
