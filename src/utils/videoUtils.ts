@@ -71,6 +71,25 @@ export function getEmbedUrl(url: string, options: EmbedOptions = {}): string | n
   return url;
 }
 
+export function getDriveVideoId(url: string): string | null {
+  if (!url.includes('drive.google.com')) return null;
+
+  if (url.includes('/d/')) {
+    return url.split('/d/')[1]?.split('/')[0] || null;
+  }
+
+  if (url.includes('id=')) {
+    return url.split('id=')[1]?.split('&')[0] || null;
+  }
+
+  return null;
+}
+
+export function getDriveVideoDirectUrl(url: string): string | null {
+  const id = getDriveVideoId(url);
+  return id ? `https://docs.google.com/uc?export=download&id=${id}` : null;
+}
+
 /**
  * Checks if a URL is from a platform that requires an iframe embed.
  */
