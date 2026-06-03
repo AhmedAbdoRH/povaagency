@@ -117,17 +117,28 @@ export default function VideoItem({
 
   if (isEmbeddable(videoUrl)) {
     return (
-      <div
-        className={`relative w-full bg-black ${className}`}
-        style={containerStyle ?? { aspectRatio: '16 / 9' }}
-      >
-        <iframe
-          src={getEmbedUrl(videoUrl, { autoplay: autoPlay, mute: muted, loop: loop, controls: controls }) || ''}
-          className="absolute inset-0 w-full h-full"
-          allowFullScreen
-          title={title || 'Video'}
-          allow="autoplay; encrypted-media; fullscreen"
-        />
+      <div className="w-full">
+        <div
+          className={`relative w-full bg-black ${className}`}
+          style={containerStyle ?? { aspectRatio: '16 / 9' }}
+        >
+          <iframe
+            src={getEmbedUrl(videoUrl, { autoplay: autoPlay, mute: muted, loop: loop, controls: controls }) || ''}
+            className="absolute inset-0 w-full h-full"
+            allowFullScreen
+            title={title || 'Video'}
+            allow="autoplay; encrypted-media; fullscreen"
+          />
+        </div>
+        
+        {/* Video Title - تحت الفيديو المضمن */}
+        {title && (
+          <div className="mt-4 px-2">
+            <h3 className="text-gray-900 dark:text-white text-base font-bold leading-snug">
+              {title}
+            </h3>
+          </div>
+        )}
       </div>
     );
   }
