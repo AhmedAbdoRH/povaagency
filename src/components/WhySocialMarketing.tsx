@@ -293,13 +293,13 @@ export default function WhySocialMarketing() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white py-20">
+    <section className="relative overflow-hidden bg-white py-6">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.04),transparent_60%)]" />
       </div>
 
       <div className="relative z-10 w-full">
-        <div className="container mx-auto px-4 py-12 text-center">
+        <div className="container mx-auto px-4 py-3 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -322,8 +322,8 @@ export default function WhySocialMarketing() {
         </div>
 
         {/* Stacked Cards Container - 100% Mobile Safe Overflow Handling */}
-        <div className="w-full overflow-hidden px-4 py-8">
-          <div className="relative flex h-[520px] items-center justify-center md:h-[480px]">
+        <div className="w-full overflow-hidden px-4 py-0">
+          <div className="relative flex h-[340px] items-center justify-center md:h-[300px]">
             <div className="relative h-full w-full max-w-5xl">
               {highlights.map((item, index) => (
                 <Card
