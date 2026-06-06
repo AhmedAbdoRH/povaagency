@@ -8,15 +8,25 @@ function Card({
   index,
   activeIndex,
   isMobile,
+  onClick,
+  total,
+  setCurrentIndex,
 }: {
   item: any;
   index: number;
   activeIndex: number;
   isMobile: boolean;
+  onClick: () => void;
+  total: number;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const { language } = useLanguage();
   const isActive = index === activeIndex;
-  const offset = index - activeIndex;
+
+  // Calculate circular offset for seamless wrap-around animation
+  let offset = index - activeIndex;
+  if (offset < -total / 2) offset += total;
+  if (offset > total / 2) offset -= total;
 
   const ref = useRef<HTMLDivElement>(null);
   
@@ -53,229 +63,183 @@ function Card({
     y.set(0);
   };
 
+  const swipeThreshold = 50;
+  const onDragEnd = (_e: any, info: any) => {
+    if (!isActive) return;
+    const swipe = info.offset.x;
+    if (language === 'ar') {
+      if (swipe < -swipeThreshold) {
+        setCurrentIndex((prev) => (prev - 1 + total) % total);
+      } else if (swipe > swipeThreshold) {
+        setCurrentIndex((prev) => (prev + 1) % total);
+      }
+    } else {
+      if (swipe < -swipeThreshold) {
+        setCurrentIndex((prev) => (prev + 1) % total);
+      } else if (swipe > swipeThreshold) {
+        setCurrentIndex((prev) => (prev - 1 + total) % total);
+      }
+    }
+  };
+
   return (
-    <motion.div
-      key={item.title}
-      className="absolute w-full max-w-4xl"
-      initial={false}
-      animate={{
-        zIndex: isActive ? 10 : Math.max(0, 10 - Math.abs(offset)),
-        x: isActive ? 0 : (language === 'ar' ? offset * (isMobile ? -18 : -120) : offset * (isMobile ? 18 : 120)),
-        y: isActive ? 0 : Math.abs(offset) * (isMobile ? 10 : 15),
-        z: isActive ? 0 : Math.abs(offset) * (isMobile ? -20 : -80),
-        rotateY: isActive ? 0 : (isMobile ? 0 : (language === 'ar' ? (offset > 0 ? 25 : -25) : (offset > 0 ? -25 : 25))),
-        rotateX: isActive ? 0 : (isMobile ? 0 : 5),
-        opacity: isActive ? 1 : Math.max(0, 1 - Math.abs(offset) * 0.3),
-        scale: isActive ? 1 : (isMobile ? 0.96 : 0.85),
-      }}
-      transition={{
-        duration: 0.6,
-        ease: [0.32, 0.72, 0, 1], // easeOutBack for smoother 3D transition
-      }}
-      style={{
-        perspective: isMobile ? '900px' : '1500px',
-        transformStyle: 'preserve-3d',
-        transformOrigin: 'center center',
-      }}
-    >
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
       <motion.div
-        ref={ref}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="relative flex w-full flex-col items-center gap-8 rounded-3xl border-2 bg-white p-8 backdrop-blur-xl md:flex-row md:p-12 overflow-hidden group"
-        style={{
-          borderColor: isActive ? 'rgb(229, 231, 235)' : 'rgb(243, 244, 246)',
-          boxShadow: isActive
-            ? '0 40px 80px -20px rgba(0,0,0,0.25), 0 20px 40px -10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)'
-            : '0 10px 30px -10px rgba(0,0,0,0.1)',
-          rotateX: isActive && !isMobile ? rotateX : 0,
-          rotateY: isActive && !isMobile ? rotateY : 0,
-          transformStyle: 'preserve-3d',
+        key={item.title}
+        className="pointer-events-auto w-[90vw] max-w-[340px] md:w-[560px] md:max-w-none"
+        initial={false}
+        animate={{
+          zIndex: isActive ? 10 : Math.max(0, 10 - Math.abs(offset)),
+          x: offset * (isMobile ? 35 : 220) * (language === 'ar' ? -1 : 1),
+          y: isActive ? 0 : Math.abs(offset) * (isMobile ? 6 : 12),
+          z: isActive ? 0 : Math.abs(offset) * (isMobile ? -30 : -150),
+          rotateY: isActive ? 0 : (isMobile ? (offset * -12 * (language === 'ar' ? -1 : 1)) : (offset * -30 * (language === 'ar' ? -1 : 1))),
+          rotateX: isActive ? 0 : (isMobile ? 0 : 5),
+          opacity: isActive ? 1 : Math.max(0, 1.2 - Math.abs(offset) * 0.4),
+          scale: isActive ? 1 : (isMobile ? 0.92 : 0.82),
         }}
-        whileHover={isActive ? { 
-          scale: 1.03,
-          boxShadow: '0 50px 100px -25px rgba(0,0,0,0.3), 0 30px 60px -15px rgba(0,0,0,0.15)'
-        } : {}}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        transition={{
+          duration: 0.65,
+          ease: [0.25, 1, 0.5, 1], // Custom easeOut cubic transition for buttery smoothness
+        }}
+        style={{
+          perspective: isMobile ? '800px' : '1600px',
+          transformStyle: 'preserve-3d',
+          transformOrigin: 'center center',
+        }}
+        drag={isActive ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={onDragEnd}
+        onClick={onClick}
       >
-        {/* 3D Background Layers */}
-        <div 
-          className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-5 ${item.color} transition-opacity duration-300 group-hover:opacity-10`} 
-          style={{ transform: "translateZ(-20px)" }}
-        />
-        
-        {/* Animated Glow */}
-        <motion.div 
-          className={`absolute ${language === 'ar' ? '-right-20' : '-left-20'} -top-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-20 ${item.color}`} 
-          style={{ transform: "translateZ(-40px)" }}
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.35, 0.2],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Glass Reflection Effect */}
-        <div 
-          className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-          style={{ transform: "translateZ(5px)" }}
-        />
-
-        {/* Bottom Glow */}
-        <motion.div 
-          className={`absolute ${language === 'ar' ? '-left-20' : '-right-20'} -bottom-20 h-40 w-40 rounded-full bg-gradient-to-br blur-[80px] opacity-15 ${item.color}`} 
-          style={{ transform: "translateZ(-40px)" }}
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.3, 0.15],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
-
-        {/* Shine Effect */}
         <motion.div
-          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100"
+          ref={ref}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="relative flex w-full flex-col items-center gap-6 rounded-[2rem] border bg-white/95 p-6 backdrop-blur-xl md:flex-row md:p-10 md:gap-8 overflow-hidden group select-none cursor-pointer"
           style={{
-            background: `linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)`,
-            transform: "translateZ(10px)",
+            borderColor: isActive ? 'rgb(229, 231, 235)' : 'rgb(243, 244, 246)',
+            boxShadow: isActive
+              ? '0 30px 60px -15px rgba(0,0,0,0.12), 0 15px 30px -10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)'
+              : '0 8px 24px -12px rgba(0,0,0,0.06)',
+            rotateX: isActive && !isMobile ? rotateX : 0,
+            rotateY: isActive && !isMobile ? rotateY : 0,
+            transformStyle: 'preserve-3d',
           }}
-          initial={{ x: '-100%', opacity: 0 }}
-          whileHover={{ x: '100%', opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-        />
-
-        {/* 3D Border Accent */}
-        <div 
-          className={`absolute inset-0 rounded-3xl border-2 opacity-0 group-hover:opacity-30 transition-opacity duration-300 ${item.color.replace('from-', 'border-').replace(' to-red-500', '').replace(' to-indigo-500', '').replace(' to-emerald-500', '').replace(' to-fuchsia-500', '').replace(' to-rose-500', '')}`}
-          style={{ transform: "translateZ(15px)" }}
-        />
-
-        {/* Icon Container with Enhanced 3D */}
-        <motion.div 
-          className={`relative flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br shadow-2xl ${item.color}`}
-          style={{ transform: "translateZ(60px)" }}
-          animate={{
-            rotateY: [0, 10, 0, -10, 0],
-            scale: [1, 1.05, 1],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          whileHover={{
-            scale: 1.1,
-            rotateZ: 5,
-            transition: { duration: 0.3 }
-          }}
+          whileHover={isActive ? { 
+            scale: 1.02,
+            boxShadow: '0 40px 80px -20px rgba(0,0,0,0.15), 0 20px 40px -10px rgba(0,0,0,0.08)'
+          } : {}}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
         >
-          {/* Icon Glow */}
-          <div className="absolute inset-0 rounded-3xl bg-white/20 blur-md" style={{ transform: "translateZ(-5px)" }} />
+          {/* Subtle gradient overlay to mimic premium light reflection */}
+          <div 
+            className={`absolute inset-0 rounded-3xl bg-gradient-to-br opacity-[0.03] ${item.color} transition-opacity duration-300 group-hover:opacity-[0.06]`} 
+            style={{ transform: "translateZ(-20px)" }}
+          />
           
-          {/* Animated Icon */}
-          <motion.div
+          {/* Glowing Orb in Center (Light Mode Premium Variant) */}
+          <motion.div 
+            className={`absolute ${language === 'ar' ? '-right-16' : '-left-16'} -top-16 h-36 w-36 rounded-full bg-gradient-to-br blur-[60px] opacity-15 ${item.color}`} 
+            style={{ transform: "translateZ(-40px)" }}
             animate={{
-              y: [0, -5, 0],
+              scale: [1, 1.25, 1],
+              opacity: [0.15, 0.25, 0.15],
             }}
             transition={{
-              duration: 2,
+              duration: 4,
               repeat: Infinity,
               ease: "easeInOut",
             }}
+          />
+
+          {/* Shine Effect */}
+          <motion.div
+            className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)`,
+              transform: "translateZ(10px)",
+            }}
+            initial={{ x: '-100%', opacity: 0 }}
+            whileHover={{ x: '100%', opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          />
+
+          {/* Icon Container with 3D Depth */}
+          <motion.div 
+            className={`relative flex h-20 w-20 md:h-24 md:w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-md ${item.color}`}
+            style={{ transform: "translateZ(50px)" }}
+            animate={{
+              rotateY: [0, 8, 0, -8, 0],
+              scale: [1, 1.03, 1],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            whileHover={{
+              scale: 1.08,
+              rotateZ: 4,
+              transition: { duration: 0.3 }
+            }}
           >
-            <item.icon className="h-10 w-10 text-white drop-shadow-lg relative z-10" />
+            <div className="absolute inset-0 rounded-2xl bg-white/20 blur-sm" style={{ transform: "translateZ(-5px)" }} />
+            <motion.div
+              animate={{
+                y: [0, -4, 0],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <item.icon className="h-9 w-9 md:h-11 md:w-11 text-white drop-shadow-md relative z-10" />
+            </motion.div>
           </motion.div>
 
-          {/* Sparkle Effect */}
-          <motion.div
-            className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full"
-            animate={{
-              scale: [0, 1, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          {/* Content with 3D Depth */}
+          <div 
+            className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10 relative`}
+            style={{ transform: "translateZ(30px)" }}
+          >
+            <h3 className="mb-3 text-2xl font-bold text-gray-900 md:text-3xl relative">
+              <span className="relative z-10">{item.title}</span>
+            </h3>
+            
+            <p className="text-base leading-relaxed text-gray-600 md:text-lg">
+              {item.description}
+            </p>
+          </div>
+
+          {/* Active Card Glow border */}
+          {isActive && (
+            <motion.div
+              className="absolute inset-0 rounded-[2rem] border border-gray-200/60 pointer-events-none"
+              animate={{
+                scale: [1, 1.01, 1],
+                opacity: [0.4, 0.7, 0.4],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              style={{ transform: "translateZ(15px)" }}
+            />
+          )}
         </motion.div>
-
-        {/* Content with 3D Depth */}
-        <div 
-          className={`flex-1 text-center ${language === 'ar' ? 'md:text-right' : 'md:text-left'} z-10 relative`}
-          style={{ transform: "translateZ(40px)" }}
-        >
-          {/* Title with Text Shadow */}
-          <motion.h3 
-            className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl relative"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <span className="relative z-10 drop-shadow-sm">{item.title}</span>
-            {/* 3D Text Layer */}
-            <span 
-              className="absolute inset-0 text-gray-400 opacity-20 blur-[1px]" 
-              style={{ transform: "translate(2px, 2px)" }}
-              aria-hidden="true"
-            >
-              {item.title}
-            </span>
-          </motion.h3>
-          
-          {/* Description with subtle animation */}
-          <motion.p 
-            className="text-lg leading-relaxed text-gray-600 md:text-xl relative"
-            initial={{ opacity: 0.8 }}
-            whileHover={{ opacity: 1 }}
-          >
-            {item.description}
-          </motion.p>
-
-          {/* Decorative Corner Elements */}
-          <motion.div
-            className={`absolute ${language === 'ar' ? 'right-0' : 'left-0'} bottom-0 w-16 h-16 opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
-            style={{
-              background: `radial-gradient(circle at ${language === 'ar' ? 'bottom right' : 'bottom left'}, currentColor 0%, transparent 70%)`,
-              transform: "translateZ(20px)",
-            }}
-          />
-        </div>
-
-        {/* Pulse Effect on Active Card */}
-        {isActive && (
-          <motion.div
-            className="absolute inset-0 rounded-3xl border-2 border-white/50"
-            animate={{
-              scale: [1, 1.02, 1],
-              opacity: [0.5, 0.8, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            style={{ transform: "translateZ(25px)" }}
-          />
-        )}
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
 export default function WhySocialMarketing() {
   const { t, language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
   const highlights = [
     {
@@ -310,13 +274,13 @@ export default function WhySocialMarketing() {
     },
   ];
 
-  // Auto-flip cards every 4 seconds, but pause on user interaction
+  // Auto-flip cards every 4 seconds, resetting the interval on manual card change
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % highlights.length);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(timer);
-  }, [highlights.length]);
+  }, [currentIndex, highlights.length]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 767px)');
@@ -328,14 +292,14 @@ export default function WhySocialMarketing() {
     return () => mediaQuery.removeEventListener('change', updateIsMobile);
   }, []);
 
-return (
+  return (
     <section className="relative overflow-hidden bg-white py-20">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.05),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(238,82,57,0.04),transparent_60%)]" />
       </div>
 
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 py-20 text-center">
+      <div className="relative z-10 w-full">
+        <div className="container mx-auto px-4 py-12 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -357,22 +321,21 @@ return (
           </motion.h2>
         </div>
 
-        {/* Stacked Cards Container */}
-        <div className="container mx-auto overflow-hidden px-4">
-          <div className="relative flex h-[500px] items-center justify-center overflow-hidden md:h-[450px]">
-            <div className="relative h-full w-full max-w-4xl overflow-hidden">
+        {/* Stacked Cards Container - 100% Mobile Safe Overflow Handling */}
+        <div className="w-full overflow-hidden px-4 py-8">
+          <div className="relative flex h-[520px] items-center justify-center md:h-[480px]">
+            <div className="relative h-full w-full max-w-5xl">
               {highlights.map((item, index) => (
-                <motion.div
+                <Card
                   key={index}
-                  className="cursor-pointer"
-                >
-                  <Card
-                    item={item}
-                    index={index}
-                    activeIndex={currentIndex}
-                    isMobile={isMobile}
-                  />
-                </motion.div>
+                  item={item}
+                  index={index}
+                  activeIndex={currentIndex}
+                  isMobile={isMobile}
+                  onClick={() => setCurrentIndex(index)}
+                  total={highlights.length}
+                  setCurrentIndex={setCurrentIndex}
+                />
               ))}
             </div>
           </div>
