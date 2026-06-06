@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 import { useLanguage } from '../hooks/useLanguage';
 import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
+import { linkifyText } from '../utils/linkify';
+import React from 'react';
 
 interface ClientCardProps {
   id: string;
@@ -14,9 +16,33 @@ interface ClientCardProps {
 }
 
 export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo }: ClientCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const navigate = useNavigate();
   const aspectRatio = useVideoAspectRatio(videoUrl, imageUrl);
 
+  const getExternalLink = (text: string): string | null => {
+    // التحقق من وجود رابط كامل يبدأ بـ http أو https
+    const urlRegex = /(https?:\/\/[^\s]+)/gi;
+    const urlMatch = text.match(urlRegex);
+    if (urlMatch && urlMatch[0]) {
+      return urlMatch[0];
+    }
+
+    // التحقق من وجود نطاق (Domain) في أي مكان بالنص ينتهي بـ TLDs مشهورة
+    const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.(?:com|net|org|co|io|gov|edu|info|me|app|xyz|site|online|link|agency|dev)(?:\/[^\s]*)?)/i;
+    const domainMatch = text.match(domainRegex);
+    if (domainMatch && domainMatch[0]) {
+      let url = domainMatch[0].trim();
+      if (!/^https?:\/\//i.test(url)) {
+        url = `https://${url}`;
+      }
+      return url;
+    }
+    
+    return null;
+  };
+
+  const isExternal = Boolean(getExternalLink(name));
   const hasVideo = Boolean(videoUrl);
   const showVideoAtNaturalRatio = hasVideo && aspectRatio !== null;
   const isVideoEmbed = hasVideo && isEmbeddable(videoUrl!);
@@ -26,20 +52,32 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   // isVerticalVideo = true أو undefined يعني طولي (افتراضي)
   const isHorizontalVideo = isVerticalVideo === false;
 
-  const mediaStyle: React.CSSProperties | undefined = isHorizontalVideo
-    ? (showVideoAtNaturalRatio
-        ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
-        : isVideoEmbed
-          ? { aspectRatio: '16 / 9' }
-          : hasVideo
-            ? undefined
-            : { aspectRatio: '1 / 1' })
-    : { aspectRatio: '9 / 16' }; // طولي افتراضي
+  const mediaStyle: React.CSSProperties | undefined = isExternal
+    ? { aspectRatio: '1720 / 1080' }
+    : isHorizontalVideo
+      ? (showVideoAtNaturalRatio
+          ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
+          : isVideoEmbed
+            ? { aspectRatio: '16 / 9' }
+            : hasVideo
+              ? undefined
+              : { aspectRatio: '1 / 1' })
+      : { aspectRatio: '1 / 1' }; // مربع افتراضي
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const externalLink = getExternalLink(name);
+    if (externalLink) {
+      window.open(externalLink, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(`/client/${id}`);
+    }
+  };
 
   return (
-    <Link
-      to={`/client/${id}`}
-      className="flex flex-col bg-[#060b14] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 group hover:border-[#ec533a]/50 hover:-translate-y-2"
+    <div
+      onClick={handleCardClick}
+      className="flex flex-col bg-[#060b14] rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 group hover:border-[#ec533a]/50 hover:-translate-y-2 cursor-pointer"
     >
       {/* Media Content */}
       <div
@@ -93,18 +131,35 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
           {name}
         </h3>
 
-        {/* الوصف - يظهر عند hover */}
-        <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
-          <div className="overflow-hidden">
-            <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-2">
-              {description || t('clientCard.clickForDetails')}
+        {isExternal ? (
+          <div className="mt-2">
+            <p className="text-gray-300 text-sm leading-relaxed mb-4">
+              {description ? linkifyText(description) : (language === 'en' ? 'Visit Website' : 'زيارة الموقع')}
             </p>
-            <div className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg">
-              {t('clientCard.viewDetails')}
+            <div
+              onClick={handleCardClick}
+              className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg"
+            >
+              {language === 'en' ? 'Visit Website' : 'زيارة الموقع'}
             </div>
           </div>
-        </div>
+        ) : (
+          /* الوصف - يظهر عند hover للعملاء العاديين */
+          <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
+            <div className="overflow-hidden">
+              <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-2">
+                {description ? linkifyText(description) : t('clientCard.clickForDetails')}
+              </p>
+              <div
+                onClick={handleCardClick}
+                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg"
+              >
+                {t('clientCard.viewDetails')}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }

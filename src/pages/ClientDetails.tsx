@@ -7,6 +7,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
 import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
 import VideoItem from '../components/VideoItem';
+import { linkifyText } from '../utils/linkify';
 
 interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
   specialization?: {
@@ -84,7 +85,7 @@ export default function ClientDetails() {
                    
                    {(language === 'en' ? (client.description_en || client.description) : client.description) && (
                      <p className="text-gray-400 leading-relaxed max-w-3xl text-sm md:text-base whitespace-pre-line mb-6">
-                       {language === 'en' ? (client.description_en || client.description) : client.description}
+                       {linkifyText(language === 'en' ? (client.description_en || client.description) || '' : client.description || '')}
                      </p>
                    )}
 
@@ -135,12 +136,12 @@ export default function ClientDetails() {
                     
                     {/* المحتوى النصي - تحت الميديا */}
                     <div className="p-5 bg-[#203158]">
-                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
-                        {language === 'en' ? (item.title_en || item.title) : item.title}
+                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300 break-all">
+                        {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
                       </h4>
                       {(item.description || item.description_en) && (
                         <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                          {language === 'en' ? (item.description_en || item.description) : item.description}
+                          {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
                         </p>
                       )}
                     </div>
