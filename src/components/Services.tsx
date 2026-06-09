@@ -86,7 +86,7 @@ export default function Services() {
               const coreService = linkedCoreServices.find(cs => cs.page?.id === page.id);
               const iconColor = coreService?.iconColor || 'text-accent';
 
-              // Map service slug to image filename in public folder
+              // Map service slug to image filename or external URL
               const getImageForService = (slug: string | undefined) => {
                 if (!slug) return null;
                 const imageMap: Record<string, string> = {
@@ -97,7 +97,7 @@ export default function Services() {
                   'brand-identity': '/Brand Identity.jpg',
                   'website-design': '/Website Design.jpg',
                   'social-media-campaigns': '/Social Media Campaigns.jpg',
-                  'post-design': '/Post Design.jpg',
+                  'post-design': 'https://ibb.co/VYtQB7YW', 
                   'photography': '/Photography.jpg',
                 };
                 return imageMap[slug] || null;
