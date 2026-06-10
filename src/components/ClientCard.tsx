@@ -125,20 +125,20 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
       </div>
 
       {/* Text Content - تحت الميديا */}
-      <div className="relative p-6 bg-[#060b14] flex flex-col">
+      <div className="relative p-8 bg-[#060b14] flex flex-col">
         {/* اسم العمل */}
-        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
+        <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
           {name}
         </h3>
 
         {isExternal ? (
           <div className="mt-2">
-            <p className="text-gray-300 text-sm leading-relaxed mb-4">
+            <p className="text-gray-300 text-xs leading-relaxed mb-4">
               {description ? linkifyText(description) : (language === 'en' ? 'Visit Website' : 'زيارة الموقع')}
             </p>
             <div
               onClick={handleCardClick}
-              className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg"
+              className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2.5 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
             >
               {language === 'en' ? 'Visit Website' : 'زيارة الموقع'}
             </div>
@@ -147,12 +147,12 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
           /* الوصف - يظهر عند hover للعملاء العاديين */
           <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
             <div className="overflow-hidden">
-              <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-2">
+              <p className="text-gray-300 text-xs leading-relaxed mb-4 line-clamp-2">
                 {description ? linkifyText(description) : t('clientCard.clickForDetails')}
               </p>
               <div
                 onClick={handleCardClick}
-                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-3 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg"
+                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2.5 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
               >
                 {t('clientCard.viewDetails')}
               </div>

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Briefcase, Layers } from 'lucide-react';
 import type { Client, Page } from '../types/database';
 import type { CoreServiceDefinition } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
@@ -181,13 +180,13 @@ export default function CoreServicePageView({
                 </div>
               ) : (
                 <>
-                  <div className="mb-8 flex flex-wrap gap-3">
+                  <div className="mb-8 flex flex-wrap gap-2">
                     {sectionsWithAll.map(section => (
                       <button
                         key={section.id}
                         type="button"
                         onClick={() => setSelectedSectionId(section.id)}
-                        className={`rounded-2xl border px-5 py-3 text-right transition-all backdrop-blur-md ${
+                        className={`rounded-xl border px-3 py-2 text-sm text-right transition-all backdrop-blur-md ${
                           selectedSectionId === section.id
                             ? 'border-accent bg-accent text-white shadow-lg shadow-accent/20'
                             : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
@@ -205,7 +204,7 @@ export default function CoreServicePageView({
                   </div>
 
                   {selectedSection && (
-                    <div className="rounded-[1.5rem] border border-white/10 bg-[#040810]/90 p-6">
+                    <>
                       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <h3 className="text-2xl font-bold text-white">
@@ -228,7 +227,7 @@ export default function CoreServicePageView({
                           {t('coreServicePage.noWorksInSection')}
                         </div>
                       ) : (
-                        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">
                           {selectedClients.map(client => {
                             const videoContent = (client as any).content?.find((c: any) => c.content_type === 'video');
                             return (
@@ -246,7 +245,7 @@ export default function CoreServicePageView({
                           })}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </>
               )}
