@@ -78,8 +78,8 @@ export default function MarketingCoreServices() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
           {linkedCoreServices.map((service, index) => {
-            // Map service slug to image filename in public folder
-            const getImageForService = (slug: string) => {
+            // Use image from database if available, otherwise fallback to static images
+            const serviceImage = service.page?.image_url || (() => {
               const imageMap: Record<string, string> = {
                 'marketing-strategy': '/Marketing Strategy.jpg',
                 'content-creation': '/Content Creation.jpg',
@@ -91,10 +91,8 @@ export default function MarketingCoreServices() {
                 'post-design': '/Post Design.jpg',
                 'photography': '/Photography.jpg',
               };
-              return imageMap[slug] || null;
-            };
-
-            const serviceImage = getImageForService(service.slug);
+              return imageMap[service.slug] || null;
+            })();
 
             return (
               <motion.div

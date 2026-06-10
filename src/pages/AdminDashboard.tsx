@@ -236,25 +236,29 @@ export default function AdminDashboard() {
     return (
       <div
         key={item.slug}
-        className={`group relative overflow-hidden rounded-3xl border bg-[#0c1426] p-8 shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-[#203158] hover:shadow-2xl cursor-pointer ${item.borderColor}`}
+        className={`group relative overflow-hidden rounded-3xl border bg-[#0c1426] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-[#203158] hover:shadow-2xl cursor-pointer ${item.borderColor}`}
+        onClick={() => {
+          if (linkedPage) {
+            setEditingPage(linkedPage.id);
+            setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '', banner_url: linkedPage.banner_url || '' });
+          } else {
+            setEditingPage(null);
+            setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '', banner_url: '' });
+          }
+          setActiveForm('page');
+        }}
       >
-        <button
-          onClick={() => {
-            if (linkedPage) {
-              setSelectedPage(linkedPage.id);
-              setSelectedSpec(null);
-              setSelectedClient(null);
-            } else {
-              setEditingPage(null);
-              setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '', banner_url: '' });
-              setActiveForm('page');
-            }
-          }}
-          className="absolute inset-0 z-20"
-        />
+        {/* Background Image */}
+        {linkedPage?.image_url && (
+          <img
+            src={linkedPage.image_url}
+            alt={item.title}
+            className="absolute inset-0 h-full w-full object-cover opacity-30 transition-opacity duration-500 group-hover:opacity-40"
+          />
+        )}
 
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-100 transition-opacity duration-500`}
+          className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-70 transition-opacity duration-500`}
         />
 
         <div className="pointer-events-none relative z-10 flex h-full flex-col">
@@ -271,6 +275,25 @@ export default function AdminDashboard() {
           </h3>
 
           <div className="flex-grow" />
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (linkedPage) {
+                setEditingPage(linkedPage.id);
+                setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '', banner_url: linkedPage.banner_url || '' });
+              } else {
+                setEditingPage(null);
+                setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '', banner_url: '' });
+              }
+              setActiveForm('page');
+            }}
+            className="pointer-events-auto z-30 flex items-center justify-center gap-2 rounded-lg bg-blue-500/30 px-3 py-2 text-blue-300 hover:bg-blue-500/50 transition-colors border border-blue-500/30"
+            title="تعديل الصورة والمعلومات"
+          >
+            <Edit className="h-4 w-4" />
+            <span className="text-xs font-bold">تعديل</span>
+          </button>
         </div>
 
         <item.icon
@@ -323,8 +346,45 @@ export default function AdminDashboard() {
                   <input value={pageForm.name_en} onChange={e => setPageForm({ ...pageForm, name_en: e.target.value })} placeholder="اسم الخدمة الرئيسية (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description} onChange={e => setPageForm({ ...pageForm, description: e.target.value })} placeholder="وصف الخدمة الرئيسية" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description_en} onChange={e => setPageForm({ ...pageForm, description_en: e.target.value })} placeholder="وصف الخدمة الرئيسية (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
-                  <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-image')} className="rounded-xl bg-gray-800/50 p-3" />
-                  <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-banner')} className="rounded-xl bg-gray-800/50 p-3" />
+                  
+                  {/* Image Preview */}
+                  {pageForm.image_url && (
+                    <div className="relative rounded-xl overflow-hidden">
+                      <img src={pageForm.image_url} alt="صورة الخدمة" className="h-40 w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setPageForm({ ...pageForm, image_url: '' })}
+                        className="absolute top-2 right-2 rounded-lg bg-red-500/80 p-2 text-white hover:bg-red-500 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-1 gap-2">
+                    <label className="text-sm text-gray-400">صورة الخدمة الرئيسية</label>
+                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-image')} className="rounded-xl bg-gray-800/50 p-3" />
+                  </div>
+                  
+                  {/* Banner Preview */}
+                  {pageForm.banner_url && (
+                    <div className="relative rounded-xl overflow-hidden">
+                      <img src={pageForm.banner_url} alt="صورة البانر" className="h-40 w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setPageForm({ ...pageForm, banner_url: '' })}
+                        className="absolute top-2 right-2 rounded-lg bg-red-500/80 p-2 text-white hover:bg-red-500 transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-1 gap-2">
+                    <label className="text-sm text-gray-400">صورة البانر</label>
+                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-banner')} className="rounded-xl bg-gray-800/50 p-3" />
+                  </div>
+                  
                   {uploading && <div className="text-sm text-blue-300">جارٍ الرفع...</div>}
                   <div className="grid grid-cols-2 gap-3">
                     <button type="submit" className="rounded-xl bg-blue-600 p-4">{editingPage ? 'تحديث' : 'ربط الخدمة'}</button>
