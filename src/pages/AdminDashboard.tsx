@@ -10,7 +10,7 @@ import { optimizeImage, isImageFile } from '../utils/imageOptimization';
 
 type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | null;
 
-const emptyPageForm = { name: '', name_en: '', description: '', description_en: '', image_url: '', banner_url: '' };
+const emptyPageForm = { name: '', name_en: '', description: '', description_en: '', image_url: '' };
 const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '' };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
@@ -102,7 +102,13 @@ export default function AdminDashboard() {
     setContentForm({ ...emptyContentForm, client_id: selectedClient || '' });
   };
 
-  const uploadImage = async (file: File, target: 'page-image' | 'page-banner' | 'spec' | 'client' | 'content') => {
+  const scrollToForm = () => {
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const uploadImage = async (file: File, target: 'page-image' | 'spec' | 'client' | 'content') => {
     setUploading(true);
     try {
       // التحقق من أن الملف هو صورة
@@ -127,20 +133,19 @@ export default function AdminDashboard() {
 
       const ext = optimizedFile.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      
+
       toast.info('جاري رفع الصورة...');
       const uploaded = await supabase.storage.from('services').upload(fileName, optimizedFile, { upsert: true });
-      
+
       if (uploaded.error) throw uploaded.error;
-      
+
       const { data } = supabase.storage.from('services').getPublicUrl(fileName);
-      
+
       if (target === 'page-image') setPageForm(v => ({ ...v, image_url: data.publicUrl }));
-      if (target === 'page-banner') setPageForm(v => ({ ...v, banner_url: data.publicUrl }));
       if (target === 'spec') setSpecForm(v => ({ ...v, image_url: data.publicUrl }));
       if (target === 'client') setClientForm(v => ({ ...v, image_url: data.publicUrl }));
       if (target === 'content') setContentForm(v => ({ ...v, image_url: data.publicUrl }));
-      
+
       toast.success('تم رفع الصورة بنجاح ✨');
     } catch (error: any) {
       toast.error(`خطأ: ${error.message}`);
@@ -236,16 +241,17 @@ export default function AdminDashboard() {
     return (
       <div
         key={item.slug}
-        className={`group relative overflow-hidden rounded-3xl border bg-[#0c1426] shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all duration-500 hover:bg-[#203158] hover:shadow-2xl cursor-pointer ${item.borderColor}`}
+        className={`group relative overflow-hidden rounded-2xl border-2 bg-gradient-to-br ${item.bgGradient} shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 cursor-pointer ${item.borderColor}`}
         onClick={() => {
           if (linkedPage) {
             setEditingPage(linkedPage.id);
-            setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '', banner_url: linkedPage.banner_url || '' });
+            setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '' });
           } else {
             setEditingPage(null);
-            setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '', banner_url: '' });
+            setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '' });
           }
           setActiveForm('page');
+          scrollToForm();
         }}
       >
         {/* Background Image */}
@@ -253,24 +259,23 @@ export default function AdminDashboard() {
           <img
             src={linkedPage.image_url}
             alt={item.title}
-            className="absolute inset-0 h-full w-full object-cover opacity-30 transition-opacity duration-500 group-hover:opacity-40"
+            className="absolute inset-0 h-full w-full object-cover opacity-20 transition-opacity duration-500 group-hover:opacity-30"
           />
         )}
 
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${item.bgGradient} opacity-70 transition-opacity duration-500`}
-        />
+        {/* Dark overlay for better text contrast */}
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-all duration-500" />
 
-        <div className="pointer-events-none relative z-10 flex h-full flex-col">
-          <div className="mb-6 flex items-start justify-between">
+        <div className="pointer-events-none relative z-10 flex h-full flex-col p-6">
+          <div className="mb-4 flex items-start justify-between">
             <div
-              className={`h-16 w-16 scale-110 rounded-2xl border border-white/10 bg-black/60 shadow-2xl backdrop-blur-lg transition-transform duration-500 ease-out group-hover:scale-125 ${item.iconColor} flex items-center justify-center`}
+              className={`h-14 w-14 rounded-xl border-2 border-white/30 bg-white/10 shadow-lg backdrop-blur-md transition-transform duration-300 group-hover:scale-110 ${item.iconColor} flex items-center justify-center`}
             >
-              <item.icon className="h-8 w-8 drop-shadow-[0_0_8px_currentColor]" strokeWidth={1.5} />
+              <item.icon className="h-7 w-7 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" strokeWidth={2} />
             </div>
           </div>
 
-          <h3 className="mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-2xl font-bold leading-[1.4] text-transparent transition-all duration-300 group-hover:to-white">
+          <h3 className="mb-2 text-xl font-bold text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             {item.title}
           </h3>
 
@@ -281,23 +286,24 @@ export default function AdminDashboard() {
               e.stopPropagation();
               if (linkedPage) {
                 setEditingPage(linkedPage.id);
-                setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '', banner_url: linkedPage.banner_url || '' });
+                setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '' });
               } else {
                 setEditingPage(null);
-                setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '', banner_url: '' });
+                setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '' });
               }
               setActiveForm('page');
+              scrollToForm();
             }}
-            className="pointer-events-auto z-30 flex items-center justify-center gap-2 rounded-lg bg-blue-500/30 px-3 py-2 text-blue-300 hover:bg-blue-500/50 transition-colors border border-blue-500/30"
+            className="pointer-events-auto z-30 flex items-center justify-center gap-2 rounded-xl bg-white/90 px-4 py-2.5 text-gray-900 font-bold hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl"
             title="تعديل الصورة والمعلومات"
           >
             <Edit className="h-4 w-4" />
-            <span className="text-xs font-bold">تعديل</span>
+            <span className="text-sm">تعديل</span>
           </button>
         </div>
 
         <item.icon
-          className={`pointer-events-none absolute -bottom-8 -left-8 h-44 w-44 rotate-12 opacity-10 transition-all duration-1000 ease-in-out group-hover:rotate-45 group-hover:scale-125 ${item.iconColor}`}
+          className={`pointer-events-none absolute -bottom-6 -right-6 h-32 w-32 rotate-12 opacity-5 transition-all duration-1000 ease-in-out group-hover:rotate-45 group-hover:scale-125 ${item.iconColor}`}
         />
       </div>
     );
@@ -365,26 +371,7 @@ export default function AdminDashboard() {
                     <label className="text-sm text-gray-400">صورة الخدمة الرئيسية</label>
                     <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-image')} className="rounded-xl bg-gray-800/50 p-3" />
                   </div>
-                  
-                  {/* Banner Preview */}
-                  {pageForm.banner_url && (
-                    <div className="relative rounded-xl overflow-hidden">
-                      <img src={pageForm.banner_url} alt="صورة البانر" className="h-40 w-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setPageForm({ ...pageForm, banner_url: '' })}
-                        className="absolute top-2 right-2 rounded-lg bg-red-500/80 p-2 text-white hover:bg-red-500 transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                  
-                  <div className="grid grid-cols-1 gap-2">
-                    <label className="text-sm text-gray-400">صورة البانر</label>
-                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-banner')} className="rounded-xl bg-gray-800/50 p-3" />
-                  </div>
-                  
+
                   {uploading && <div className="text-sm text-blue-300">جارٍ الرفع...</div>}
                   <div className="grid grid-cols-2 gap-3">
                     <button type="submit" className="rounded-xl bg-blue-600 p-4">{editingPage ? 'تحديث' : 'ربط الخدمة'}</button>
@@ -402,7 +389,7 @@ export default function AdminDashboard() {
                   <h2 className="text-3xl font-bold text-pink-300">الأقسام - {pages.find(p => p.id === selectedPage)?.name}</h2>
                   <p className="mt-2 text-sm text-gray-400">هذه الأقسام تظهر مباشرة داخل صفحة الخدمة الرئيسية.</p>
                 </div>
-                <button onClick={() => { resetForms(); setSpecForm(v => ({ ...v, service_id: primaryService(selectedPage)?.id || '' })); setActiveForm('spec'); }} className="rounded-xl bg-pink-500/20 px-4 py-2 text-pink-200">إضافة قسم</button>
+                <button onClick={() => { resetForms(); setSpecForm(v => ({ ...v, service_id: primaryService(selectedPage)?.id || '' })); setActiveForm('spec'); scrollToForm(); }} className="rounded-xl bg-pink-500/20 px-4 py-2 text-pink-200">إضافة قسم</button>
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{filteredSpecs.map(spec => (
                 <div key={spec.id} className="overflow-hidden rounded-2xl border border-gray-600/50 bg-gray-700/30 flex flex-col">
@@ -414,7 +401,7 @@ export default function AdminDashboard() {
                     </div>
                   </button>
                   <div className="flex gap-2 p-3">
-                    <button onClick={() => { setEditingSpec(spec.id); setSpecForm({ service_id: spec.service_id, name: spec.name, name_en: spec.name_en || '', description: spec.description || '', description_en: spec.description_en || '', image_url: spec.image_url || '' }); setActiveForm('spec'); }} className="flex-1 rounded-lg bg-pink-500/20 py-2 text-pink-200"><Edit className="mx-auto h-4 w-4" /></button>
+                    <button onClick={() => { setEditingSpec(spec.id); setSpecForm({ service_id: spec.service_id, name: spec.name, name_en: spec.name_en || '', description: spec.description || '', description_en: spec.description_en || '', image_url: spec.image_url || '' }); setActiveForm('spec'); scrollToForm(); }} className="flex-1 rounded-lg bg-pink-500/20 py-2 text-pink-200"><Edit className="mx-auto h-4 w-4" /></button>
                     <button onClick={() => removeItem('specializations', spec.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button>
                   </div>
                   <button onClick={() => { setSelectedSpec(spec.id); setSelectedClient(null); }} className="w-full rounded-none bg-pink-600/40 px-4 py-3 font-bold text-pink-200 hover:bg-pink-600/60 transition-colors flex items-center justify-center gap-2">
@@ -433,7 +420,7 @@ export default function AdminDashboard() {
             <div>
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-green-300">العملاء - {specializations.find(s => s.id === selectedSpec)?.name}</h2>
-                <button onClick={() => { resetForms(); setClientForm(v => ({ ...v, specialization_id: selectedSpec })); setActiveForm('client'); }} className="rounded-xl bg-green-500/20 px-4 py-2 text-green-200">إضافة عميل</button>
+                <button onClick={() => { resetForms(); setClientForm(v => ({ ...v, specialization_id: selectedSpec })); setActiveForm('client'); scrollToForm(); }} className="rounded-xl bg-green-500/20 px-4 py-2 text-green-200">إضافة عميل</button>
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{filteredClients.map(client => (
                 <div key={client.id} className="overflow-hidden rounded-2xl border border-gray-600/50 bg-gray-700/30 flex flex-col">
@@ -445,7 +432,7 @@ export default function AdminDashboard() {
                     </div>
                   </button>
                   <div className="flex gap-2 p-3">
-                    <button onClick={() => { setEditingClient(client.id); setClientForm({ specialization_id: client.specialization_id, name: client.name, name_en: client.name_en || '', description: client.description || '', description_en: client.description_en || '', image_url: client.image_url || '', project_url: client.project_url || '', logo_url: client.logo_url || '' }); setActiveForm('client'); }} className="flex-1 rounded-lg bg-green-500/20 py-2 text-green-200"><Edit className="mx-auto h-4 w-4" /></button>
+                    <button onClick={() => { setEditingClient(client.id); setClientForm({ specialization_id: client.specialization_id, name: client.name, name_en: client.name_en || '', description: client.description || '', description_en: client.description_en || '', image_url: client.image_url || '', project_url: client.project_url || '', logo_url: client.logo_url || '' }); setActiveForm('client'); scrollToForm(); }} className="flex-1 rounded-lg bg-green-500/20 py-2 text-green-200"><Edit className="mx-auto h-4 w-4" /></button>
                     <button onClick={() => removeItem('clients', client.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button>
                   </div>
                   <button onClick={() => setSelectedClient(client.id)} className="w-full rounded-none bg-green-600/40 px-4 py-3 font-bold text-green-200 hover:bg-green-600/60 transition-colors flex items-center justify-center gap-2">
@@ -464,9 +451,9 @@ export default function AdminDashboard() {
             <div>
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-orange-300">محتوى العميل - {clients.find(c => c.id === selectedClient)?.name}</h2>
-                <button onClick={() => { resetForms(); setContentForm(v => ({ ...v, client_id: selectedClient })); setActiveForm('content'); }} className="rounded-xl bg-orange-500/20 px-4 py-2 text-orange-200">إضافة محتوى</button>
+                <button onClick={() => { resetForms(); setContentForm(v => ({ ...v, client_id: selectedClient })); setActiveForm('content'); scrollToForm(); }} className="rounded-xl bg-orange-500/20 px-4 py-2 text-orange-200">إضافة محتوى</button>
               </div>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{filteredContents.map(item => <div key={item.id} className="overflow-hidden rounded-2xl border border-gray-600/50 bg-gray-700/30"><div className="relative aspect-square">{item.image_url ? <><img src={item.image_url} alt={item.title} className="h-full w-full object-cover cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage(item.image_url)} /><button onClick={() => setZoomedImage(item.image_url)} className="absolute top-2 right-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm p-2 rounded-lg transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"><ZoomIn className="h-4 w-4 text-white" /></button></> : <div className="h-full w-full bg-gray-800/50" />}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-0 left-0 right-0 p-3"><h3 className="line-clamp-2 font-bold">{item.title}</h3><p className="mt-1 text-xs text-gray-400">{item.content_type}</p></div></div><div className="flex gap-2 p-3"><button onClick={() => { setEditingContent(item.id); setContentForm({ client_id: item.client_id, title: item.title, description: item.description || '', image_url: item.image_url || '', video_url: item.video_url || '', is_vertical_video: item.is_vertical_video !== false, content_type: item.content_type || 'image' }); setActiveForm('content'); }} className="flex-1 rounded-lg bg-orange-500/20 py-2 text-orange-200"><Edit className="mx-auto h-4 w-4" /></button><button onClick={() => removeItem('client_content', item.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button></div></div>)}</div>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{filteredContents.map(item => <div key={item.id} className="overflow-hidden rounded-2xl border border-gray-600/50 bg-gray-700/30"><div className="relative aspect-square">{item.image_url ? <><img src={item.image_url} alt={item.title} className="h-full w-full object-cover cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage(item.image_url)} /><button onClick={() => setZoomedImage(item.image_url)} className="absolute top-2 right-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm p-2 rounded-lg transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"><ZoomIn className="h-4 w-4 text-white" /></button></> : <div className="h-full w-full bg-gray-800/50" />}<div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" /><div className="absolute bottom-0 left-0 right-0 p-3"><h3 className="line-clamp-2 font-bold">{item.title}</h3><p className="mt-1 text-xs text-gray-400">{item.content_type}</p></div></div><div className="flex gap-2 p-3"><button onClick={() => { setEditingContent(item.id); setContentForm({ client_id: item.client_id, title: item.title, description: item.description || '', image_url: item.image_url || '', video_url: item.video_url || '', is_vertical_video: item.is_vertical_video !== false, content_type: item.content_type || 'image' }); setActiveForm('content'); scrollToForm(); }} className="flex-1 rounded-lg bg-orange-500/20 py-2 text-orange-200"><Edit className="mx-auto h-4 w-4" /></button><button onClick={() => removeItem('client_content', item.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button></div></div>)}</div>
               {activeForm === 'content' && <form onSubmit={saveContent} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5"><input value={contentForm.title} onChange={e => setContentForm({ ...contentForm, title: e.target.value })} placeholder="عنوان المحتوى (اختياري)" className="rounded-xl bg-gray-800/50 p-4" /><textarea value={contentForm.description} onChange={e => setContentForm({ ...contentForm, description: e.target.value })} placeholder="وصف المحتوى (اختياري)" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><select value={contentForm.content_type} onChange={e => setContentForm({ ...contentForm, content_type: e.target.value as 'image' | 'video' | 'text' })} className="rounded-xl bg-gray-800/50 p-4"><option value="image">صورة</option><option value="video">فيديو</option><option value="text">نص</option></select>{contentForm.content_type === 'image' && <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'content')} className="rounded-xl bg-gray-800/50 p-3" />}{contentForm.content_type === 'video' && <><input value={contentForm.video_url} onChange={e => setContentForm({ ...contentForm, video_url: e.target.value })} placeholder="رابط الفيديو" className="rounded-xl bg-gray-800/50 p-4" /><label className="flex items-center gap-3 rounded-xl bg-gray-800/50 p-4 cursor-pointer hover:bg-gray-700/50 transition-colors"><input type="checkbox" checked={!contentForm.is_vertical_video} onChange={e => setContentForm({ ...contentForm, is_vertical_video: !e.target.checked })} className="w-5 h-5 rounded text-orange-500 bg-gray-900 border-gray-600 focus:ring-orange-500 focus:ring-offset-gray-800" /><span className="text-gray-200 font-medium">هذا الفيديو عرضي (16:9)</span></label></>}{uploading && <div className="text-sm text-orange-300">جارٍ الرفع...</div>}<div className="grid grid-cols-2 gap-3"><button type="submit" className="rounded-xl bg-orange-600 p-4">{editingContent ? 'تحديث' : 'إضافة'}</button><button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">إغلاق</button></div></form>}
             </div>
           )}
