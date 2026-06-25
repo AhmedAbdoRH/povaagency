@@ -83,7 +83,6 @@ export default function MarketingCoreServices() {
               const imageMap: Record<string, string> = {
                 'marketing-strategy': '/Marketing Strategy.jpg',
                 'content-creation': '/Content Creation.jpg',
-                'video-production': '/Video Production.jpg',
                 'media-production': '/Media Production.jpg',
                 'brand-identity': '/Brand Identity.jpg',
                 'website-design': '/Website Design.jpg',

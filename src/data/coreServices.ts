@@ -8,7 +8,6 @@ import {
   Palette,
   Sparkles,
   Target,
-  Video,
 } from 'lucide-react';
 import type { Page } from '../types/database';
 
@@ -49,20 +48,10 @@ export const coreServices: CoreServiceDefinition[] = [
     borderColor: 'border-purple-500/30',
   },
   {
-    slug: 'video-production',
-    title: 'تصوير الفيديو',
-    description: 'تنفيذ فيديوهات احترافية للإعلانات والمحتوى الترويجي والرسائل البصرية التي تعكس قيمة مشروعك.',
-    aliases: ['الفيديو', 'إنتاج الفيديو', 'تصوير وإنتاج الفيديو'],
-    icon: Video,
-    bgGradient: 'from-orange-100 via-orange-50 to-white',
-    iconColor: 'text-orange-400',
-    borderColor: 'border-orange-500/30',
-  },
-  {
     slug: 'media-production',
-    title: 'الإنتاج الإعلامي',
+    title: 'إنتاج الفيديوهات',
     description: 'خدمات إنتاج متكاملة تشمل التخطيط والتنفيذ وما بعد الإنتاج لتقديم مخرجات جاهزة للنشر والتوزيع.',
-    aliases: ['الإنتاج', 'الإنتاج المرئي', 'الإنتاج الرقمي'],
+    aliases: ['الإنتاج', 'الإنتاج المرئي', 'الإنتاج الرقمي', 'الإنتاج الإعلامي', 'إنتاج الفيديو'],
     icon: Film,
     bgGradient: 'from-indigo-100 via-indigo-50 to-white',
     iconColor: 'text-indigo-400',
@@ -169,7 +158,10 @@ export const resolveCoreServicesWithPages = (pages: Page[]): CoreServiceWithPage
 
   coreServices.forEach(coreService => {
     if (!pageByCoreService.has(coreService.slug) && unassignedPages.length > 0) {
-      pageByCoreService.set(coreService.slug, unassignedPages.shift() || null);
+      const page = unassignedPages.shift();
+      if (page) {
+        pageByCoreService.set(coreService.slug, page);
+      }
     }
   });
 
