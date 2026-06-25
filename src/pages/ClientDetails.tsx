@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Client, ClientContent } from '../types/database';
-import { ArrowRight, ExternalLink, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getEmbedUrl, isEmbeddable } from '../utils/videoUtils';
-import { useVideoAspectRatio } from '../hooks/useVideoAspectRatio';
 import VideoItem from '../components/VideoItem';
 import { linkifyText } from '../utils/linkify';
+import ContentProtection from '../components/ContentProtection';
 
 interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
   specialization?: {
@@ -103,52 +102,54 @@ export default function ClientDetails() {
 
           {/* Portfolio / Content Gallery */}
           {contents.length > 0 ? (
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-                <span className="w-2 h-8 bg-[#ec533a] rounded-full inline-block"></span>
-                {t('clientDetails.viewWorks')}
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {contents.map((item) => (
-                  <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
-                    {/* الميديا - فيديو أو صورة */}
-                    <div className="relative overflow-hidden">
-                      {item.content_type === 'video' ? (
-                        <VideoItem 
-                          videoUrl={item.video_url || ''} 
-                          title="" 
-                          poster={item.image_url || undefined} 
-                          isVerticalVideo={item.is_vertical_video}
-                        />
-                      ) : (
-                        <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
-                          {item.image_url && (
-                            <img 
-                              src={item.image_url} 
-                              alt={item.title} 
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                            />
-                          )}
-                        </div>
-                      )}
+            <ContentProtection>
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <span className="w-2 h-8 bg-[#ec533a] rounded-full inline-block"></span>
+                  {t('clientDetails.viewWorks')}
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {contents.map((item) => (
+                    <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                      {/* الميديا - فيديو أو صورة */}
+                      <div className="relative overflow-hidden">
+                        {item.content_type === 'video' ? (
+                          <VideoItem
+                            videoUrl={item.video_url || ''}
+                            title=""
+                            poster={item.image_url || undefined}
+                            isVerticalVideo={item.is_vertical_video}
+                          />
+                        ) : (
+                          <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
+                            {item.image_url && (
+                              <img
+                                src={item.image_url}
+                                alt={item.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* المحتوى النصي - تحت الميديا */}
+                      <div className="p-5 bg-[#203158]">
+                        <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300 break-all">
+                          {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
+                        </h4>
+                        {(item.description || item.description_en) && (
+                          <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
+                            {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    
-                    {/* المحتوى النصي - تحت الميديا */}
-                    <div className="p-5 bg-[#203158]">
-                      <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300 break-all">
-                        {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
-                      </h4>
-                      {(item.description || item.description_en) && (
-                        <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                          {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </ContentProtection>
           ) : (
             <div className="text-center py-20 bg-[#203158] rounded-2xl border border-white/5">
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">

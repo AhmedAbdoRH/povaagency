@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Layers, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Client, Page, Specialization } from '../types/database';
 import ClientCard from '../components/ClientCard';
 import { findCoreServiceByPageId } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
+import ContentProtection from '../components/ContentProtection';
 
 export default function SpecializationDetails() {
   const { id } = useParams<{ id: string }>();
@@ -138,29 +139,31 @@ export default function SpecializationDetails() {
             <p className="text-lg text-gray-600">{t('specDetails.noWorksDesc')}</p>
           </div>
         ) : (
-          <div>
-            <h2 className="mb-8 flex items-center gap-3 border-b border-white/10 pb-4 text-2xl font-bold">
-              <span className="block h-8 w-2 rounded-full bg-[#ec533a]" />
-              {t('specDetails.worksInSection')}
-            </h2>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {clients.map(client => {
-                const videoContent = client.content?.find(c => c.content_type === 'video');
-                return (
-                  <ClientCard
-                    key={client.id}
-                    id={client.id}
-                    name={language === 'en' ? (client.name_en || client.name) : client.name}
-                    description={language === 'en' ? (client.description_en || client.description || '') : (client.description || '')}
-                    logoUrl={client.logo_url || ''}
-                    imageUrl={client.image_url || ''}
-                    videoUrl={videoContent?.video_url || ''}
-                    isVerticalVideo={videoContent?.is_vertical_video}
-                  />
-                );
-              })}
+          <ContentProtection>
+            <div>
+              <h2 className="mb-8 flex items-center gap-3 border-b border-white/10 pb-4 text-2xl font-bold">
+                <span className="block h-8 w-2 rounded-full bg-[#ec533a]" />
+                {t('specDetails.worksInSection')}
+              </h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {clients.map(client => {
+                  const videoContent = client.content?.find(c => c.content_type === 'video');
+                  return (
+                    <ClientCard
+                      key={client.id}
+                      id={client.id}
+                      name={language === 'en' ? (client.name_en || client.name) : client.name}
+                      description={language === 'en' ? (client.description_en || client.description || '') : (client.description || '')}
+                      logoUrl={client.logo_url || ''}
+                      imageUrl={client.image_url || ''}
+                      videoUrl={videoContent?.video_url || ''}
+                      isVerticalVideo={videoContent?.is_vertical_video}
+                    />
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </ContentProtection>
         )}
       </div>
     </div>
