@@ -10,16 +10,12 @@ import { optimizeImage, isImageFile } from '../utils/imageOptimization';
 
 type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | null;
 
-interface AdminDashboardProps {
-  onSettingsUpdate?: () => void;
-}
-
 const emptyPageForm = { name: '', name_en: '', description: '', description_en: '', image_url: '' };
 const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '' };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
 
-export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps) {
+export default function AdminDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -115,10 +111,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const uploadImage = async (file: File, target: 'page-image' | 'spec' | 'client' | 'content') => {
     setUploading(true);
     try {
+      // التحقق من أن الملف هو صورة
       if (!isImageFile(file)) {
         throw new Error('الملف يجب أن يكون صورة (JPEG, PNG, WebP, GIF)');
       }
 
+      // تحسين الصورة قبل الرفع
       let optimizedFile = file;
       try {
         toast.info('جاري تحسين الصورة...');
@@ -130,6 +128,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         });
       } catch (error) {
         console.warn('Failed to optimize image, using original:', error);
+        // إذا فشل التحسين، استخدم الصورة الأصلية
       }
 
       const ext = optimizedFile.name.split('.').pop();
@@ -216,7 +215,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   const exportCustomersToCSV = () => {
     if (customerRequests.length === 0) return toast.info('لا توجد بيانات لتصديرها');
-
+    
     const headers = ['الاسم', 'رقم الهاتف', 'الخدمات المختارة', 'تاريخ الطلب'];
     const rows = customerRequests.map(req => [
       req.name,
@@ -237,31 +236,6 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     document.body.removeChild(link);
   };
 
-  const handleEditClick = (e: React.MouseEvent, linkedPage: Page | null, item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
-    e.stopPropagation();
-    if (linkedPage) {
-      setEditingPage(linkedPage.id);
-      setPageForm({
-        name: linkedPage.name,
-        name_en: linkedPage.name_en || '',
-        description: linkedPage.description || '',
-        description_en: linkedPage.description_en || '',
-        image_url: linkedPage.image_url || ''
-      });
-    } else {
-      setEditingPage(null);
-      setPageForm({
-        name: item.title,
-        name_en: '',
-        description: item.description,
-        description_en: '',
-        image_url: ''
-      });
-    }
-    setActiveForm('page');
-    scrollToForm();
-  };
-
   const renderTopCard = (item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
     const linkedPage = item.page;
     return (
@@ -270,14 +244,17 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         className={`group relative overflow-hidden rounded-2xl border-2 bg-gradient-to-br ${item.bgGradient} shadow-lg transition-all duration-500 hover:shadow-2xl hover:scale-105 cursor-pointer ${item.borderColor}`}
         onClick={() => {
           if (linkedPage) {
-            setSelectedPage(linkedPage.id);
-            setSelectedSpec(null);
-            setSelectedClient(null);
+            setEditingPage(linkedPage.id);
+            setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '' });
           } else {
-            toast.info('هذه الخدمة غير مربوطة بقاعدة البيانات. يمكنك ربطها من زر التعديل.');
+            setEditingPage(null);
+            setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '' });
           }
+          setActiveForm('page');
+          scrollToForm();
         }}
       >
+        {/* Background Image */}
         {linkedPage?.image_url && (
           <img
             src={linkedPage.image_url}
@@ -286,6 +263,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
           />
         )}
 
+        {/* Dark overlay for better text contrast */}
         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-all duration-500" />
 
         <div className="pointer-events-none relative z-10 flex h-full flex-col p-6">
@@ -304,7 +282,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
           <div className="flex-grow" />
 
           <button
-            onClick={(e) => handleEditClick(e, linkedPage, item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (linkedPage) {
+                setEditingPage(linkedPage.id);
+                setPageForm({ name: linkedPage.name, name_en: linkedPage.name_en || '', description: linkedPage.description || '', description_en: linkedPage.description_en || '', image_url: linkedPage.image_url || '' });
+              } else {
+                setEditingPage(null);
+                setPageForm({ name: item.title, name_en: '', description: item.description, description_en: '', image_url: '' });
+              }
+              setActiveForm('page');
+              scrollToForm();
+            }}
             className="pointer-events-auto z-30 flex items-center justify-center gap-2 rounded-xl bg-white/90 px-4 py-2.5 text-gray-900 font-bold hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl"
             title="تعديل الصورة والمعلومات"
           >
@@ -328,9 +317,9 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       <div className="container mx-auto p-6 flex-grow">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img
-              src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png"
-              alt="POVA Agency"
+            <img 
+              src="https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png" 
+              alt="POVA Agency" 
               className="h-12 w-auto object-contain"
             />
             <div>
@@ -363,7 +352,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   <input value={pageForm.name_en} onChange={e => setPageForm({ ...pageForm, name_en: e.target.value })} placeholder="اسم الخدمة الرئيسية (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description} onChange={e => setPageForm({ ...pageForm, description: e.target.value })} placeholder="وصف الخدمة الرئيسية" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description_en} onChange={e => setPageForm({ ...pageForm, description_en: e.target.value })} placeholder="وصف الخدمة الرئيسية (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
-
+                  
+                  {/* Image Preview */}
                   {pageForm.image_url && (
                     <div className="relative rounded-xl overflow-hidden">
                       <img src={pageForm.image_url} alt="صورة الخدمة" className="h-40 w-full object-cover" />
@@ -376,7 +366,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       </button>
                     </div>
                   )}
-
+                  
                   <div className="grid grid-cols-1 gap-2">
                     <label className="text-sm text-gray-400">صورة الخدمة الرئيسية</label>
                     <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'page-image')} className="rounded-xl bg-gray-800/50 p-3" />
@@ -472,6 +462,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
         </div>
 
+        {/* Footer - بيانات العملاء */}
         {activeForm === 'customers' && (
           <div className="mt-12">
             <div>
@@ -480,7 +471,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   <h2 className="text-3xl font-bold text-accent">بيانات العملاء</h2>
                   <p className="mt-2 text-sm text-gray-400">جميع طلبات التعاون التي تم إرسالها من خلال الموقع.</p>
                 </div>
-                <button
+                <button 
                   onClick={exportCustomersToCSV}
                   className="flex items-center gap-2 rounded-xl bg-accent px-6 py-3 font-bold text-white shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 active:scale-95"
                 >
@@ -519,7 +510,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                             {new Date(req.created_at).toLocaleString('ar-EG')}
                           </td>
                           <td className="px-6 py-4">
-                            <button
+                            <button 
                               onClick={() => removeItem('collaboration_requests', req.id)}
                               className="rounded-lg bg-red-500/10 p-2 text-red-500 hover:bg-red-500/20 transition-colors"
                             >
@@ -541,10 +532,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         )}
       </div>
 
+      {/* True Footer - بيانات العملاء Button */}
       <div className="border-t border-gray-700/50 bg-gray-900/50 mt-auto">
         <div className="container mx-auto p-6 flex flex-col items-center justify-center">
-          <button
-            onClick={() => { setActiveForm('customers'); setSelectedPage(null); setSelectedSpec(null); setSelectedClient(null); }}
+          <button 
+            onClick={() => { setActiveForm('customers'); setSelectedPage(null); setSelectedSpec(null); setSelectedClient(null); }} 
             className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-bold ${activeForm === 'customers' ? 'bg-accent/20 text-accent' : 'bg-gray-700/30 text-gray-300 hover:text-white hover:bg-gray-700/50'}`}
           >
             <Users className="w-5 h-5" />
@@ -553,15 +545,16 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         </div>
       </div>
 
+      {/* Image Zoom Modal */}
       {zoomedImage && (
-        <div
+        <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
           onClick={() => setZoomedImage(null)}
         >
           <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
-            <img
-              src={zoomedImage}
-              alt="Zoomed"
+            <img 
+              src={zoomedImage} 
+              alt="Zoomed" 
               className="max-w-full max-h-full object-contain rounded-lg"
               onClick={(e) => e.stopPropagation()}
             />
