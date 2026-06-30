@@ -48,7 +48,7 @@ export const coreServices: CoreServiceDefinition[] = [
     borderColor: 'border-purple-500/30',
   },
   {
-    slug: 'media-production',
+    slug: 'video-productions',
     title: 'إنتاج الفيديوهات',
     description: 'خدمات إنتاج متكاملة تشمل التخطيط والتنفيذ وما بعد الإنتاج لتقديم مخرجات جاهزة للنشر والتوزيع.',
     aliases: ['الإنتاج', 'الإنتاج المرئي', 'الإنتاج الرقمي', 'الإنتاج الإعلامي', 'إنتاج الفيديو'],
@@ -91,7 +91,18 @@ export const coreServices: CoreServiceDefinition[] = [
     slug: 'post-design',
     title: 'تصميم المنشورات',
     description: 'ابتكار تصاميم منشورات احترافية ومتسقة مع الهوية لتدعم المحتوى وتزيد من قوة الحضور البصري.',
-    aliases: ['المنشورات', 'تصميم السوشيال ميديا', 'تصميم البوستات'],
+    aliases: [
+      'المنشورات',
+      'تصميم السوشيال ميديا',
+      'تصميم البوستات',
+      'التصميم الجرافيكي',
+      'الجرافيك',
+      'تصميم جرافيكي',
+      'Graphic Design',
+      'Graphic',
+      'Visual Design',
+      'Social Media Design',
+    ],
     icon: Image,
     bgGradient: 'from-fuchsia-100 via-fuchsia-50 to-white',
     iconColor: 'text-fuchsia-400',
@@ -176,3 +187,33 @@ export const findCoreServiceBySlug = (slug: string) =>
 
 export const findCoreServiceByPageId = (pages: Page[], pageId: string) =>
   resolveCoreServicesWithPages(pages).find(coreService => coreService.page?.id === pageId) || null;
+
+/**
+ * Returns true when a client's specialization belongs to the Graphic Design
+ * core service (slug: 'post-design'). Accepts the specialization record that
+ * ClientDetails attaches to the client (service_id + name) so callers don't
+ * need an extra round-trip.
+ */
+export const isGraphicDesignContext = (specialization?: {
+  service_id?: string | null;
+  name?: string | null;
+} | null) => {
+  if (!specialization) return false;
+
+  const service = findCoreServiceBySlug('post-design');
+  if (service && specialization.service_id && specialization.service_id === service) {
+    // We don't store id on definition directly; fall through to name check below.
+  }
+
+  // Match by Arabic title (definitive) or any alias.
+  if (service) {
+    const candidates = [service.title, service.slug, ...(service.aliases || [])]
+      .map(value => normalizeText(value))
+      .filter(Boolean);
+    const normalizedSpec = normalizeText(specialization.name);
+    if (normalizedSpec && candidates.some(c => normalizedSpec.includes(c) || c.includes(normalizedSpec))) {
+      return true;
+    }
+  }
+  return false;
+};

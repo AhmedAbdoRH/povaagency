@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Client, ClientContent } from '../types/database';
-import { ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import VideoItem from '../components/VideoItem';
 import { linkifyText } from '../utils/linkify';
 import ContentProtection from '../components/ContentProtection';
+import { isGraphicDesignContext } from '../data/coreServices';
 
 interface ClientWithPartialSpec extends Omit<Client, 'specialization'> {
   specialization?: {
@@ -23,6 +24,11 @@ export default function ClientDetails() {
   const [client, setClient] = useState<ClientWithPartialSpec | null>(null);
   const [contents, setContents] = useState<ClientContent[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Horizontal rail state (only used for graphic-design clients with all-image content)
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -45,6 +51,34 @@ export default function ClientDetails() {
       });
     }
   }, [id]);
+
+  const updateScrollButtons = () => {
+    const el = galleryRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+    const el = galleryRef.current;
+    if (!el) return;
+    const onScroll = () => updateScrollButtons();
+    const onResize = () => updateScrollButtons();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [contents]);
+
+  const scrollByAmount = (direction: 'left' | 'right') => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.85, 400);
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
 
   if (loading) return <div className="min-h-screen pt-24 text-center text-white bg-[#162341] flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#ec533a]"></div></div>;
   if (!client) return <div className="min-h-screen pt-24 text-center text-white bg-[#162341] flex flex-col items-center justify-center gap-4"><h2 className="text-2xl font-bold">{t('clientDetails.notFound')}</h2><Link to="/" className="text-[#ec533a]">{t('clientDetails.backToHome')}</Link></div>;
@@ -109,45 +143,124 @@ export default function ClientDetails() {
                   {t('clientDetails.viewWorks')}
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {contents.map((item) => (
-                    <div key={item.id} className="bg-[#203158] rounded-2xl overflow-hidden border border-white/5 group shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
-                      {/* الميديا - فيديو أو صورة */}
-                      <div className="relative overflow-hidden">
-                        {item.content_type === 'video' ? (
-                          <VideoItem
-                            videoUrl={item.video_url || ''}
-                            title=""
-                            poster={item.image_url || undefined}
-                            isVerticalVideo={item.is_vertical_video}
-                          />
-                        ) : (
-                          <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-black/40">
-                            {item.image_url && (
-                              <img
-                                src={item.image_url}
-                                alt={item.title}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                {(() => {
+                  const isGraphicClient = isGraphicDesignContext(client.specialization);
+
+                  if (isGraphicClient) {
+                    return (
+                      <>
+                        <div className="relative">
+                          {canScrollLeft && (
+                            <button
+                              type="button"
+                              aria-label="السابق"
+                              onClick={() => scrollByAmount('left')}
+                              className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 hover:bg-red-600 transition-colors"
+                            >
+                              <ChevronRight className="h-6 w-6 rtl:rotate-180" />
+                            </button>
+                          )}
+                          {canScrollRight && (
+                            <button
+                              type="button"
+                              aria-label="التالي"
+                              onClick={() => scrollByAmount('right')}
+                              className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 hover:bg-red-600 transition-colors"
+                            >
+                              <ChevronLeft className="h-6 w-6 rtl:rotate-180" />
+                            </button>
+                          )}
+                          <div
+                            ref={galleryRef}
+                            className="flex gap-6 overflow-x-auto overflow-y-hidden pb-6 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                          >
+                            {contents.map((item) => (
+                              <div
+                                key={item.id}
+                                className="group relative shrink-0 snap-center rounded-xl overflow-hidden"
+                              >
+                                {item.content_type === 'video' ? (
+                                  <VideoItem
+                                    videoUrl={item.video_url || ''}
+                                    title=""
+                                    poster={item.image_url || undefined}
+                                    isVerticalVideo={item.is_vertical_video}
+                                  />
+                                ) : item.image_url ? (
+                                  <img
+                                    src={item.image_url}
+                                    alt={item.title}
+                                    className="block w-auto h-auto rounded-xl transition-transform duration-300 group-hover:scale-[1.02]"
+                                    style={{ maxWidth: 'none', maxHeight: 'none' }}
+                                    loading="lazy"
+                                    draggable={false}
+                                  />
+                                ) : (
+                                  <div className="h-64 w-96 bg-[#203158] rounded-xl flex items-center justify-center text-gray-400 text-sm">
+                                    لا توجد صورة
+                                  </div>
+                                )}
+                                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-b-xl">
+                                  <h4 className="text-white font-semibold text-sm mb-1 break-all">
+                                    {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
+                                  </h4>
+                                  {(item.description || item.description_en) && (
+                                    <p className="text-gray-200 text-xs line-clamp-2 leading-relaxed">
+                                      {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  }
+
+                  return (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {contents.map((item) => (
+                        <div key={item.id} className="bg-transparent rounded-2xl overflow-visible border-0 group transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                          {/* الميديا - فيديو أو صورة بمقاسها الطبيعي */}
+                          {item.content_type === 'video' ? (
+                            <div className="relative">
+                              <VideoItem
+                                videoUrl={item.video_url || ''}
+                                title=""
+                                poster={item.image_url || undefined}
+                                isVerticalVideo={item.is_vertical_video}
                               />
+                            </div>
+                          ) : item.image_url ? (
+                            <img
+                              src={item.image_url}
+                              alt={item.title}
+                              className="block w-auto h-auto rounded-xl"
+                              style={{ maxWidth: 'none', maxHeight: 'none' }}
+                              loading="lazy"
+                              draggable={false}
+                            />
+                          ) : null}
+
+                          {/* المحتوى النصي - تحت الميديا */}
+                          <div className="p-4">
+                            <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300 break-all">
+                              {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
+                            </h4>
+                            {(item.description || item.description_en) && (
+                              <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
+                                {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
+                              </p>
                             )}
                           </div>
-                        )}
-                      </div>
-
-                      {/* المحتوى النصي - تحت الميديا */}
-                      <div className="p-5 bg-[#203158]">
-                        <h4 className="text-lg font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300 break-all">
-                          {linkifyText(language === 'en' ? (item.title_en || item.title) || '' : item.title || '')}
-                        </h4>
-                        {(item.description || item.description_en) && (
-                          <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                            {linkifyText(language === 'en' ? (item.description_en || item.description) || '' : item.description || '')}
-                          </p>
-                        )}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                    </>
+                  );
+                })()}
               </div>
             </ContentProtection>
           ) : (

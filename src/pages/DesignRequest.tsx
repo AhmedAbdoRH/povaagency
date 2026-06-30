@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Send } from 'lucide-react';
+import { Upload, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const DesignRequest = () => {
@@ -12,6 +12,37 @@ const DesignRequest = () => {
     files: [] as File[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollButtons = () => {
+    const el = galleryRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+    const el = galleryRef.current;
+    if (!el) return;
+    const onScroll = () => updateScrollButtons();
+    const onResize = () => updateScrollButtons();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+
+  const scrollByAmount = (direction: 'left' | 'right') => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.85, 400);
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -97,10 +128,38 @@ const DesignRequest = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-[#162341] rounded-2xl p-8 mb-8 border border-gray-800"
+              className="rounded-2xl p-8 mb-8"
             >
               <h2 className="text-2xl font-bold text-white mb-6 text-center">سابقة أعمالنا</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              {/* Horizontal scrolling gallery - each work shows at its full natural size */}
+              <div className="relative">
+                {canScrollLeft && (
+                  <button
+                    type="button"
+                    aria-label="السابق"
+                    onClick={() => scrollByAmount('left')}
+                    className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 hover:bg-red-600 transition-colors"
+                  >
+                    {/* In RTL, the "back" button sits on the right; the arrow points right (toward the start) */}
+                    <ChevronRight className="h-6 w-6 rtl:rotate-180" />
+                  </button>
+                )}
+                {canScrollRight && (
+                  <button
+                    type="button"
+                    aria-label="التالي"
+                    onClick={() => scrollByAmount('right')}
+                    className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30 hover:bg-red-600 transition-colors"
+                  >
+                    {/* In RTL, the "forward" button sits on the left; the arrow points left (toward the end) */}
+                    <ChevronLeft className="h-6 w-6 rtl:rotate-180" />
+                  </button>
+                )}
+                <div
+                  ref={galleryRef}
+                  className="flex gap-6 overflow-x-auto overflow-y-hidden pb-6 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                >
                 {[
                   { title: 'هوية بصرية متكاملة', category: 'هوية بصرية', image: '/work1.jpg' },
                   { title: 'حملة تسويق رقمي', category: 'تسويق', image: '/work2.jpg' },
@@ -109,31 +168,30 @@ const DesignRequest = () => {
                   { title: 'موشن جرافيك', category: 'موشن', image: '/work5.jpg' },
                   { title: 'إدارة سوشيال ميديا', category: 'سوشيال ميديا', image: '/work6.jpg' }
                 ].map((work, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                    className="group cursor-pointer"
+                    className="group relative shrink-0 snap-center rounded-xl overflow-hidden"
                   >
-                    <div className="aspect-[4/3] bg-[#203158] rounded-xl overflow-hidden mb-4">
-                      <img 
-                        src={work.image} 
-                        alt={work.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder-work.jpg';
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-white font-semibold text-sm mb-1">{work.title}</h3>
-                        <span className="text-accent text-xs">{work.category}</span>
-                      </div>
+                    <img
+                      src={work.image}
+                      alt={work.title}
+                      className="block h-auto max-h-[80vh] w-auto max-w-[90vw] object-contain rounded-xl transition-transform duration-300 group-hover:scale-[1.02]"
+                      loading="lazy"
+                      draggable={false}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-work.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <h3 className="text-white font-semibold text-sm mb-1">{work.title}</h3>
+                      <span className="text-accent text-xs">{work.category}</span>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
+                </div>
               </div>
+
               <p className="text-center text-gray-400 mt-6">
                 هذه نماذج قليلة من أعمالنا. نحن مستعدون لتنفيذ مشاريع مماثلة وأكثر إبداعاً لمشروعك.
               </p>
