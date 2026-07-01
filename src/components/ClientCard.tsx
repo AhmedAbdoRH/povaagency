@@ -52,17 +52,17 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   // isVerticalVideo = true أو undefined يعني طولي (افتراضي)
   const isHorizontalVideo = isVerticalVideo === false;
 
-  const mediaStyle: React.CSSProperties | undefined = isExternal
-    ? { aspectRatio: '1720 / 1080' }
-    : isHorizontalVideo
-      ? (showVideoAtNaturalRatio
-          ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
-          : isVideoEmbed
-            ? { aspectRatio: '16 / 9' }
-            : hasVideo
-              ? undefined
-              : { aspectRatio: '1 / 1' })
-      : { aspectRatio: '1 / 1' }; // مربع افتراضي
+  const mediaStyle: React.CSSProperties | undefined = hasVideo
+    ? (isHorizontalVideo
+        ? (showVideoAtNaturalRatio
+            ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
+            : isVideoEmbed
+              ? { aspectRatio: '16 / 9' }
+              : undefined)
+        : (showVideoAtNaturalRatio
+            ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
+            : { aspectRatio: '1 / 1' }))
+    : { aspectRatio: '1 / 1' }; // صور/لوجو بدون فيديو: مربع 1:1 في كل الحالات
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();

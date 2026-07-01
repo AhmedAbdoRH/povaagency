@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Download, Users, X, ZoomIn } from 'lucide-react';
+import { Edit, Trash2, Download, Users, X, ZoomIn, Plus } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
@@ -262,6 +262,121 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     scrollToForm();
   };
 
+  const handleAddDirectWork = async (item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
+    const pageId = item.page?.id;
+    if (!pageId) {
+      toast.error('لا يمكن العثور على الصفحة المرتبطة بالخدمة');
+      return;
+    }
+
+    try {
+      // Step 1: Ensure there is at least one service for the page
+      let serviceId = '';
+      const pageServices = services.filter(s => s.page_id === pageId);
+      if (pageServices.length === 0) {
+        // Create a default service
+        const page = pages.find(p => p.id === pageId);
+        if (!page) {
+          throw new Error('الصفحة غير موجودة');
+        }
+        const { data: newService, error: serviceError } = await supabase
+          .from('services')
+          .insert([{
+            page_id: pageId,
+            name: page.name || 'خدمة افتراضية',
+            name_en: page.name_en || 'Default Service',
+            description: page.description || '',
+            description_en: page.description_en || '',
+            image_url: page.image_url || '',
+            is_active: true,
+            display_order: 0,
+          }])
+          .select()
+          .single();
+
+        if (serviceError) throw serviceError;
+        serviceId = newService.id;
+      } else {
+        serviceId = pageServices[0].id;
+      }
+
+      // Step 2: Ensure there is at least one specialization for the service
+      let specializationId = '';
+      const serviceSpecializations = specializations.filter(s => s.service_id === serviceId);
+      if (serviceSpecializations.length === 0) {
+        // Create a default specialization
+        const { data: newSpec, error: specError } = await supabase
+          .from('specializations')
+          .insert([{
+            service_id: serviceId,
+            name: 'المحفظة',
+            name_en: 'Portfolio',
+            description: '',
+            description_en: '',
+            image_url: '',
+            is_active: true,
+            display_order: 0,
+          }])
+          .select()
+          .single();
+
+        if (specError) throw specError;
+        specializationId = newSpec.id;
+      } else {
+        specializationId = serviceSpecializations[0].id;
+      }
+
+      // Step 3: Ensure there is at least one client for the specialization
+      let clientId = '';
+      const specializationClients = clients.filter(c => c.specialization_id === specializationId);
+      if (specializationClients.length === 0) {
+        // Create a default client
+        const { data: newClient, error: clientError } = await supabase
+          .from('clients')
+          .insert([{
+            specialization_id: specializationId,
+            name: 'العملاء الرئيسيين',
+            name_en: 'Main Clients',
+            description: '',
+            description_en: '',
+            image_url: '',
+            project_url: '',
+            logo_url: '',
+            is_active: true,
+            display_order: 0,
+          }])
+          .select()
+          .single();
+
+        if (clientError) throw clientError;
+        clientId = newClient.id;
+      } else {
+        clientId = specializationClients[0].id;
+      }
+
+      // Step 4: Set the content form and open it
+      setContentForm({
+        ...emptyContentForm,
+        client_id: clientId,
+        title: '',
+        description: '',
+        image_url: '',
+        video_url: '',
+        is_vertical_video: false,
+        content_type: 'image' as const,
+      });
+      setActiveForm('content');
+      scrollToForm();
+
+      // Refresh data to update the lists
+      await fetchData();
+
+      toast.success('تم إعداد البيئة لإضافة عمل مباشر. يمكنك الآن إضافة المحتوى.');
+    } catch (err: any) {
+      toast.error(`خطأ: ${err.message}`);
+    }
+  };
+
   const renderTopCard = (item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
     const linkedPage = item.page;
     return (
@@ -311,6 +426,19 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             <Edit className="h-4 w-4" />
             <span className="text-sm">تعديل</span>
           </button>
+          {item.slug === 'marketing-strategy' && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddDirectWork(item);
+              }}
+              className="pointer-events-auto z-30 flex items-center justify-center gap-2 rounded-xl bg-white/90 px-4 py-2.5 text-gray-900 font-bold hover:bg-white transition-all duration-300 shadow-lg hover:shadow-xl"
+              title="إضافة عمل مباشر"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="text-sm">إضافة عمل مباشر</span>
+            </button>
+          )}
         </div>
 
         <item.icon

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '../lib/supabase';
-import type { Page } from '../types/database';
+import type { Page, Client } from '../types/database';
 import {
   findCoreServiceBySlug,
   resolveCoreServicesWithPages,
@@ -17,6 +17,7 @@ export default function ServiceDetails() {
   const [coreService, setCoreService] = useState<CoreServiceDefinition | null>(null);
   const [page, setPage] = useState<Page | null>(null);
   const [sections, setSections] = useState<SpecializationWithClients[]>([]);
+  const [directClients, setDirectClients] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,11 +102,54 @@ export default function ServiceDetails() {
       }));
 
       setSections(normalizedSections);
+      // For marketing-strategy, if no sections, fetch direct clients
+      if (selectedCoreService?.slug === 'marketing-strategy' && normalizedSections.length === 0 && resolvedPage) {
+        await fetchDirectClients(resolvedPage.id);
+      }
     } catch (err: any) {
       console.error('Error loading core service page:', err);
       setError(err.message || 'تعذر تحميل بيانات الخدمة.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchDirectClients = async (pageId: string) => {
+    try {
+      const { data: servicesData, error: servicesError } = await supabase
+        .from('services')
+        .select('id')
+        .eq('page_id', pageId)
+        .eq('is_active', true);
+      if (servicesError) throw servicesError;
+      const serviceIds = servicesData.map(s => s.id);
+      if (serviceIds.length === 0) {
+        setDirectClients([]);
+        return;
+      }
+      const { data: specsData, error: specsError } = await supabase
+        .from('specializations')
+        .select('id')
+        .in('service_id', serviceIds)
+        .eq('is_active', true);
+      if (specsError) throw specsError;
+      const specIds = specsData.map(s => s.id);
+      if (specIds.length === 0) {
+        setDirectClients([]);
+        return;
+      }
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('clients')
+        .select('*, client_content(*)')
+        .in('specialization_id', specIds)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (clientsError) throw clientsError;
+      setDirectClients(clientsData || []);
+    } catch (err) {
+      console.error('Error fetching direct clients:', err);
+      setDirectClients([]);
     }
   };
 

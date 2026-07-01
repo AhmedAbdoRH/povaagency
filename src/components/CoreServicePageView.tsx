@@ -13,6 +13,7 @@ const defaultTranslations: Record<string, string> = {
   'coreServicePage.noPageLinked': 'لا توجد صفحة مرتبطة بهذه الخدمة',
   'coreServicePage.noSections': 'لا توجد أقسام متاحة',
   'coreServicePage.noWorksInSection': 'لا توجد أعمال في هذا القسم',
+  'coreServicePage.portfolio': 'سيرة الأعمال', // fallback for portfolio title
 };
 
 export interface SpecializationWithClients {
@@ -38,6 +39,8 @@ interface CoreServicePageViewProps {
   coreService: CoreServiceDefinition;
   page: Page | null;
   sections: SpecializationWithClients[];
+  /** Optional direct clients to show when there are no sections (e.g., for marketing strategy) */
+  directClients?: Client[];
 }
 
 type SectionLike = Pick<
@@ -70,9 +73,13 @@ export default function CoreServicePageView({
   coreService,
   page,
   sections,
+  directClients,
 }: CoreServicePageViewProps) {
   const { language, t } = useLanguage();
   const [shuffleSeed] = useState(() => Math.floor(Math.random() * 2 ** 32));
+
+  // Check if this is marketing-strategy page
+  const isMarketingStrategy = coreService.slug === 'marketing-strategy';
 
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
@@ -180,28 +187,31 @@ export default function CoreServicePageView({
                 </div>
               ) : (
                 <>
-                  <div className="mb-8 flex flex-wrap gap-2">
-                    {sectionsWithAll.map(section => (
-                      <button
-                        key={section.id}
-                        type="button"
-                        onClick={() => setSelectedSectionId(section.id)}
-                        className={`rounded-xl border px-3 py-2 text-sm text-right transition-all backdrop-blur-md ${
-                          selectedSectionId === section.id
-                            ? 'border-accent bg-accent text-white shadow-lg shadow-accent/20'
-                            : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
-                        }`}
-                      >
-                        <div className="font-bold">
-                          {section.id === ALL_SECTION_ID
-                            ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
-                            : language === 'en'
-                              ? (section.name_en || section.name)
-                              : section.name}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                  {/* Hide section buttons for marketing-strategy */}
+                  {!isMarketingStrategy && (
+                    <div className="mb-8 flex flex-wrap gap-2">
+                      {sectionsWithAll.map(section => (
+                        <button
+                          key={section.id}
+                          type="button"
+                          onClick={() => setSelectedSectionId(section.id)}
+                          className={`rounded-xl border px-3 py-2 text-sm text-right transition-all backdrop-blur-md ${
+                            selectedSectionId === section.id
+                              ? 'border-accent bg-accent text-white shadow-lg shadow-accent/20'
+                              : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
+                          }`}
+                        >
+                          <div className="font-bold">
+                            {section.id === ALL_SECTION_ID
+                              ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
+                              : language === 'en'
+                                ? (section.name_en || section.name)
+                                : section.name}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {selectedSection && (
                     <>
