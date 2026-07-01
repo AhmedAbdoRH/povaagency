@@ -78,8 +78,8 @@ export default function CoreServicePageView({
   const { language, t } = useLanguage();
   const [shuffleSeed] = useState(() => Math.floor(Math.random() * 2 ** 32));
 
-  // Check if this is marketing-strategy page
-  const isMarketingStrategy = coreService.slug === 'marketing-strategy';
+  // Check if this is marketing-strategy or content-creation page (hide section buttons)
+  const hideSectionButtons = coreService.slug === 'marketing-strategy' || coreService.slug === 'content-creation';
 
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
@@ -187,8 +187,8 @@ export default function CoreServicePageView({
                 </div>
               ) : (
                 <>
-                  {/* Hide section buttons for marketing-strategy */}
-                  {!isMarketingStrategy && (
+                  {/* Hide section buttons for marketing-strategy and content-creation */}
+                  {!hideSectionButtons && (
                     <div className="mb-8 flex flex-wrap gap-2">
                       {sectionsWithAll.map(section => (
                         <button

@@ -102,8 +102,12 @@ export default function ServiceDetails() {
       }));
 
       setSections(normalizedSections);
-      // For marketing-strategy, if no sections, fetch direct clients
-      if (selectedCoreService?.slug === 'marketing-strategy' && normalizedSections.length === 0 && resolvedPage) {
+      // For marketing-strategy and content-creation, if no sections, fetch direct clients
+      if (
+        (selectedCoreService?.slug === 'marketing-strategy' || selectedCoreService?.slug === 'content-creation') && 
+        normalizedSections.length === 0 && 
+        resolvedPage
+      ) {
         await fetchDirectClients(resolvedPage.id);
       }
     } catch (err: any) {
