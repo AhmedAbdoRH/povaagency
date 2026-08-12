@@ -20,6 +20,9 @@ export default defineConfig({
     },
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
+    // Output directory for Cloudflare Pages
+    outDir: 'dist',
+    emptyOutDir: true,
   },
   optimizeDeps: {
     include: [

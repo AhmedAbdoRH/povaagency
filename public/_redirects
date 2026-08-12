@@ -1,3 +1,6 @@
+# SPA routing - fallback for regular users
+/* /index.html 200
+
 # Prerender.io integration with token-based authentication
-/*  https://service.prerender.io/https://designs4u.com/:splat  200!  X-Prerender-Token=V85u5WS8kbxdXKCF5KuR  User-Agent=Googlebot|Bingbot|Yandex|DuckDuckBot|Baiduspider|facebookexternalhit|twitterbot|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator
-/*    /index.html   200
+# Note: This needs to be configured in Cloudflare Functions or Workers
+# as Cloudflare Pages doesn't support conditional redirects based on User-Agent
