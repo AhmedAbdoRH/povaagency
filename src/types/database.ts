@@ -1,3 +1,10 @@
+export interface PageLinkItem {
+  id?: string;
+  title?: string;
+  url: string;
+  type?: 'drive' | 'youtube' | 'link';
+}
+
 export interface Page {
   id: string;
   name: string;
@@ -6,6 +13,10 @@ export interface Page {
   description_en: string | null;
   image_url: string | null; // الصورة الرئيسية المربعة
   banner_url: string | null; // البانر
+  drive_url?: string | null; // رابط جوجل درايف
+  google_drive_url?: string | null; // اسم بديل لرابط جوجل درايف
+  youtube_url?: string | null; // رابط يوتيوب
+  custom_links?: PageLinkItem[] | string | null; // روابط إضافية
   is_active: boolean;
   display_order: number;
   created_at: string;

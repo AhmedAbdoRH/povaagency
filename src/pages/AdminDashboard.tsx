@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Download, Users, X, ZoomIn, Plus } from 'lucide-react';
+import { Edit, Trash2, Download, Users, X, ZoomIn, Plus, Play, ExternalLink, Video } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
 import type { Client, ClientContent, Page, Service, Specialization } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { optimizeImage, isImageFile } from '../utils/imageOptimization';
+import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos } from '../utils/pageLinks';
 
 type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | null;
 
@@ -14,7 +15,15 @@ interface AdminDashboardProps {
   onSettingsUpdate?: () => void;
 }
 
-const emptyPageForm = { name: '', name_en: '', description: '', description_en: '', image_url: '' };
+const emptyPageForm = {
+  name: '',
+  name_en: '',
+  description: '',
+  description_en: '',
+  image_url: '',
+  drive_url: '',
+  additional_videos: [] as { id: string; title: string; url: string }[],
+};
 const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '' };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
@@ -167,10 +176,52 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   const savePage = async (e: React.FormEvent) => {
     e.preventDefault();
-    const op = editingPage ? supabase.from('pages').update(pageForm).eq('id', editingPage) : supabase.from('pages').insert([pageForm]);
-    const { error } = await op;
+    const cleanDesc = cleanPageDescription(pageForm.description);
+    const cleanDescEn = cleanPageDescription(pageForm.description_en);
+    const driveUrl = pageForm.drive_url?.trim() || null;
+    const additionalVideos = (pageForm.additional_videos || []).filter(v => v.url && v.url.trim());
+
+    // Encode in description for fallback persistence
+    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos);
+
+    const fullPayload: any = {
+      name: pageForm.name,
+      name_en: pageForm.name_en || null,
+      description: encodedDesc,
+      description_en: cleanDescEn || null,
+      image_url: pageForm.image_url || null,
+      drive_url: driveUrl,
+      custom_links: additionalVideos.length > 0 ? additionalVideos : null,
+    };
+
+    let op = editingPage 
+      ? supabase.from('pages').update(fullPayload).eq('id', editingPage) 
+      : supabase.from('pages').insert([fullPayload]);
+    
+    let { error } = await op;
+
+    // If Supabase table doesn't have the new columns yet, fall back without columns
+    if (error && (
+      error.message.includes('drive_url') || 
+      error.message.includes('custom_links') ||
+      error.message.includes('column')
+    )) {
+      const fallbackPayload = {
+        name: pageForm.name,
+        name_en: pageForm.name_en || null,
+        description: encodedDesc,
+        description_en: cleanDescEn || null,
+        image_url: pageForm.image_url || null,
+      };
+      const fallbackOp = editingPage 
+        ? supabase.from('pages').update(fallbackPayload).eq('id', editingPage) 
+        : supabase.from('pages').insert([fallbackPayload]);
+      const fallbackRes = await fallbackOp;
+      error = fallbackRes.error;
+    }
+
     if (error) return toast.error(`خطأ: ${error.message}`);
-    toast.success(editingPage ? 'تم تحديث الخدمة الرئيسية.' : 'تم ربط الخدمة الرئيسية.');
+    toast.success(editingPage ? 'تم تحديث الخدمة الرئيسية وفيديوهات Google Drive بنجاح.' : 'تم ربط الخدمة وفيديوهات Google Drive بنجاح.');
     resetForms();
     await fetchData();
   };
@@ -241,21 +292,26 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     e.stopPropagation();
     if (linkedPage) {
       setEditingPage(linkedPage.id);
+      const extracted = extractDriveVideos(linkedPage);
       setPageForm({
         name: linkedPage.name,
         name_en: linkedPage.name_en || '',
-        description: linkedPage.description || '',
-        description_en: linkedPage.description_en || '',
-        image_url: linkedPage.image_url || ''
+        description: cleanPageDescription(linkedPage.description || ''),
+        description_en: cleanPageDescription(linkedPage.description_en || ''),
+        image_url: linkedPage.image_url || '',
+        drive_url: extracted.primary_url || '',
+        additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url })),
       });
     } else {
       setEditingPage(null);
       setPageForm({
         name: item.title,
         name_en: '',
-        description: item.description,
+        description: cleanPageDescription(item.description),
         description_en: '',
-        image_url: ''
+        image_url: '',
+        drive_url: '',
+        additional_videos: [],
       });
     }
     setActiveForm('page');
@@ -491,6 +547,129 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   <input value={pageForm.name_en} onChange={e => setPageForm({ ...pageForm, name_en: e.target.value })} placeholder="اسم الخدمة الرئيسية (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description} onChange={e => setPageForm({ ...pageForm, description: e.target.value })} placeholder="وصف الخدمة الرئيسية" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={pageForm.description_en} onChange={e => setPageForm({ ...pageForm, description_en: e.target.value })} placeholder="وصف الخدمة الرئيسية (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
+
+                  {/* قسم فيديوهات الخدمة من Google Drive فقط */}
+                  <div className="rounded-2xl border border-blue-500/30 bg-blue-950/20 p-5 space-y-4">
+                    <div className="flex items-center gap-2.5 border-b border-blue-500/20 pb-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        <Video className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-blue-200 flex items-center gap-2">
+                          <span>فيديوهات الخدمة من Google Drive</span>
+                          <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full font-normal">
+                            مشغل مدمج
+                          </span>
+                        </h4>
+                        <p className="text-xs text-gray-400">
+                          تظهر الفيديوهات بمشغل مدمج مباشرة تحت وصف الخدمة وقبل أزرار الأقسام
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* حقل رابط فيديو Google Drive الرئيسي */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <label className="font-semibold text-gray-200 flex items-center gap-1.5">
+                          <Play className="h-3.5 w-3.5 text-blue-400 fill-current" />
+                          <span>رابط فيديو Google Drive الرئيسي:</span>
+                        </label>
+                        {pageForm.drive_url && (
+                          <a
+                            href={pageForm.drive_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 flex items-center gap-1 underline"
+                          >
+                            <span>فتح للتجربة</span>
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
+                      </div>
+                      <input
+                        type="url"
+                        value={pageForm.drive_url}
+                        onChange={e => setPageForm({ ...pageForm, drive_url: e.target.value })}
+                        placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
+                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                      />
+                      <p className="text-[11px] text-gray-400 leading-relaxed">
+                        💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
+                      </p>
+                    </div>
+
+                    {/* فيديوهات Google Drive إضافية */}
+                    <div className="pt-2 border-t border-white/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-gray-300 font-medium">
+                          فيديوهات Google Drive إضافية (اختياري):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPageForm({
+                            ...pageForm,
+                            additional_videos: [
+                              ...(pageForm.additional_videos || []),
+                              { id: `vid_${Date.now()}`, title: '', url: '' }
+                            ]
+                          })}
+                          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20"
+                        >
+                          <Plus className="h-3 w-3" />
+                          <span>إضافة فيديو درايف آخر</span>
+                        </button>
+                      </div>
+
+                      {(pageForm.additional_videos || []).map((vid, idx) => (
+                        <div key={vid.id || idx} className="flex items-center gap-2 mt-2 bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                          <input
+                            type="text"
+                            value={vid.title || ''}
+                            onChange={e => {
+                              const updated = [...(pageForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], title: e.target.value };
+                              setPageForm({ ...pageForm, additional_videos: updated });
+                            }}
+                            placeholder="عنوان الفيديو (مثلاً: استعراض تفصيلي)"
+                            className="w-1/3 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                          />
+                          <input
+                            type="url"
+                            value={vid.url}
+                            onChange={e => {
+                              const updated = [...(pageForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], url: e.target.value };
+                              setPageForm({ ...pageForm, additional_videos: updated });
+                            }}
+                            placeholder="رابط الفيديو في درايف https://drive.google.com/file/d/..."
+                            className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                          />
+                          {vid.url && (
+                            <a
+                              href={vid.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-blue-400 hover:text-blue-300"
+                              title="تجربة الرابط"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = (pageForm.additional_videos || []).filter((_, i) => i !== idx);
+                              setPageForm({ ...pageForm, additional_videos: updated });
+                            }}
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg"
+                            title="حذف الفيديو"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
                   {pageForm.image_url && (
                     <div className="relative rounded-xl overflow-hidden">

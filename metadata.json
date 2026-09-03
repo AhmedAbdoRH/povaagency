@@ -1,0 +1,6 @@
+{
+  "name": "POVA Agency",
+  "description": "Integrated digital marketing, branding, content production, and advertising agency web application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

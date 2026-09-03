@@ -37,6 +37,8 @@ export default defineConfig({
   },
   // Enable gzip compression
   server: {
+    host: '0.0.0.0',
+    port: 3000,
     headers: {
       'Cache-Control': 'no-store',
     },

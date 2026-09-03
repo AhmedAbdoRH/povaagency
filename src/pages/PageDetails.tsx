@@ -29,7 +29,7 @@ export default function PageDetails() {
 
       const { data: allPagesData, error: allPagesError } = await supabase
         .from('pages')
-        .select('id, name, name_en, description, description_en, image_url, banner_url, is_active, display_order, created_at, updated_at')
+        .select('*')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: true });
 

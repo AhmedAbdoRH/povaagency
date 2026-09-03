@@ -336,6 +336,10 @@
     "all": "الكل",
     "noPageLinked": "لم يتم ربط هذه الخدمة ببياناتها في قاعدة البيانات بعد.",
     "noSections": "لا توجد أقسام مضافة لهذه الخدمة حتى الآن.",
-    "noWorksInSection": "لا توجد أعمال داخل هذا القسم حتى الآن."
+    "noWorksInSection": "لا توجد أعمال داخل هذا القسم حتى الآن.",
+    "serviceVideos": "فيديوهات الخدمة من Google Drive",
+    "singleServiceVideo": "فيديو تعريفي للخدمة",
+    "openInDrive": "فتح الفيديو على Google Drive",
+    "drivePlayer": "مشغل Google Drive"
   }
 }

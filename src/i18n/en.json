@@ -335,6 +335,10 @@
     "all": "All",
     "noPageLinked": "This service has not been linked to its data in the database yet.",
     "noSections": "No sections added for this service yet.",
-    "noWorksInSection": "No works within this section yet."
+    "noWorksInSection": "No works within this section yet.",
+    "serviceVideos": "Service Videos (Google Drive)",
+    "singleServiceVideo": "Service Walkthrough Video",
+    "openInDrive": "Open in Google Drive",
+    "drivePlayer": "Google Drive Player"
   }
 }

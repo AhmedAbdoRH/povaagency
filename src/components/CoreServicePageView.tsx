@@ -4,6 +4,8 @@ import type { Client, Page } from '../types/database';
 import type { CoreServiceDefinition } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import ClientCard from './ClientCard';
+import ServiceDriveVideos from './ServicePageLinks';
+import { cleanPageDescription } from '../utils/pageLinks';
 
 // Default translations fallback
 const defaultTranslations: Record<string, string> = {
@@ -130,9 +132,10 @@ export default function CoreServicePageView({
 
   const HeroIcon = coreService.icon;
   const heroImage = page?.banner_url || page?.image_url || null;
-  const summary = language === 'en' 
+  const rawSummary = language === 'en' 
     ? (page?.description_en || page?.description || coreService.description)
     : (page?.description || coreService.description);
+  const summary = cleanPageDescription(rawSummary);
   const pageTitle = language === 'en'
     ? (page?.name_en || page?.name || coreService.title)
     : (page?.name || coreService.title);
@@ -174,6 +177,9 @@ export default function CoreServicePageView({
               <p className="max-w-3xl text-lg leading-8 text-gray-200">
                 {summary}
               </p>
+
+              {/* فيديوهات Google Drive التوضيحية تحت وصف الخدمة مباشرة */}
+              <ServiceDriveVideos page={page} />
             </div>
 
             <div className="border-t border-white/10 pt-10">

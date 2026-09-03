@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const formatDescription = (description: string): string | React.ReactNode[] => {
   if (!description) return '';
   
