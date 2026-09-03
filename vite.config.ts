@@ -39,15 +39,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
-    headers: {
-      'Cache-Control': 'no-store',
-    },
-    watch: {
-      usePolling: false,
-      interval: 1000,
-    },
-    hmr: {
-      overlay: true,
-    },
+    strictPort: true,
   },
 });
