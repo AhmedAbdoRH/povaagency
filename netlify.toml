@@ -7,7 +7,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
+    X-Frame-Options = "SAMEORIGIN"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
@@ -57,24 +57,8 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Prerender.io integration with token-based authentication
-[[redirects]]
-  from = "/*"
-  to = "https://service.prerender.io/https://designs4u.com/:splat"
-  status = 200
-  force = false
-  headers = {X-Prerender-Token = "V85u5WS8kbxdXKCF5KuR"}
-  conditions = {User-Agent = ["Googlebot", "Bingbot", "Yandex", "DuckDuckBot", "Baiduspider", "facebookexternalhit", "twitterbot", "rogerbot", "linkedinbot", "embedly", "quora link preview", "showyoubot", "outbrain", "pinterest", "slackbot", "vkShare", "W3C_Validator"]}
-
 # SPA routing - fallback for regular users
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Redirect www to non-www
-[[redirects]]
-  from = "https://www.designs4u.com/*"
-  to = "https://designs4u.com/:splat"
-  status = 301
-  force = true

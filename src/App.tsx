@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { AnimatePresence } from 'framer-motion';
 import { supabase } from './lib/supabase';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
@@ -31,7 +30,6 @@ import CompanyValues from './components/CompanyValues';
 import DigitalMarketingBenefits from './components/DigitalMarketingBenefits';
 import BrandDifferentiation from './components/BrandDifferentiation';
 import MarketingCoreServices from './components/MarketingCoreServices';
-import LoadingScreen from './components/LoadingScreenNew';
 import type { StoreSettings, Banner } from './types/database';
 import { ThemeProvider } from './theme/ThemeContext';
 
@@ -123,15 +121,9 @@ function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    
-    // Auto-dismiss splash screen after at most 800ms
-    const splashTimer = setTimeout(() => {
-      if (isMounted) setShowSplash(false);
-    }, 800);
 
     async function initApp() {
       try {
@@ -169,7 +161,6 @@ function App() {
     initApp();
     return () => { 
       isMounted = false;
-      clearTimeout(splashTimer);
     };
   }, []);
 
@@ -187,14 +178,6 @@ function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <AnimatePresence>
-          {showSplash && (
-            <LoadingScreen 
-              logoUrl={storeSettings?.logo_url || 'https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png'} 
-              onFinish={() => setShowSplash(false)}
-            />
-          )}
-        </AnimatePresence>
         <Helmet>
           <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
           <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
