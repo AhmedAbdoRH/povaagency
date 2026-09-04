@@ -8,7 +8,6 @@ interface LoadingScreenProps {
 
 export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Progress animation
@@ -16,26 +15,31 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Hide loading screen after completion
           setTimeout(() => {
-            setIsVisible(false);
             onFinish?.();
-          }, 500);
+          }, 300);
           return 100;
         }
-        return prev + Math.random() * 10 + 5;
+        return Math.min(100, prev + Math.random() * 15 + 10);
       });
-    }, 100);
+    }, 70);
 
-    return () => clearInterval(progressInterval);
+    // Guaranteed fallback timer to never block rendering beyond 1.8s
+    const fallbackTimer = setTimeout(() => {
+      clearInterval(progressInterval);
+      onFinish?.();
+    }, 1800);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(fallbackTimer);
+    };
   }, [onFinish]);
-
-  if (!isVisible) return null;
 
   return (
     <motion.div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0c1426]"
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}

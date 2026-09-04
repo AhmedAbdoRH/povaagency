@@ -102,10 +102,25 @@ const Layout = ({ children, banners: layoutBanners, storeSettings }: LayoutProps
   );
 };
 
-function App() {
-  const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
-  const [banners, setBanners] = useState<Banner[]>([]);
+const DEFAULT_STORE_SETTINGS: StoreSettings = {
+  id: '00000000-0000-0000-0000-000000000001',
+  store_name: 'POVA Agency',
+  store_description: 'وكالة تسويق رقمي متكاملة لتصميم الهوية وإنتاج المحتوى والإعلانات',
+  logo_url: 'https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png',
+  meta_title: 'POVA | وكالة تسويق رقمي متكاملة',
+  meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
+  theme_settings: {
+    primaryColor: '#ffffff',
+    secondaryColor: '#f8f9fa',
+    fontFamily: 'Cairo, sans-serif',
+    backgroundColor: '#ffffff',
+    backgroundGradient: ''
+  }
+} as StoreSettings;
 
+function App() {
+  const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [isAppLoading, setIsAppLoading] = useState(true);
 
@@ -113,45 +128,35 @@ function App() {
     let isMounted = true;
     async function initApp() {
       try {
-        // Fetch all essential data in parallel for speed and stability
-        const [settingsRes, bannersRes, pagesRes] = await Promise.all([
+        // Safe fetch with 1500ms timeout to ensure app NEVER gets stuck on loading screen
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Fetch timeout')), 1500)
+        );
+
+        const fetchPromise = Promise.all([
           supabase.from('store_settings').select('*').limit(1).maybeSingle(),
           supabase.from('banners').select('*').order('created_at', { ascending: false }),
           supabase.from('pages').select('*').order('name')
         ]);
 
-        if (isMounted) {
-          // Handle Store Settings
-          if (settingsRes.data) {
-            setStoreSettings(settingsRes.data);
-          } else {
-            setStoreSettings({
-              id: '00000000-0000-0000-0000-000000000001',
-              store_name: 'POVA Agency',
-              store_description: 'وكالة تسويق رقمي متكاملة',
-              logo_url: '/agency-logo.png',
-              meta_title: 'POVA | وكالة تسويق رقمي',
-              meta_description: 'نقدم حلول تسويقية مبتكرة لتنمية أعمالك',
-              theme_settings: {
-                primaryColor: '#ffffff',
-                secondaryColor: '#f8f9fa',
-                fontFamily: 'Cairo, sans-serif',
-                backgroundColor: '#ffffff',
-                backgroundGradient: ''
-              }
-            } as StoreSettings);
-          }
+        const [settingsRes, bannersRes, pagesRes] = (await Promise.race([
+          fetchPromise,
+          timeoutPromise
+        ])) as any;
 
-          // Handle other data
-          setBanners(bannersRes.data || []);
-          setCategories(pagesRes.data || []);
-          
-          // Signal that the app is ready
-          setIsAppLoading(false);
+        if (isMounted) {
+          if (settingsRes?.data) {
+            setStoreSettings(settingsRes.data);
+          }
+          if (bannersRes?.data) {
+            setBanners(bannersRes.data);
+          }
+          if (pagesRes?.data) {
+            setCategories(pagesRes.data);
+          }
         }
       } catch (error) {
-        console.error("Critical error during app initialization:", error);
-        if (isMounted) setIsAppLoading(false);
+        console.warn("App initialized with fallback data:", error);
       }
     }
     
@@ -174,7 +179,10 @@ function App() {
 
   if (isAppLoading) {
     return (
-      <LoadingScreen logoUrl={storeSettings?.logo_url || '/agency-logo.png'} />
+      <LoadingScreen 
+        logoUrl={storeSettings?.logo_url || 'https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png'} 
+        onFinish={() => setIsAppLoading(false)}
+      />
     );
   }
   return (
