@@ -7,19 +7,8 @@ export default defineConfig({
   build: {
     // Use esbuild for minification (faster and doesn't require terser)
     minify: 'esbuild',
-    // Optimize chunk splitting
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          ui: ['framer-motion', 'lucide-react'],
-          supabase: ['@supabase/supabase-js'],
-        },
-      },
-    },
     // Increase chunk size warning limit
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     // Output directory for Cloudflare Pages
     outDir: 'dist',
     emptyOutDir: true,

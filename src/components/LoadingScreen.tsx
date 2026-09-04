@@ -24,15 +24,15 @@ export default function LoadingScreen({ logoUrl, onFinish }: LoadingScreenProps)
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-white"
-      initial={{ opacity: 0 }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0c1426]"
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
       <div className="relative">
         {/* Logo Container with Dark Navy Border/Frame */}
-        <div className="relative inline-block p-6 md:p-8 rounded-3xl border-4 border-[#162341] bg-white shadow-2xl">
+        <div className="relative inline-block p-6 md:p-8 rounded-3xl border-4 border-[#162341] bg-[#101b33] shadow-2xl">
           <img
             src={logoUrl && !logoUrl.includes('supabase.co') ? logoUrl : '/agency-logo.png'}
             alt="Logo"

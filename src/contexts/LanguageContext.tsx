@@ -22,9 +22,16 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   useEffect(() => {
     // Get language from localStorage or browser default
-    const savedLanguage = localStorage.getItem('language') as Language | null;
-    const browserLanguage = navigator.language.split('-')[0] as Language;
-    const defaultLanguage = savedLanguage || (browserLanguage === 'en' ? 'en' : 'ar');
+    let defaultLanguage: Language = 'ar';
+    try {
+      const savedLanguage = localStorage.getItem('language') as Language | null;
+      const browserLang = (typeof navigator !== 'undefined' && navigator.language) 
+        ? (navigator.language.split('-')[0] as Language) 
+        : 'ar';
+      defaultLanguage = savedLanguage || (browserLang === 'en' ? 'en' : 'ar');
+    } catch (e) {
+      defaultLanguage = 'ar';
+    }
     
     setLanguage(defaultLanguage);
     updateHtmlDirection(defaultLanguage);

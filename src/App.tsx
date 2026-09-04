@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { AnimatePresence } from 'framer-motion';
 import { supabase } from './lib/supabase';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Header from './components/Header';
@@ -122,13 +123,18 @@ function App() {
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
+    
+    // Auto-dismiss splash screen after at most 800ms
+    const splashTimer = setTimeout(() => {
+      if (isMounted) setShowSplash(false);
+    }, 800);
+
     async function initApp() {
       try {
-        // Safe fetch with 1500ms timeout to ensure app NEVER gets stuck on loading screen
         const timeoutPromise = new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Fetch timeout')), 1500)
         );
@@ -161,9 +167,11 @@ function App() {
     }
     
     initApp();
-    return () => { isMounted = false; };
+    return () => { 
+      isMounted = false;
+      clearTimeout(splashTimer);
+    };
   }, []);
-
 
   useEffect(() => {
     if (storeSettings) {
@@ -176,18 +184,17 @@ function App() {
     }
   }, [storeSettings]);
 
-
-  if (isAppLoading) {
-    return (
-      <LoadingScreen 
-        logoUrl={storeSettings?.logo_url || 'https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png'} 
-        onFinish={() => setIsAppLoading(false)}
-      />
-    );
-  }
   return (
     <ThemeProvider>
       <LanguageProvider>
+        <AnimatePresence>
+          {showSplash && (
+            <LoadingScreen 
+              logoUrl={storeSettings?.logo_url || 'https://res.cloudinary.com/dvikey3wc/image/upload/v1777437920/agency-logo_lbppdi.png'} 
+              onFinish={() => setShowSplash(false)}
+            />
+          )}
+        </AnimatePresence>
         <Helmet>
           <title>{storeSettings?.meta_title || 'POVA Agency'}</title>
           <meta name="description" content={storeSettings?.meta_description || 'وكالة تسويق رقمي'} />
