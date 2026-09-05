@@ -128,20 +128,6 @@
   </head>
   <body class="bg-[#0c1426] text-white">
     <div id="root" class="min-h-screen"></div>
-    <script>
-      window.addEventListener('error', function(event) {
-        console.error('Window error caught:', event.error || event.message);
-        var root = document.getElementById('root');
-        if (root && (!root.firstElementChild || root.innerText.trim() === '')) {
-          root.innerHTML = '<div style="background:#0c1426;color:#ffffff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;direction:rtl;font-family:Cairo,sans-serif;text-align:center;">' +
-            '<div style="max-width:500px;background:#162341;border:1px solid rgba(255,255,255,0.1);padding:32px;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">' +
-            '<h2 style="font-size:22px;font-weight:bold;margin-bottom:12px;color:#ec533a;">حدث خطأ أثناء تحميل الصفحة</h2>' +
-            '<p style="color:#94a3b8;font-size:14px;margin-bottom:20px;">' + (event.message || 'حدث خطأ غير متوقع أثناء تشغيل الموقع') + '</p>' +
-            '<button onclick="location.reload()" style="background:#ec533a;color:#ffffff;border:none;padding:10px 24px;border-radius:8px;font-weight:bold;cursor:pointer;">إعادة تحميل الصفحة</button>' +
-            '</div></div>';
-        }
-      });
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
