@@ -22,9 +22,10 @@ const emptyPageForm = {
   description_en: '',
   image_url: '',
   drive_url: '',
-  additional_videos: [] as { id: string; title: string; url: string }[],
+  primary_thumbnail_url: '',
+  additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[],
 };
-const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '' };
+const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', drive_url: '', primary_thumbnail_url: '', additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[] };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
 
@@ -179,10 +180,15 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     const cleanDesc = cleanPageDescription(pageForm.description);
     const cleanDescEn = cleanPageDescription(pageForm.description_en);
     const driveUrl = pageForm.drive_url?.trim() || null;
-    const additionalVideos = (pageForm.additional_videos || []).filter(v => v.url && v.url.trim());
+    const additionalVideos = (pageForm.additional_videos || []).filter(v => v.url && v.url.trim()).map(v => ({
+      id: v.id,
+      title: v.title,
+      url: v.url,
+      thumbnail_url: v.thumbnail_url || null
+    }));
 
     // Encode in description for fallback persistence
-    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos);
+    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, pageForm.primary_thumbnail_url);
 
     const fullPayload: any = {
       name: pageForm.name,
@@ -229,10 +235,55 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const saveSpec = async (e: React.FormEvent) => {
     e.preventDefault();
     const serviceId = specForm.service_id || (selectedPage ? await ensurePrimaryService(selectedPage) : '');
-    const op = editingSpec ? supabase.from('specializations').update({ ...specForm, service_id: serviceId }).eq('id', editingSpec) : supabase.from('specializations').insert([{ ...specForm, service_id: serviceId }]);
-    const { error } = await op;
+    
+    const cleanDesc = cleanPageDescription(specForm.description);
+    const cleanDescEn = cleanPageDescription(specForm.description_en);
+    const driveUrl = specForm.drive_url?.trim() || null;
+    const additionalVideos = (specForm.additional_videos || []).filter(v => v.url && v.url.trim());
+
+    // Encode in description for fallback persistence
+    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, specForm.primary_thumbnail_url);
+
+    const fullPayload: any = {
+      service_id: serviceId,
+      name: specForm.name,
+      name_en: specForm.name_en || null,
+      description: encodedDesc,
+      description_en: cleanDescEn || null,
+      image_url: specForm.image_url || null,
+      drive_url: driveUrl,
+      custom_links: additionalVideos.length > 0 ? additionalVideos : null,
+    };
+
+    let op = editingSpec 
+      ? supabase.from('specializations').update(fullPayload).eq('id', editingSpec) 
+      : supabase.from('specializations').insert([fullPayload]);
+    
+    let { error } = await op;
+
+    // If Supabase table doesn't have the new columns yet, fall back without columns
+    if (error && (
+      error.message.includes('drive_url') || 
+      error.message.includes('custom_links') ||
+      error.message.includes('column')
+    )) {
+      const fallbackPayload = {
+        service_id: serviceId,
+        name: specForm.name,
+        name_en: specForm.name_en || null,
+        description: encodedDesc,
+        description_en: cleanDescEn || null,
+        image_url: specForm.image_url || null,
+      };
+      const fallbackOp = editingSpec 
+        ? supabase.from('specializations').update(fallbackPayload).eq('id', editingSpec) 
+        : supabase.from('specializations').insert([fallbackPayload]);
+      const fallbackRes = await fallbackOp;
+      error = fallbackRes.error;
+    }
+
     if (error) return toast.error(`خطأ: ${error.message}`);
-    toast.success(editingSpec ? 'تم تحديث القسم.' : 'تمت إضافة القسم.');
+    toast.success(editingSpec ? 'تم تحديث القسم وفيديوهات Google Drive بنجاح.' : 'تمت إضافة القسم وفيديوهات Google Drive بنجاح.');
     resetForms();
     await fetchData();
   };
@@ -300,7 +351,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         description_en: cleanPageDescription(linkedPage.description_en || ''),
         image_url: linkedPage.image_url || '',
         drive_url: extracted.primary_url || '',
-        additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url })),
+        primary_thumbnail_url: extracted.videos[0]?.thumbnail_url || '',
+        additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url, thumbnail_url: v.thumbnail_url || '' })),
       });
     } else {
       setEditingPage(null);
@@ -311,6 +363,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         description_en: '',
         image_url: '',
         drive_url: '',
+        primary_thumbnail_url: '',
         additional_videos: [],
       });
     }
@@ -596,6 +649,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       <p className="text-[11px] text-gray-400 leading-relaxed">
                         💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
                       </p>
+                      <input
+                        type="url"
+                        value={pageForm.primary_thumbnail_url}
+                        onChange={e => setPageForm({ ...pageForm, primary_thumbnail_url: e.target.value })}
+                        placeholder="رابط كافر الفيديو الرئيسي (اختياري) https://..."
+                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                      />
                     </div>
 
                     {/* فيديوهات Google Drive إضافية */}
@@ -621,37 +681,53 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       </div>
 
                       {(pageForm.additional_videos || []).map((vid, idx) => (
-                        <div key={vid.id || idx} className="flex items-center gap-2 mt-2 bg-gray-800/50 p-2 rounded-xl border border-gray-700">
-                          <input
-                            type="text"
-                            value={vid.title || ''}
-                            onChange={e => {
-                              const updated = [...(pageForm.additional_videos || [])];
-                              updated[idx] = { ...updated[idx], title: e.target.value };
-                              setPageForm({ ...pageForm, additional_videos: updated });
-                            }}
-                            placeholder="عنوان الفيديو (مثلاً: استعراض تفصيلي)"
-                            className="w-1/3 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
-                          />
-                          <input
-                            type="url"
-                            value={vid.url}
-                            onChange={e => {
-                              const updated = [...(pageForm.additional_videos || [])];
-                              updated[idx] = { ...updated[idx], url: e.target.value };
-                              setPageForm({ ...pageForm, additional_videos: updated });
-                            }}
-                            placeholder="رابط الفيديو في درايف https://drive.google.com/file/d/..."
-                            className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
-                          />
-                          {vid.url && (
-                            <a
-                              href={vid.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 text-blue-400 hover:text-blue-300"
-                              title="تجربة الرابط"
-                            >
+                        <div key={vid.id || idx} className="flex flex-col gap-2 mt-2 bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={vid.title || ''}
+                              onChange={e => {
+                                const updated = [...(pageForm.additional_videos || [])];
+                                updated[idx] = { ...updated[idx], title: e.target.value };
+                                setPageForm({ ...pageForm, additional_videos: updated });
+                              }}
+                              placeholder="عنوان الفيديو (مثلاً: استعراض تفصيلي)"
+                              className="w-1/3 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                            />
+                            <input
+                              type="url"
+                              value={vid.url}
+                              onChange={e => {
+                                const updated = [...(pageForm.additional_videos || [])];
+                                updated[idx] = { ...updated[idx], url: e.target.value };
+                                setPageForm({ ...pageForm, additional_videos: updated });
+                              }}
+                              placeholder="رابط الفيديو في درايف https://drive.google.com/file/d/..."
+                              className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="url"
+                              value={vid.thumbnail_url || ''}
+                              onChange={e => {
+                                const updated = [...(pageForm.additional_videos || [])];
+                                updated[idx] = { ...updated[idx], thumbnail_url: e.target.value };
+                                setPageForm({ ...pageForm, additional_videos: updated });
+                              }}
+                              placeholder="رابط صورة الغلاف (اختياري) https://..."
+                              className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                            />
+                          </div>
+                          <div className="flex items-center justify-end gap-2">
+                            {vid.url && (
+                              <a
+                                href={vid.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 text-blue-400 hover:text-blue-300"
+                                title="تجربة الرابط"
+                              >
                               <ExternalLink className="h-3.5 w-3.5" />
                             </a>
                           )}
@@ -666,6 +742,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
+                        </div>
                         </div>
                       ))}
                     </div>
@@ -718,7 +795,24 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                     </div>
                   </button>
                   <div className="flex gap-2 p-3">
-                    <button onClick={() => { setEditingSpec(spec.id); setSpecForm({ service_id: spec.service_id, name: spec.name, name_en: spec.name_en || '', description: spec.description || '', description_en: spec.description_en || '', image_url: spec.image_url || '' }); setActiveForm('spec'); scrollToForm(); }} className="flex-1 rounded-lg bg-pink-500/20 py-2 text-pink-200"><Edit className="mx-auto h-4 w-4" /></button>
+                    <button onClick={() => { 
+                      const specData = specializations.find(s => s.id === spec.id);
+                      const extracted = specData ? extractDriveVideos(specData as any) : { primary_url: '', videos: [] };
+                      setEditingSpec(spec.id); 
+                      setSpecForm({ 
+                        service_id: spec.service_id, 
+                        name: spec.name, 
+                        name_en: spec.name_en || '', 
+                        description: spec.description || '', 
+                        description_en: spec.description_en || '', 
+                        image_url: spec.image_url || '',
+                        drive_url: extracted.primary_url || '',
+                        primary_thumbnail_url: extracted.videos[0]?.thumbnail_url || '',
+                        additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url, thumbnail_url: v.thumbnail_url || '' })),
+                      }); 
+                      setActiveForm('spec'); 
+                      scrollToForm(); 
+                    }} className="flex-1 rounded-lg bg-pink-500/20 py-2 text-pink-200"><Edit className="mx-auto h-4 w-4" /></button>
                     <button onClick={() => removeItem('specializations', spec.id)} className="flex-1 rounded-lg bg-red-500/20 py-2 text-red-200"><Trash2 className="mx-auto h-4 w-4" /></button>
                   </div>
                   <button onClick={() => { setSelectedSpec(spec.id); setSelectedClient(null); }} className="w-full rounded-none bg-pink-600/40 px-4 py-3 font-bold text-pink-200 hover:bg-pink-600/60 transition-colors flex items-center justify-center gap-2">
@@ -729,7 +823,123 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   </button>
                 </div>
               ))}</div>
-              {activeForm === 'spec' && <form onSubmit={saveSpec} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5"><input value={specForm.name} onChange={e => setSpecForm({ ...specForm, name: e.target.value })} placeholder="اسم القسم" className="rounded-xl bg-gray-800/50 p-4" required /><input value={specForm.name_en} onChange={e => setSpecForm({ ...specForm, name_en: e.target.value })} placeholder="اسم القسم (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description} onChange={e => setSpecForm({ ...specForm, description: e.target.value })} placeholder="وصف القسم" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description_en} onChange={e => setSpecForm({ ...specForm, description_en: e.target.value })} placeholder="وصف القسم (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />{uploading && <div className="text-sm text-pink-300">جارٍ الرفع...</div>}<div className="grid grid-cols-2 gap-3"><button type="submit" className="rounded-xl bg-pink-600 p-4">{editingSpec ? 'تحديث' : 'إضافة'}</button><button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">إغلاق</button></div></form>}
+              {activeForm === 'spec' && <form onSubmit={saveSpec} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5"><input value={specForm.name} onChange={e => setSpecForm({ ...specForm, name: e.target.value })} placeholder="اسم القسم" className="rounded-xl bg-gray-800/50 p-4" required /><input value={specForm.name_en} onChange={e => setSpecForm({ ...specForm, name_en: e.target.value })} placeholder="اسم القسم (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description} onChange={e => setSpecForm({ ...specForm, description: e.target.value })} placeholder="وصف القسم" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description_en} onChange={e => setSpecForm({ ...specForm, description_en: e.target.value })} placeholder="وصف القسم (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />
+                  
+                  {/* فيديوهات Google Drive للقسم */}
+                  <div className="grid grid-cols-1 gap-2 rounded-xl bg-gray-800/30 p-4 border border-gray-700/50">
+                    <label className="text-sm text-gray-400">رابط فيديو Google Drive الرئيسي للقسم:</label>
+                    {specForm.drive_url && (
+                      <a
+                        href={specForm.drive_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-2 py-1 text-xs text-blue-300 hover:bg-blue-500/20 transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        <span>معاينة الرابط الحالي</span>
+                      </a>
+                    )}
+                    <input
+                      type="url"
+                      value={specForm.drive_url}
+                      onChange={e => setSpecForm({ ...specForm, drive_url: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
+                      className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                    />
+                    <input
+                      type="url"
+                      value={specForm.primary_thumbnail_url}
+                      onChange={e => setSpecForm({ ...specForm, primary_thumbnail_url: e.target.value })}
+                      placeholder="رابط كافر الفيديو الرئيسي (اختياري) https://..."
+                      className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                    />
+                    
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm text-gray-400">فيديوهات إضافية:</span>
+                      <button
+                        type="button"
+                        onClick={() => setSpecForm({
+                          ...specForm,
+                          additional_videos: [
+                            ...(specForm.additional_videos || []),
+                            { id: `vid_${Date.now()}`, title: '', url: '', thumbnail_url: '' }
+                          ]
+                        })}
+                        className="flex items-center gap-1.5 rounded-lg bg-pink-500/20 px-3 py-1.5 text-xs font-medium text-pink-200 hover:bg-pink-500/30 transition-colors"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>إضافة فيديو</span>
+                      </button>
+                    </div>
+
+                    {(specForm.additional_videos || []).map((vid, idx) => (
+                      <div key={vid.id || idx} className="flex flex-col gap-2 mt-2 bg-gray-800/50 p-2 rounded-xl border border-gray-700">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={vid.title || ''}
+                            onChange={e => {
+                              const updated = [...(specForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], title: e.target.value };
+                              setSpecForm({ ...specForm, additional_videos: updated });
+                            }}
+                            placeholder="عنوان الفيديو (مثلاً: استعراض تفصيلي)"
+                            className="w-1/3 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                          />
+                          <input
+                            type="url"
+                            value={vid.url}
+                            onChange={e => {
+                              const updated = [...(specForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], url: e.target.value };
+                              setSpecForm({ ...specForm, additional_videos: updated });
+                            }}
+                            placeholder="رابط الفيديو في درايف https://drive.google.com/file/d/..."
+                            className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="url"
+                            value={vid.thumbnail_url || ''}
+                            onChange={e => {
+                              const updated = [...(specForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], thumbnail_url: e.target.value };
+                              setSpecForm({ ...specForm, additional_videos: updated });
+                            }}
+                            placeholder="رابط صورة الغلاف (اختياري) https://..."
+                            className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
+                          />
+                        </div>
+                        <div className="flex items-center justify-end gap-2">
+                          {vid.url && (
+                            <a
+                              href={vid.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-blue-400 hover:text-blue-300"
+                              title="تجربة الرابط"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = (specForm.additional_videos || []).filter((_, i) => i !== idx);
+                              setSpecForm({ ...specForm, additional_videos: updated });
+                            }}
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg"
+                            title="حذف الفيديو"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {uploading && <div className="text-sm text-pink-300">جارٍ الرفع...</div>}<div className="grid grid-cols-2 gap-3"><button type="submit" className="rounded-xl bg-pink-600 p-4">{editingSpec ? 'تحديث' : 'إضافة'}</button><button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">إغلاق</button></div></form>}
             </div>
           )}
 

@@ -1,9 +1,10 @@
-import type { Page } from '../types/database';
+import type { Page, Specialization } from '../types/database';
 
 export interface DriveVideoItem {
   id?: string;
   title?: string;
   url: string;
+  thumbnail_url?: string | null;
 }
 
 export interface ExtractedDriveVideos {
@@ -13,6 +14,7 @@ export interface ExtractedDriveVideos {
     title: string;
     url: string;
     embedUrl: string;
+    thumbnail_url?: string | null;
   }[];
 }
 
@@ -32,19 +34,22 @@ export function cleanPageDescription(description: string | null | undefined): st
 export function encodeDescriptionWithDriveVideos(
   description: string | null | undefined,
   driveUrl: string | null | undefined,
-  additionalVideos?: DriveVideoItem[] | null
+  additionalVideos?: DriveVideoItem[] | null,
+  primaryThumbnailUrl?: string | null
 ): string {
   const baseDescription = cleanPageDescription(description);
   const cleanDriveUrl = driveUrl?.trim() || '';
   const cleanAdditional = (additionalVideos || []).filter(v => v.url && v.url.trim());
+  const cleanPrimaryThumbnail = primaryThumbnailUrl?.trim() || '';
 
-  if (!cleanDriveUrl && cleanAdditional.length === 0) {
+  if (!cleanDriveUrl && cleanAdditional.length === 0 && !cleanPrimaryThumbnail) {
     return baseDescription;
   }
 
   const dataToSave = {
     drive_url: cleanDriveUrl,
     additional_videos: cleanAdditional,
+    primary_thumbnail_url: cleanPrimaryThumbnail,
   };
 
   const tag = `<!--DRIVE_VIDEOS:${JSON.stringify(dataToSave)}-->`;
@@ -103,10 +108,23 @@ export function isGoogleDriveUrl(url: string | null | undefined): boolean {
   return url.includes('drive.google.com') || url.includes('docs.google.com');
 }
 
+function getPrimaryThumbnailUrl(page: Page | Specialization): string | null {
+  const description = page.description || page.description_en || '';
+  const match = description.match(META_TAG_REGEX);
+  if (!match?.[1]) return null;
+
+  try {
+    const parsed = JSON.parse(match[1]);
+    return typeof parsed.primary_thumbnail_url === 'string' ? parsed.primary_thumbnail_url : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Extracts all Google Drive videos from a Page
+ * Extracts all Google Drive videos from a Page or Specialization
  */
-export function extractDriveVideos(page: Page | null | undefined): ExtractedDriveVideos {
+export function extractDriveVideos(page: Page | Specialization | null | undefined): ExtractedDriveVideos {
   const result: ExtractedDriveVideos = {
     primary_url: '',
     videos: [],
@@ -117,7 +135,7 @@ export function extractDriveVideos(page: Page | null | undefined): ExtractedDriv
   const seenUrls = new Set<string>();
 
   // Helper to add a video
-  const addVideo = (rawUrl: string, title?: string, id?: string) => {
+  const addVideo = (rawUrl: string, title?: string, id?: string, thumbnailUrl?: string | null) => {
     const trimmed = rawUrl.trim();
     if (!trimmed || seenUrls.has(trimmed)) return;
     seenUrls.add(trimmed);
@@ -127,23 +145,24 @@ export function extractDriveVideos(page: Page | null | undefined): ExtractedDriv
       title: title || (result.videos.length === 0 ? 'فيديو تعريفي' : `فيديو ${result.videos.length + 1}`),
       url: trimmed,
       embedUrl: embed,
+      thumbnail_url: thumbnailUrl || null,
     });
   };
 
   // 1. Direct column: drive_url or google_drive_url
   if (page.drive_url && typeof page.drive_url === 'string' && page.drive_url.trim()) {
     result.primary_url = page.drive_url.trim();
-    addVideo(page.drive_url.trim(), 'فيديو الخدمة');
+    addVideo(page.drive_url.trim(), 'فيديو الخدمة', undefined, getPrimaryThumbnailUrl(page));
   } else if (page.google_drive_url && typeof page.google_drive_url === 'string' && page.google_drive_url.trim()) {
     result.primary_url = page.google_drive_url.trim();
-    addVideo(page.google_drive_url.trim(), 'فيديو الخدمة');
+    addVideo(page.google_drive_url.trim(), 'فيديو الخدمة', undefined, getPrimaryThumbnailUrl(page));
   }
 
   // 2. Custom links column
   if (Array.isArray(page.custom_links)) {
     page.custom_links.forEach((item, idx) => {
       if (item && item.url) {
-        addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id);
+        addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
       }
     });
   } else if (typeof page.custom_links === 'string') {
@@ -152,7 +171,7 @@ export function extractDriveVideos(page: Page | null | undefined): ExtractedDriv
       if (Array.isArray(parsed)) {
         parsed.forEach((item, idx) => {
           if (item && item.url) {
-            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id);
+            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
           }
         });
       }
@@ -171,19 +190,19 @@ export function extractDriveVideos(page: Page | null | undefined): ExtractedDriv
         if (!result.primary_url) {
           result.primary_url = parsed.drive_url.trim();
         }
-        addVideo(parsed.drive_url.trim(), 'فيديو الخدمة');
+        addVideo(parsed.drive_url.trim(), 'فيديو الخدمة', undefined, parsed.primary_thumbnail_url || null);
       }
       if (Array.isArray(parsed.additional_videos)) {
-        parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string }, idx: number) => {
+        parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
           if (item && item.url) {
-            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id);
+            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
           }
         });
       }
       if (Array.isArray(parsed.custom_links)) {
-        parsed.custom_links.forEach((item: { url?: string; title?: string; id?: string }, idx: number) => {
+        parsed.custom_links.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
           if (item && item.url) {
-            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id);
+            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
           }
         });
       }
@@ -196,7 +215,7 @@ export function extractDriveVideos(page: Page | null | undefined): ExtractedDriv
 }
 
 // Backward-compatibility exports
-export function extractPageLinks(page: Page | null | undefined) {
+export function extractPageLinks(page: Page | Specialization | null | undefined) {
   const driveInfo = extractDriveVideos(page);
   return {
     drive_url: driveInfo.primary_url,

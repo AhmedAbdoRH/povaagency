@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Play, Video } from 'lucide-react';
-import type { Page } from '../types/database';
+import type { Page, Specialization } from '../types/database';
 import { extractDriveVideos } from '../utils/pageLinks';
 import { useLanguage } from '../hooks/useLanguage';
 
 interface ServiceDriveVideosProps {
-  page: Page | null;
+  page: Page | Specialization | null;
 }
 
 export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
   const { language, t } = useLanguage();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  // Reset video loaded state when switching videos
+  useEffect(() => {
+    setVideoLoaded(false);
+  }, [selectedIndex]);
 
   if (!page) return null;
 
@@ -90,13 +96,34 @@ export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
       <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-[#040810] shadow-[0_16px_48px_rgba(0,0,0,0.7)]">
         {/* Video Frame */}
         <div className="relative aspect-video w-full">
-          <iframe
-            src={activeVideo.embedUrl}
-            title={activeVideo.title || 'Google Drive Video'}
-            className="h-full w-full border-0"
-            allow="autoplay; fullscreen"
-            allowFullScreen
-          />
+          {activeVideo.thumbnail_url && !videoLoaded ? (
+            <>
+              {/* Thumbnail with play button overlay */}
+              <div className="relative h-full w-full">
+                <img
+                  src={activeVideo.thumbnail_url}
+                  alt={activeVideo.title || 'Video thumbnail'}
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  onClick={() => setVideoLoaded(true)}
+                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group"
+                >
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm group-hover:bg-white/30 transition-all">
+                    <Play className="h-8 w-8 text-white fill-current" />
+                  </div>
+                </button>
+              </div>
+            </>
+          ) : (
+            <iframe
+              src={activeVideo.embedUrl}
+              title={activeVideo.title || 'Google Drive Video'}
+              className="h-full w-full border-0"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          )}
         </div>
 
         {/* Bottom bar with active video title and drive badge */}

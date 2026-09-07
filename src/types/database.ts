@@ -2,6 +2,7 @@ export interface PageLinkItem {
   id?: string;
   title?: string;
   url: string;
+  thumbnail_url?: string | null; // صورة الغلاف للفيديو
   type?: 'drive' | 'youtube' | 'link';
 }
 
@@ -84,6 +85,9 @@ export interface Service {
   description: string | null;
   description_en: string | null;
   image_url: string | null;
+  drive_url?: string | null; // رابط جوجل درايف
+  youtube_url?: string | null; // رابط يوتيوب
+  custom_links?: PageLinkItem[] | string | null; // روابط إضافية
   is_active: boolean;
   display_order: number;
   created_at: string;
@@ -174,6 +178,9 @@ export interface Specialization {
   description: string | null;
   description_en: string | null;
   image_url: string | null;
+  drive_url?: string | null; // رابط جوجل درايف
+  youtube_url?: string | null; // رابط يوتيوب
+  custom_links?: PageLinkItem[] | string | null; // روابط إضافية
   is_active: boolean;
   display_order: number;
   created_at: string;

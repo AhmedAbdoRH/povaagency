@@ -4,6 +4,7 @@ import { Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { Client, Page, Specialization } from '../types/database';
 import ClientCard from '../components/ClientCard';
+import ServiceDriveVideos from '../components/ServicePageLinks';
 import { findCoreServiceByPageId } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import ContentProtection from '../components/ContentProtection';
@@ -129,6 +130,9 @@ export default function SpecializationDetails() {
                 {specDesc}
               </p>
             )}
+
+            {/* فيديوهات Google Drive التوضيحية تحت وصف القسم مباشرة */}
+            <ServiceDriveVideos page={specialization as any} />
           </div>
         </div>
 
