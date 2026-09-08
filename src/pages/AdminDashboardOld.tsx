@@ -462,9 +462,23 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                 </div>
                                 <textarea placeholder="وصف التخصص" value={newSpecialization.description_ar || ''} onChange={e => setNewSpecialization({...newSpecialization, description_ar: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ec533a] focus:outline-none" rows={2} />
                                 {/* غلاف الفيديو */}
-                                <div className="flex gap-4 items-center p-3 bg-gray-700/50 rounded border border-gray-600">
+                                <div className="space-y-3 p-3 bg-gray-700/50 rounded border border-gray-600">
+                                    <label className="block text-sm font-semibold text-gray-300">غلاف الفيديو (صورة القسم)</label>
+                                    
+                                    {/* رابط الصورة */}
                                     <div className="flex-1">
-                                        <label className="block text-sm text-gray-400 mb-1">غلاف الفيديو (صورة القسم)</label>
+                                        <input 
+                                            type="text"
+                                            placeholder="رابط الصورة من Google Drive أو أي مصدر"
+                                            value={newSpecialization.video_thumbnail || ''}
+                                            onChange={e => setNewSpecialization({...newSpecialization, video_thumbnail: e.target.value})}
+                                            className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ec533a] focus:outline-none text-sm"
+                                        />
+                                    </div>
+                                    
+                                    {/* أو رفع ملف */}
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs text-gray-400">أو</span>
                                         <input 
                                             type="file" 
                                             accept="image/*" 
@@ -473,21 +487,23 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                             disabled={uploadingVideoThumbnail}
                                         />
                                     </div>
+
+                                    {/* معاينة الصورة */}
                                     {newSpecialization.video_thumbnail && (
-                                        <img 
-                                            src={newSpecialization.video_thumbnail} 
-                                            alt="غلاف الفيديو" 
-                                            className="w-20 h-20 object-cover rounded bg-white"
-                                        />
-                                    )}
-                                    {newSpecialization.video_thumbnail && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setNewSpecialization({...newSpecialization, video_thumbnail: ''})}
-                                            className="text-red-400 hover:text-red-300"
-                                        >
-                                            <X size={20} />
-                                        </button>
+                                        <div className="flex gap-3 items-center">
+                                            <img 
+                                                src={newSpecialization.video_thumbnail} 
+                                                alt="غلاف الفيديو" 
+                                                className="w-24 h-24 object-cover rounded bg-white"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setNewSpecialization({...newSpecialization, video_thumbnail: ''})}
+                                                className="text-red-400 hover:text-red-300 text-sm"
+                                            >
+                                                <X size={20} />
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="flex gap-2">

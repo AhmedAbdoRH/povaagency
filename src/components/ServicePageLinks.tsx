@@ -99,11 +99,15 @@ export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
           {activeVideo.thumbnail_url && !videoLoaded ? (
             <>
               {/* Thumbnail with play button overlay */}
-              <div className="relative h-full w-full">
+              <div className="relative h-full w-full bg-black">
                 <img
                   src={activeVideo.thumbnail_url}
                   alt={activeVideo.title || 'Video thumbnail'}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    console.error('Failed to load thumbnail:', activeVideo.thumbnail_url);
+                    setVideoLoaded(true); // Load video if thumbnail fails
+                  }}
                 />
                 <button
                   onClick={() => setVideoLoaded(true)}

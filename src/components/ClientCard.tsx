@@ -13,9 +13,11 @@ interface ClientCardProps {
   imageUrl?: string;
   videoUrl?: string;
   isVerticalVideo?: boolean;
+  aspectRatioOverride?: string; // مقاس مخصص (مثل '3 / 4')
+  projectUrl?: string; // رابط المشروع
 }
 
-export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo }: ClientCardProps) {
+export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl }: ClientCardProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const aspectRatio = useVideoAspectRatio(videoUrl, imageUrl);
@@ -42,7 +44,9 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
     return null;
   };
 
-  const isExternal = Boolean(getExternalLink(name));
+  // أولوية للـ projectUrl، ثم للـ name parsing
+  const externalUrl = projectUrl || getExternalLink(name);
+  const isExternal = Boolean(externalUrl);
   const hasVideo = Boolean(videoUrl);
   const showVideoAtNaturalRatio = hasVideo && aspectRatio !== null;
   const isVideoEmbed = hasVideo && isEmbeddable(videoUrl!);
@@ -52,7 +56,9 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   // isVerticalVideo = true أو undefined يعني طولي (افتراضي)
   const isHorizontalVideo = isVerticalVideo === false;
 
-  const mediaStyle: React.CSSProperties | undefined = hasVideo
+  const mediaStyle: React.CSSProperties | undefined = aspectRatioOverride
+    ? { aspectRatio: aspectRatioOverride }
+    : hasVideo
     ? (isHorizontalVideo
         ? (showVideoAtNaturalRatio
             ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
@@ -61,14 +67,13 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
               : undefined)
         : (showVideoAtNaturalRatio
             ? { aspectRatio: `${aspectRatio.width} / ${aspectRatio.height}` }
-            : { aspectRatio: '1 / 1' }))
-    : { aspectRatio: '1 / 1' }; // صور/لوجو بدون فيديو: مربع 1:1 في كل الحالات
+            : { aspectRatio: '4 / 3' }))  // موحد المقاس للصور العمودية
+    : { aspectRatio: '4 / 3' }; // موحد المقاس للصور
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const externalLink = getExternalLink(name);
-    if (externalLink) {
-      window.open(externalLink, '_blank', 'noopener,noreferrer');
+    if (externalUrl) {
+      window.open(externalUrl, '_blank', 'noopener,noreferrer');
     } else {
       navigate(`/client/${id}`);
     }
@@ -125,34 +130,49 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
       </div>
 
       {/* Text Content - تحت الميديا */}
-      <div className="relative p-8 bg-[#060b14] flex flex-col">
+      <div className="relative p-6 bg-[#060b14] flex flex-col">
         {/* اسم العمل */}
-        <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#ec533a] transition-colors duration-300">
+        <h3 className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-[#ec533a] transition-colors duration-300">
           {name}
         </h3>
 
+        {/* رابط الموقع */}
+        {isExternal && externalUrl && (
+          <a
+            href={externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-xs text-gray-400 hover:text-[#ec533a] mb-3 truncate block"
+          >
+            {externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+          </a>
+        )}
+
         {isExternal ? (
           <div className="mt-2">
-            <p className="text-gray-300 text-xs leading-relaxed mb-4">
-              {description ? linkifyText(description) : (language === 'en' ? 'Visit Website' : 'زيارة الموقع')}
-            </p>
-            <div
+            {description && (
+              <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+                {linkifyText(description)}
+              </p>
+            )}
+            <button
               onClick={handleCardClick}
-              className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2.5 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
+              className="w-full text-center bg-[#ec533a] hover:bg-[#d63d2a] text-white py-2 rounded-lg transition-all duration-300 font-semibold shadow-lg text-sm"
             >
-              {language === 'en' ? 'Visit Website' : 'زيارة الموقع'}
-            </div>
+              {language === 'en' ? 'View Website' : 'اعرض الموقع'}
+            </button>
           </div>
         ) : (
           /* الوصف - يظهر عند hover للعملاء العاديين */
           <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
             <div className="overflow-hidden">
-              <p className="text-gray-300 text-xs leading-relaxed mb-4 line-clamp-2">
+              <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
                 {description ? linkifyText(description) : t('clientCard.clickForDetails')}
               </p>
               <div
                 onClick={handleCardClick}
-                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2.5 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
+                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
               >
                 {t('clientCard.viewDetails')}
               </div>

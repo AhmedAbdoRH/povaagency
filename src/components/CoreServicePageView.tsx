@@ -83,6 +83,9 @@ export default function CoreServicePageView({
   // Check if this is marketing-strategy or content-creation page (hide section buttons)
   const hideSectionButtons = coreService.slug === 'marketing-strategy' || coreService.slug === 'content-creation';
 
+  // تحديد المقاس حسب الخدمة
+  const cardAspectRatio = coreService.slug === 'website-design' ? '16 / 9' : undefined;
+
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
 
@@ -256,6 +259,8 @@ export default function CoreServicePageView({
                                 imageUrl={client.image_url || ''}
                                 videoUrl={videoContent?.video_url || ''}
                                 isVerticalVideo={videoContent?.is_vertical_video}
+                                aspectRatioOverride={cardAspectRatio}
+                                projectUrl={client.project_url || ''}
                               />
                             );
                           })}

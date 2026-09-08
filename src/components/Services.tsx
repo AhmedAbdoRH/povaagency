@@ -115,7 +115,7 @@ export default function Services() {
                   className="group cursor-pointer overflow-hidden rounded-2xl border-2 border-white/5 bg-[#162341]/80 backdrop-blur-sm transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-accent/20"
                   onClick={() => navigate(routeByPageId.get(page.id) || `/page/${page.id}`)}
                 >
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-[4/3] overflow-hidden">
                     {displayImage ? (
                       <>
                         <img

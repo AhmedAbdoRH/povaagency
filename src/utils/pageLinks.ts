@@ -109,6 +109,12 @@ export function isGoogleDriveUrl(url: string | null | undefined): boolean {
 }
 
 function getPrimaryThumbnailUrl(page: Page | Specialization): string | null {
+  // أولوية للـ video_thumbnail من الجدول
+  if ('video_thumbnail' in page && page.video_thumbnail) {
+    return page.video_thumbnail;
+  }
+
+  // Fallback للـ metadata في الوصف
   const description = page.description || page.description_en || '';
   const match = description.match(META_TAG_REGEX);
   if (!match?.[1]) return null;
