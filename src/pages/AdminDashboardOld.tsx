@@ -29,6 +29,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   // Upload states
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
+  const [uploadingVideoThumbnail, setUploadingVideoThumbnail] = useState(false);
 
   // Editing states
   const [editingPage, setEditingPage] = useState<string | null>(null);
@@ -44,7 +45,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
   // New Item States
   const [newPage, setNewPage] = useState({ name: '', description: '', slug: '' });
-  const [newSpecialization, setNewSpecialization] = useState({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
+  const [newSpecialization, setNewSpecialization] = useState<{
+    page_id: string;
+    name_ar: string;
+    name_en: string;
+    description_ar: string;
+    description_en: string;
+    video_thumbnail: string;
+  }>({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '', video_thumbnail: '' });
   const [newClient, setNewClient] = useState<Partial<Client>>({
     name: '',
     description: '',
@@ -106,14 +114,15 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   // Helper: Handle Image Upload
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
-    type: 'client' | 'banner'
+    type: 'client' | 'banner' | 'specialization'
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const bucket = type === 'banner' ? 'banners' : 'services'; // Keeping 'services' bucket for clients to reuse existing storage or create 'clients' bucket
+    const bucket = type === 'banner' ? 'banners' : type === 'specialization' ? 'sections' : 'services';
     if (type === 'client') setUploadingImage(true);
     if (type === 'banner') setUploadingBannerImage(true);
+    if (type === 'specialization') setUploadingVideoThumbnail(true);
 
     try {
       if (!file.type.startsWith('image/')) throw new Error('الرجاء اختيار ملف صورة صالح');
@@ -135,6 +144,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         setNewClient(prev => ({ ...prev, logo_url: publicUrl }));
       } else if (type === 'banner') {
         setNewBanner(prev => ({ ...prev, image_url: publicUrl }));
+      } else if (type === 'specialization') {
+        setNewSpecialization(prev => ({ ...prev, video_thumbnail: publicUrl }));
       }
       setSuccessMsg('تم رفع الصورة بنجاح!');
     } catch (err: any) {
@@ -142,6 +153,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     } finally {
       if (type === 'client') setUploadingImage(false);
       if (type === 'banner') setUploadingBannerImage(false);
+      if (type === 'specialization') setUploadingVideoThumbnail(false);
       event.target.value = '';
     }
   };
@@ -259,7 +271,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     try {
       const { error } = await supabase.from('specializations').insert([newSpecialization]);
       if (error) throw error;
-      setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
+      setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '', video_thumbnail: '' });
       await fetchData();
       setSuccessMsg("تمت إضافة التخصص بنجاح!");
     } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
@@ -273,7 +285,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
           const { error } = await supabase.from('specializations').update(newSpecialization).eq('id', editingSpecialization);
           if (error) throw error;
           setEditingSpecialization(null);
-          setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '' });
+          setNewSpecialization({ page_id: '', name_ar: '', name_en: '', description_ar: '', description_en: '', video_thumbnail: '' });
           await fetchData();
           setSuccessMsg("تم تحديث التخصص بنجاح!");
       } catch (err: any) { setError(err.message); } finally { setIsLoading(false); }
@@ -449,6 +461,35 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                     <input type="text" placeholder="اسم التخصص (عربي)" value={newSpecialization.name_ar} onChange={e => setNewSpecialization({...newSpecialization, name_ar: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ec533a] focus:outline-none" />
                                 </div>
                                 <textarea placeholder="وصف التخصص" value={newSpecialization.description_ar || ''} onChange={e => setNewSpecialization({...newSpecialization, description_ar: e.target.value})} className="w-full p-3 bg-gray-700 border border-gray-600 rounded focus:border-[#ec533a] focus:outline-none" rows={2} />
+                                {/* غلاف الفيديو */}
+                                <div className="flex gap-4 items-center p-3 bg-gray-700/50 rounded border border-gray-600">
+                                    <div className="flex-1">
+                                        <label className="block text-sm text-gray-400 mb-1">غلاف الفيديو (صورة القسم)</label>
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            onChange={(e) => handleImageUpload(e, 'specialization')}
+                                            className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#ec533a] file:text-white hover:file:bg-[#d63d2a]"
+                                            disabled={uploadingVideoThumbnail}
+                                        />
+                                    </div>
+                                    {newSpecialization.video_thumbnail && (
+                                        <img 
+                                            src={newSpecialization.video_thumbnail} 
+                                            alt="غلاف الفيديو" 
+                                            className="w-20 h-20 object-cover rounded bg-white"
+                                        />
+                                    )}
+                                    {newSpecialization.video_thumbnail && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewSpecialization({...newSpecialization, video_thumbnail: ''})}
+                                            className="text-red-400 hover:text-red-300"
+                                        >
+                                            <X size={20} />
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="flex gap-2">
                                     <button type="submit" className="bg-[#ec533a] hover:bg-[#d63d2a] text-white px-6 py-2 rounded font-bold flex-1">{editingSpecialization ? 'حفظ التعديلات' : 'إضافة التخصص'}</button>
                                     {editingSpecialization && <button type="button" onClick={() => {setEditingSpecialization(null); setNewSpecialization({page_id:'', name_ar:'', name_en:'', description_ar:'', description_en:''})}} className="bg-gray-600 hover:bg-gray-500 px-6 py-2 rounded font-bold">إلغاء</button>}
@@ -463,9 +504,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                                     <div>
                                         <span className="font-bold text-[#ec533a] ml-2">[{spec.page?.name}]</span>
                                         <span>{spec.name_ar}</span>
+                                        {spec.video_thumbnail && <span className="text-green-400 mr-2">✓</span>}
                                     </div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => {setEditingSpecialization(spec.id); setNewSpecialization({page_id: spec.page_id, name_ar: spec.name_ar, name_en: spec.name_en, description_ar: spec.description_ar, description_en: spec.description_en})}} className="text-blue-400"><Edit size={16} /></button>
+                                        <button onClick={() => {setEditingSpecialization(spec.id); setNewSpecialization({page_id: spec.page_id, name_ar: spec.name_ar, name_en: spec.name_en, description_ar: spec.description_ar, description_en: spec.description_en, video_thumbnail: spec.video_thumbnail || ''})}} className="text-blue-400"><Edit size={16} /></button>
                                         <button onClick={() => setDeleteModal({id: spec.id, type: 'specialization'})} className="text-red-400"><Trash2 size={16} /></button>
                                     </div>
                                 </div>

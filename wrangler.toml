@@ -7,6 +7,7 @@ pages_build_output_dir = "dist"
 # povaagency.com
 # www.povaagency.com
 
-# Environment variables (set these in Cloudflare dashboard)
-# VITE_SUPABASE_URL = "your-supabase-url"
-# VITE_SUPABASE_ANON_KEY = "your-supabase-anon-key"
+# Environment variables for build time
+[vars]
+VITE_SUPABASE_URL = "https://omailusfkppwhhiwlepe.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NTM4MjksImV4cCI6MjEwNDQyOTgyOX0.0vaeSqU1PA76D819t3lWz1iCyc6aNKE3EOtHlRQlXc0"

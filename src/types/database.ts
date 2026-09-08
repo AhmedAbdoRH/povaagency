@@ -178,6 +178,7 @@ export interface Specialization {
   description: string | null;
   description_en: string | null;
   image_url: string | null;
+  video_thumbnail: string | null; // غلاف الفيديو (رفع ملف)
   drive_url?: string | null; // رابط جوجل درايف
   youtube_url?: string | null; // رابط يوتيوب
   custom_links?: PageLinkItem[] | string | null; // روابط إضافية

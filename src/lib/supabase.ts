@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // إعدادات Supabase - استخدام الإعدادات الافتراضية للمشروع لضمان عمل الموقع حتى في بيئات النشر الثابت
-const DEFAULT_SUPABASE_URL = 'https://xijyciccygbdwudehdoa.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWNjeWdiZHd1ZGVoZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzYyMjUsImV4cCI6MjA4NzkxMjIyNX0.RoOE0zWudd4dDekgVtMvoOd1Qdd3uRFJ2k4WWTETu70';
+const DEFAULT_SUPABASE_URL = 'https://omailusfkppwhhiwlepe.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NTM4MjksImV4cCI6MjEwNDQyOTgyOX0.0vaeSqU1PA76D819t3lWz1iCyc6aNKE3EOtHlRQlXc0';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;

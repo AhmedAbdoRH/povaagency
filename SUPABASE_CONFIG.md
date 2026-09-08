@@ -7,17 +7,17 @@
 
 ### API URL
 ```
-https://xijyciccygbdwudehdoa.supabase.co
+https://omailusfkppwhhiwlepe.supabase.co
 ```
 
 ### Anon Key (Public)
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWNjeWdiZHd1ZGVoZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzYyMjUsImV4cCI6MjA4NzkxMjIyNX0.RoOE0zWudd4dDekgVtMvoOd1Qdd3uRFJ2k4WWTETu70
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NTM4MjksImV4cCI6MjEwNDQyOTgyOX0.0vaeSqU1PA76D819t3lWz1iCyc6aNKE3EOtHlRQlXc0
 ```
 
 ### Service Role Key (Secret - للاستخدام في الـ Backend فقط)
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWNjeWdiZHd1ZGVoZG9hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjMzNjIyNSwiZXhwIjoyMDg3OTEyMjI1fQ.okK-fr8o8rmJlSkLrehufxjAYPi98JwTosN6W372ckM
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODg1MzgyOSwiZXhwIjoyMTA0NDI5ODI5fQ.Y3Ra3N7imPlQk8vzIQ9Pg-L5ClsH1RUuXzJhlmcvYy4
 ```
 
 ## 📋 الجداول المتاحة
@@ -48,9 +48,9 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWN
 
 ### `.env`
 ```env
-VITE_SUPABASE_URL=https://xijyciccygbdwudehdoa.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWNjeWdiZHd1ZGVoZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMzYyMjUsImV4cCI6MjA4NzkxMjIyNX0.RoOE0zWudd4dDekgVtMvoOd1Qdd3uRFJ2k4WWTETu70
-VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpanljaWNjeWdiZHd1ZGVoZG9hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjMzNjIyNSwiZXhwIjoyMDg3OTEyMjI1fQ.okK-fr8o8rmJlSkLrehufxjAYPi98JwTosN6W372ckM
+VITE_SUPABASE_URL=https://omailusfkppwhhiwlepe.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NTM4MjksImV4cCI6MjEwNDQyOTgyOX0.0vaeSqU1PA76D819t3lWz1iCyc6aNKE3EOtHlRQlXc0
+VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tYWlsdXNma3Bwd2hoaXdsZXBlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODg1MzgyOSwiZXhwIjoyMTA0NDI5ODI5fQ.Y3Ra3N7imPlQk8vzIQ9Pg-L5ClsH1RUuXzJhlmcvYy4
 ```
 
 ### `src/lib/supabase.ts`
@@ -78,7 +78,7 @@ http://localhost:5173/
 ### 3. التحقق من الاتصال
 افتح Console في المتصفح وابحث عن:
 ```
-🔗 Supabase Connected to: https://xijyciccygbdwudehdoa.supabase.co
+🔗 Supabase Connected to: https://omailusfkppwhhiwlepe.supabase.co
 ```
 
 ## 🔒 ملاحظات أمنية
@@ -91,7 +91,7 @@ http://localhost:5173/
 
 ## 📊 Dashboard Supabase
 ```
-https://supabase.com/dashboard/project/xijyciccygbdwudehdoa
+https://supabase.com/dashboard/project/omailusfkppwhhiwlepe
 ```
 
 ## ✅ تم الاختبار
@@ -104,5 +104,27 @@ https://supabase.com/dashboard/project/xijyciccygbdwudehdoa
 
 ---
 
-**آخر تحديث:** 11 مايو 2026
-**الحالة:** ✅ يعمل بشكل ممتاز
+**آخر تحديث:** 8 سبتمبر 2026
+**الحالة:** ✅ متصل بقاعدة البيانات الصحيحة (omailusfkppwhhiwlepe)
+**النشر:** ✅ تم النشر على Cloudflare Pages
+**رابط النشر:** https://58c27a57.povaagency-github.pages.dev
+
+## 🚀 آخر عملية نشر
+- **التاريخ:** 8 سبتمبر 2026
+- **الإصدار:** 58c27a57
+- **التحديثات:**
+  - إنشاء هيكل قاعدة البيانات الكامل باستخدام MCP
+  - إضافة جميع الجداول المطلوبة (9 جداول)
+  - تفعيل Row Level Security (RLS)
+  - إضافة البيانات الافتراضية لـ store_settings
+  - تحديث Secrets في Cloudflare Pages
+  - نشر التحديثات على Cloudflare Pages
+
+## 🔧 التحديث الأخير (8 سبتمبر 2026)
+- تم التبديل من المشروع xijyciccygbdwudehdoa إلى omailusfkppwhhiwlepe
+- المشروع السابق كان غير متaccessible (DNS error)
+- المشروع الجديد يعمل بشكل صحيح ومتاح
+- تحديث جميع ملفات الإعدادات (.env, wrangler.toml, src/lib/supabase.ts)
+- إنشاء هيكل قاعدة البيانات الكامل (9 جداول + RLS + Indexes)
+- تحديث التوثيق في SUPABASE_CONFIG.md
+- نشر التحديثات على Cloudflare Pages
