@@ -80,11 +80,19 @@ export default function CoreServicePageView({
   const { language, t } = useLanguage();
   const [shuffleSeed] = useState(() => Math.floor(Math.random() * 2 ** 32));
 
-  // Check if this is marketing-strategy or content-creation page (hide section buttons)
-  const hideSectionButtons = coreService.slug === 'marketing-strategy' || coreService.slug === 'content-creation';
+  // Check if this is a section that should show works directly (flattened)
+  const isDirectWorksView = coreService.slug === 'social-media-campaigns' || 
+                           coreService.slug === 'marketing-strategy' || 
+                           coreService.slug === 'content-creation';
+
+  // Check if this is marketing-strategy, content-creation or social-media-campaigns page (hide section buttons)
+  const hideSectionButtons = coreService.slug === 'marketing-strategy' || 
+                            coreService.slug === 'content-creation' ||
+                            coreService.slug === 'social-media-campaigns';
 
   // تحديد المقاس حسب الخدمة
-  const cardAspectRatio = coreService.slug === 'website-design' ? '16 / 9' : undefined;
+  const cardAspectRatio = coreService.slug === 'website-design' ? '16 / 9' : 
+                         isDirectWorksView ? '3 / 4' : undefined;
 
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
@@ -125,13 +133,48 @@ export default function CoreServicePageView({
     [sectionsWithAll, selectedSectionId]
   );
 
+  // Flattened works for social media and similar sections
+  const directWorks = useMemo(() => {
+    if (!isDirectWorksView || !selectedSection) return [];
+    
+    const works: any[] = [];
+    selectedSection.clients?.forEach(client => {
+      const clientContent = (client as any).client_content || (client as any).content || [];
+      clientContent.forEach((content: any) => {
+        works.push({
+          ...content,
+          clientName: client.name,
+          clientNameEn: client.name_en,
+          clientId: client.id,
+          // Use client data as fallback for content
+          id: content.id,
+          title: content.title || client.name,
+          description: content.description || client.description,
+          image_url: content.image_url || client.image_url,
+          video_url: content.video_url,
+          is_vertical_video: content.is_vertical_video,
+          project_url: client.project_url
+        });
+      });
+    });
+    
+    // Sort works by display order if available, or by created_at
+    return works.sort((a, b) => {
+      const orderA = a.display_order ?? 999;
+      const orderB = b.display_order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [selectedSection, isDirectWorksView]);
+
   const selectedClients = useMemo(() => {
+    if (isDirectWorksView) return []; // Use directWorks instead
     const clients = selectedSection?.clients || [];
     if (selectedSection?.id === ALL_SECTION_ID) {
       return shuffleWithSeed(clients, shuffleSeed);
     }
     return [...clients].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
-  }, [selectedSection, shuffleSeed]);
+  }, [selectedSection, shuffleSeed, isDirectWorksView]);
 
   const HeroIcon = coreService.icon;
   const heroImage = page?.banner_url || page?.image_url || null;
@@ -241,7 +284,25 @@ export default function CoreServicePageView({
                         </div>
                       </div>
 
-                      {selectedClients.length === 0 ? (
+                      {isDirectWorksView ? (
+                        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">
+                          {directWorks.map(work => (
+                            <ClientCard
+                                key={work.id}
+                                id={work.clientId}
+                                name={language === 'en' ? (work.title_en || work.title) : work.title}
+                                description={language === 'en' ? (work.description_en || work.description || '') : (work.description || '')}
+                                logoUrl=""
+                                imageUrl={work.image_url || ''}
+                                videoUrl={work.video_url || ''}
+                                isVerticalVideo={work.is_vertical_video}
+                                aspectRatioOverride={cardAspectRatio}
+                                projectUrl={work.project_url || ''}
+                                hideText={true}
+                              />
+                          ))}
+                        </div>
+                      ) : selectedClients.length === 0 ? (
                         <div className="rounded-2xl border border-dashed border-white/10 bg-[#0a1121]/60 p-8 text-center text-gray-400">
                           {t('coreServicePage.noWorksInSection')}
                         </div>

@@ -15,9 +15,10 @@ interface ClientCardProps {
   isVerticalVideo?: boolean;
   aspectRatioOverride?: string; // مقاس مخصص (مثل '3 / 4')
   projectUrl?: string; // رابط المشروع
+  hideText?: boolean; // إخفاء النصوص تحت الكارت
 }
 
-export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl }: ClientCardProps) {
+export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl, hideText }: ClientCardProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const aspectRatio = useVideoAspectRatio(videoUrl, imageUrl);
@@ -130,56 +131,58 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
       </div>
 
       {/* Text Content - تحت الميديا */}
-      <div className="relative p-6 bg-[#060b14] flex flex-col">
-        {/* اسم العمل */}
-        <h3 className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-[#ec533a] transition-colors duration-300">
-          {name}
-        </h3>
+      {!hideText && (
+        <div className="relative p-6 bg-[#060b14] flex flex-col">
+          {/* اسم العمل */}
+          <h3 className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-[#ec533a] transition-colors duration-300">
+            {name}
+          </h3>
 
-        {/* رابط الموقع */}
-        {isExternal && externalUrl && (
-          <a
-            href={externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="text-xs text-gray-400 hover:text-[#ec533a] mb-3 truncate block"
-          >
-            {externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-          </a>
-        )}
-
-        {isExternal ? (
-          <div className="mt-2">
-            {description && (
-              <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
-                {linkifyText(description)}
-              </p>
-            )}
-            <button
-              onClick={handleCardClick}
-              className="w-full text-center bg-[#ec533a] hover:bg-[#d63d2a] text-white py-2 rounded-lg transition-all duration-300 font-semibold shadow-lg text-sm"
+          {/* رابط الموقع */}
+          {isExternal && externalUrl && (
+            <a
+              href={externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-gray-400 hover:text-[#ec533a] mb-3 truncate block"
             >
-              {language === 'en' ? 'View Website' : 'اعرض الموقع'}
-            </button>
-          </div>
-        ) : (
-          /* الوصف - يظهر عند hover للعملاء العاديين */
-          <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
-            <div className="overflow-hidden">
-              <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
-                {description ? linkifyText(description) : t('clientCard.clickForDetails')}
-              </p>
-              <div
+              {externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+            </a>
+          )}
+
+          {isExternal ? (
+            <div className="mt-2">
+              {description && (
+                <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+                  {linkifyText(description)}
+                </p>
+              )}
+              <button
                 onClick={handleCardClick}
-                className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
+                className="w-full text-center bg-[#ec533a] hover:bg-[#d63d2a] text-white py-2 rounded-lg transition-all duration-300 font-semibold shadow-lg text-sm"
               >
-                {t('clientCard.viewDetails')}
+                {language === 'en' ? 'View Website' : 'اعرض الموقع'}
+              </button>
+            </div>
+          ) : (
+            /* الوصف - يظهر عند hover للعملاء العاديين */
+            <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
+              <div className="overflow-hidden">
+                <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+                  {description ? linkifyText(description) : t('clientCard.clickForDetails')}
+                </p>
+                <div
+                  onClick={handleCardClick}
+                  className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
+                >
+                  {t('clientCard.viewDetails')}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

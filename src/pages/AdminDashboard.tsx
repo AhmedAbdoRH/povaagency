@@ -9,7 +9,7 @@ import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { optimizeImage, isImageFile } from '../utils/imageOptimization';
 import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos } from '../utils/pageLinks';
 
-type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | null;
+type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | 'specContent' | null;
 
 interface AdminDashboardProps {
   onSettingsUpdate?: () => void;
@@ -372,31 +372,54 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   };
 
   const handleAddDirectWork = async (item: ReturnType<typeof resolveCoreServicesWithPages>[number]) => {
-    const pageId = item.page?.id;
-    if (!pageId) {
-      toast.error('لا يمكن العثور على الصفحة المرتبطة بالخدمة');
-      return;
-    }
-
+    let pageId = item.page?.id;
+    
     try {
-      // Step 1: Ensure there is at least one service for the page
-      let serviceId = '';
-      const pageServices = services.filter(s => s.page_id === pageId);
-      if (pageServices.length === 0) {
-        // Create a default service
-        const page = pages.find(p => p.id === pageId);
-        if (!page) {
-          throw new Error('الصفحة غير موجودة');
+      // 1. إذا لم تكن الصفحة مرتبطة، نحاول البحث عنها بالاسم أولاً
+      if (!pageId) {
+        toast.info('جاري البحث عن الصفحة المرتبطة...');
+        const { data: existingPage, error: searchError } = await supabase
+          .from('pages')
+          .select()
+          .eq('name', item.title)
+          .maybeSingle();
+        
+        if (searchError) throw searchError;
+
+        if (existingPage) {
+          pageId = existingPage.id;
+        } else {
+          // 2. إذا لم تكن موجودة نهائياً، ننشئها
+          toast.info('جاري إنشاء الصفحة في قاعدة البيانات...');
+          const { data: newPage, error: pageError } = await supabase
+            .from('pages')
+            .insert([{
+              name: item.title,
+              description: item.description,
+              is_active: true,
+              display_order: 10
+            }])
+            .select()
+            .single();
+          
+          if (pageError) throw pageError;
+          pageId = newPage.id;
         }
+      }
+
+      // تحديث البيانات للتأكد من وجود أحدث الخدمات والتخصصات
+      await fetchData();
+
+      // 3. التأكد من وجود خدمة (Service) تابعة للصفحة
+      let serviceId = '';
+      const { data: currentServices } = await supabase.from('services').select().eq('page_id', pageId);
+      
+      if (!currentServices || currentServices.length === 0) {
         const { data: newService, error: serviceError } = await supabase
           .from('services')
           .insert([{
             page_id: pageId,
-            name: page.name || 'خدمة افتراضية',
-            name_en: page.name_en || 'Default Service',
-            description: page.description || '',
-            description_en: page.description_en || '',
-            image_url: page.image_url || '',
+            name: item.title,
             is_active: true,
             display_order: 0,
           }])
@@ -406,23 +429,19 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         if (serviceError) throw serviceError;
         serviceId = newService.id;
       } else {
-        serviceId = pageServices[0].id;
+        serviceId = currentServices[0].id;
       }
 
-      // Step 2: Ensure there is at least one specialization for the service
+      // 4. التأكد من وجود تخصص (Specialization)
       let specializationId = '';
-      const serviceSpecializations = specializations.filter(s => s.service_id === serviceId);
-      if (serviceSpecializations.length === 0) {
-        // Create a default specialization
+      const { data: currentSpecs } = await supabase.from('specializations').select().eq('service_id', serviceId);
+      
+      if (!currentSpecs || currentSpecs.length === 0) {
         const { data: newSpec, error: specError } = await supabase
           .from('specializations')
           .insert([{
             service_id: serviceId,
             name: 'المحفظة',
-            name_en: 'Portfolio',
-            description: '',
-            description_en: '',
-            image_url: '',
             is_active: true,
             display_order: 0,
           }])
@@ -432,25 +451,19 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         if (specError) throw specError;
         specializationId = newSpec.id;
       } else {
-        specializationId = serviceSpecializations[0].id;
+        specializationId = currentSpecs[0].id;
       }
 
-      // Step 3: Ensure there is at least one client for the specialization
+      // 5. التأكد من وجود عميل (Client)
       let clientId = '';
-      const specializationClients = clients.filter(c => c.specialization_id === specializationId);
-      if (specializationClients.length === 0) {
-        // Create a default client
+      const { data: currentClients } = await supabase.from('clients').select().eq('specialization_id', specializationId);
+      
+      if (!currentClients || currentClients.length === 0) {
         const { data: newClient, error: clientError } = await supabase
           .from('clients')
           .insert([{
             specialization_id: specializationId,
             name: 'العملاء الرئيسيين',
-            name_en: 'Main Clients',
-            description: '',
-            description_en: '',
-            image_url: '',
-            project_url: '',
-            logo_url: '',
             is_active: true,
             display_order: 0,
           }])
@@ -460,10 +473,15 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         if (clientError) throw clientError;
         clientId = newClient.id;
       } else {
-        clientId = specializationClients[0].id;
+        clientId = currentClients[0].id;
       }
 
-      // Step 4: Set the content form and open it
+      // 6. تحديث سياق الواجهة (Breadcrumbs & visibility)
+      setSelectedPage(pageId);
+      setSelectedSpec(specializationId);
+      setSelectedClient(clientId);
+
+      // 7. فتح نموذج إضافة المحتوى
       setContentForm({
         ...emptyContentForm,
         client_id: clientId,
@@ -471,16 +489,17 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         description: '',
         image_url: '',
         video_url: '',
-        is_vertical_video: false,
+        is_vertical_video: true,
         content_type: 'image' as const,
       });
       setActiveForm('content');
-      scrollToForm();
+      
+      setTimeout(() => {
+        scrollToForm();
+      }, 300);
 
-      // Refresh data to update the lists
       await fetchData();
-
-      toast.success('تم إعداد البيئة لإضافة عمل مباشر. يمكنك الآن إضافة المحتوى.');
+      toast.success('تم التجهيز بنجاح! يمكنك الآن رفع الكارت.');
     } catch (err: any) {
       toast.error(`خطأ: ${err.message}`);
     }
@@ -535,7 +554,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             <Edit className="h-4 w-4" />
             <span className="text-sm">تعديل</span>
           </button>
-          {item.slug === 'marketing-strategy' && (
+          {(item.slug === 'marketing-strategy' || item.slug === 'social-media-campaigns') && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
