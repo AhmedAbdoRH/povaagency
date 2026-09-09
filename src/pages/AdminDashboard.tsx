@@ -649,13 +649,62 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       <p className="text-[11px] text-gray-400 leading-relaxed">
                         💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
                       </p>
-                      <input
-                        type="url"
-                        value={pageForm.primary_thumbnail_url}
-                        onChange={e => setPageForm({ ...pageForm, primary_thumbnail_url: e.target.value })}
-                        placeholder="رابط كافر الفيديو الرئيسي (اختياري) https://..."
-                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                      />
+                      
+                      {/* كافر الفيديو - رابط أو رفع */}
+                      <div className="space-y-2">
+                        <label className="text-sm text-gray-400">صورة كافر الفيديو (اختياري):</label>
+                        <input
+                          type="url"
+                          value={pageForm.primary_thumbnail_url}
+                          onChange={e => setPageForm({ ...pageForm, primary_thumbnail_url: e.target.value })}
+                          placeholder="رابط صورة الكافر https://..."
+                          className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                        />
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>أو</span>
+                          <label className="cursor-pointer text-blue-400 hover:text-blue-300 underline">
+                            ارفع صورة من جهازك
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                try {
+                                  // رفع الصورة لـ Supabase Storage
+                                  const fileName = `page_thumbnail_${Date.now()}.${file.name.split('.').pop()}`;
+                                  const { data, error } = await supabase.storage
+                                    .from('sections')
+                                    .upload(fileName, file);
+                                  
+                                  if (error) throw error;
+                                  
+                                  const { data: { publicUrl } } = supabase.storage
+                                    .from('sections')
+                                    .getPublicUrl(fileName);
+                                  
+                                  setPageForm({ ...pageForm, primary_thumbnail_url: publicUrl });
+                                  toast.success('تم رفع الصورة بنجاح!');
+                                } catch (err: any) {
+                                  console.error('Upload error:', err);
+                                  toast.error('فشل رفع الصورة: ' + err.message);
+                                }
+                                
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                        </div>
+                        {pageForm.primary_thumbnail_url && (
+                          <img 
+                            src={pageForm.primary_thumbnail_url} 
+                            alt="معاينة الكافر" 
+                            className="w-32 h-32 object-cover rounded-lg border border-gray-600"
+                          />
+                        )}
+                      </div>
                     </div>
 
                     {/* فيديوهات Google Drive إضافية */}
@@ -823,7 +872,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   </button>
                 </div>
               ))}</div>
-              {activeForm === 'spec' && <form onSubmit={saveSpec} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5"><input value={specForm.name} onChange={e => setSpecForm({ ...specForm, name: e.target.value })} placeholder="اسم القسم" className="rounded-xl bg-gray-800/50 p-4" required /><input value={specForm.name_en} onChange={e => setSpecForm({ ...specForm, name_en: e.target.value })} placeholder="اسم القسم (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description} onChange={e => setSpecForm({ ...specForm, description: e.target.value })} placeholder="وصف القسم" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><textarea value={specForm.description_en} onChange={e => setSpecForm({ ...specForm, description_en: e.target.value })} placeholder="وصف القسم (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" /><input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />
+              {activeForm === 'spec' && (
+                <form onSubmit={saveSpec} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5">
+                  <input value={specForm.name} onChange={e => setSpecForm({ ...specForm, name: e.target.value })} placeholder="اسم القسم" className="rounded-xl bg-gray-800/50 p-4" required />
+                  <input value={specForm.name_en} onChange={e => setSpecForm({ ...specForm, name_en: e.target.value })} placeholder="اسم القسم (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" />
+                  <textarea value={specForm.description} onChange={e => setSpecForm({ ...specForm, description: e.target.value })} placeholder="وصف القسم" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
+                  <textarea value={specForm.description_en} onChange={e => setSpecForm({ ...specForm, description_en: e.target.value })} placeholder="وصف القسم (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
+                  <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />
                   
                   {/* فيديوهات Google Drive للقسم */}
                   <div className="grid grid-cols-1 gap-2 rounded-xl bg-gray-800/30 p-4 border border-gray-700/50">
@@ -846,14 +901,62 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
                       className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                     />
-                    <input
-                      type="url"
-                      value={specForm.primary_thumbnail_url}
-                      onChange={e => setSpecForm({ ...specForm, primary_thumbnail_url: e.target.value })}
-                      placeholder="رابط كافر الفيديو الرئيسي (اختياري) https://..."
-                      className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                    />
                     
+                    {/* كافر الفيديو - رابط أو رفع */}
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-400">صورة كافر الفيديو (اختياري):</label>
+                      <input
+                        type="url"
+                        value={specForm.primary_thumbnail_url}
+                        onChange={e => setSpecForm({ ...specForm, primary_thumbnail_url: e.target.value })}
+                        placeholder="رابط صورة الكافر https://..."
+                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                      />
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>أو</span>
+                        <label className="cursor-pointer text-blue-400 hover:text-blue-300 underline">
+                          ارفع صورة من جهازك
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              try {
+                                const fileName = `spec_thumbnail_${Date.now()}.${file.name.split('.').pop()}`;
+                                const { data, error } = await supabase.storage
+                                  .from('sections')
+                                  .upload(fileName, file);
+                                
+                                if (error) throw error;
+                                
+                                const { data: { publicUrl } } = supabase.storage
+                                  .from('sections')
+                                  .getPublicUrl(fileName);
+                                
+                                setSpecForm({ ...specForm, primary_thumbnail_url: publicUrl });
+                                toast.success('تم رفع الصورة بنجاح!');
+                              } catch (err: any) {
+                                console.error('Upload error:', err);
+                                toast.error('فشل رفع الصورة: ' + err.message);
+                              }
+                              
+                              e.target.value = '';
+                            }}
+                          />
+                        </label>
+                      </div>
+                      {specForm.primary_thumbnail_url && (
+                        <img 
+                          src={specForm.primary_thumbnail_url} 
+                          alt="معاينة الكافر" 
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-600"
+                        />
+                      )}
+                    </div>
+
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm text-gray-400">فيديوهات إضافية:</span>
                       <button
@@ -939,7 +1042,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                     ))}
                   </div>
 
-                  {uploading && <div className="text-sm text-pink-300">جارٍ الرفع...</div>}<div className="grid grid-cols-2 gap-3"><button type="submit" className="rounded-xl bg-pink-600 p-4">{editingSpec ? 'تحديث' : 'إضافة'}</button><button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">إغلاق</button></div></form>}
+                  {uploading && <div className="text-sm text-pink-300">جارٍ الرفع...</div>}
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <button type="submit" className="rounded-xl bg-pink-600 p-4">
+                      {editingSpec ? 'تحديث' : 'إضافة'}
+                    </button>
+                    <button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">
+                      إغلاق
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           )}
 
