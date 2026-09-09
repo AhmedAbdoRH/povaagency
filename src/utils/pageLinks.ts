@@ -148,7 +148,7 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
     const embed = getGoogleDriveEmbedUrl(trimmed);
     result.videos.push({
       id: id || `drive_vid_${result.videos.length + 1}`,
-      title: title || (result.videos.length === 0 ? 'فيديو تعريفي' : `فيديو ${result.videos.length + 1}`),
+      title: title || `فيديو ${result.videos.length + 1}`,
       url: trimmed,
       embedUrl: embed,
       thumbnail_url: thumbnailUrl || null,
@@ -158,10 +158,10 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
   // 1. Direct column: drive_url or google_drive_url
   if (page.drive_url && typeof page.drive_url === 'string' && page.drive_url.trim()) {
     result.primary_url = page.drive_url.trim();
-    addVideo(page.drive_url.trim(), 'فيديو الخدمة', undefined, getPrimaryThumbnailUrl(page));
+    addVideo(page.drive_url.trim(), undefined, undefined, getPrimaryThumbnailUrl(page));
   } else if (page.google_drive_url && typeof page.google_drive_url === 'string' && page.google_drive_url.trim()) {
     result.primary_url = page.google_drive_url.trim();
-    addVideo(page.google_drive_url.trim(), 'فيديو الخدمة', undefined, getPrimaryThumbnailUrl(page));
+    addVideo(page.google_drive_url.trim(), undefined, undefined, getPrimaryThumbnailUrl(page));
   }
 
   // 2. Custom links column
@@ -196,19 +196,19 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
         if (!result.primary_url) {
           result.primary_url = parsed.drive_url.trim();
         }
-        addVideo(parsed.drive_url.trim(), 'فيديو الخدمة', undefined, parsed.primary_thumbnail_url || null);
+        addVideo(parsed.drive_url.trim(), undefined, undefined, parsed.primary_thumbnail_url || null);
       }
       if (Array.isArray(parsed.additional_videos)) {
         parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
           if (item && item.url) {
-            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
+            addVideo(item.url, item.title, item.id, item.thumbnail_url || null);
           }
         });
       }
       if (Array.isArray(parsed.custom_links)) {
         parsed.custom_links.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
           if (item && item.url) {
-            addVideo(item.url, item.title || `فيديو ${idx + 2}`, item.id, item.thumbnail_url || null);
+            addVideo(item.url, item.title, item.id, item.thumbnail_url || null);
           }
         });
       }
