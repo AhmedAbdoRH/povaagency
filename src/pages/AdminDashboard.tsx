@@ -660,10 +660,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                           placeholder="رابط صورة الكافر https://..."
                           className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                         />
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm sm:text-xs text-gray-400">
                           <span>أو</span>
-                          <label className="cursor-pointer text-blue-400 hover:text-blue-300 underline">
-                            ارفع صورة من جهازك
+                          <label className="cursor-pointer text-blue-500 hover:text-blue-400 underline font-medium">
+                            📤 ارفع صورة من جهازك
                             <input
                               type="file"
                               accept="image/*"
@@ -912,10 +912,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         placeholder="رابط صورة الكافر https://..."
                         className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                       />
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm sm:text-xs text-gray-400">
                         <span>أو</span>
-                        <label className="cursor-pointer text-blue-400 hover:text-blue-300 underline">
-                          ارفع صورة من جهازك
+                        <label className="cursor-pointer text-blue-500 hover:text-blue-400 underline font-medium">
+                          📤 ارفع صورة من جهازك
                           <input
                             type="file"
                             accept="image/*"
