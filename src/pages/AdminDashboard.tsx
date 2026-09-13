@@ -7,7 +7,8 @@ import { supabase } from '../lib/supabase';
 import type { Client, ClientContent, Page, Service, Specialization } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { optimizeImage, isImageFile } from '../utils/imageOptimization';
-import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos } from '../utils/pageLinks';
+import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
+import VideoCoverField from '../components/VideoCoverField';
 
 type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | 'specContent' | null;
 
@@ -669,61 +670,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
                       </p>
                       
-                      {/* كافر الفيديو - رابط أو رفع */}
-                      <div className="space-y-2">
-                        <label className="text-sm text-gray-400">صورة كافر الفيديو (اختياري):</label>
-                        <input
-                          type="url"
-                          value={pageForm.primary_thumbnail_url}
-                          onChange={e => setPageForm({ ...pageForm, primary_thumbnail_url: e.target.value })}
-                          placeholder="رابط صورة الكافر https://..."
-                          className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                        />
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm sm:text-xs text-gray-400">
-                          <span>أو</span>
-                          <label className="cursor-pointer text-blue-500 hover:text-blue-400 underline font-medium">
-                            📤 ارفع صورة من جهازك
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                
-                                try {
-                                  // رفع الصورة لـ Supabase Storage
-                                  const fileName = `page_thumbnail_${Date.now()}.${file.name.split('.').pop()}`;
-                                  const { data, error } = await supabase.storage
-                                    .from('sections')
-                                    .upload(fileName, file);
-                                  
-                                  if (error) throw error;
-                                  
-                                  const { data: { publicUrl } } = supabase.storage
-                                    .from('sections')
-                                    .getPublicUrl(fileName);
-                                  
-                                  setPageForm({ ...pageForm, primary_thumbnail_url: publicUrl });
-                                  toast.success('تم رفع الصورة بنجاح!');
-                                } catch (err: any) {
-                                  console.error('Upload error:', err);
-                                  toast.error('فشل رفع الصورة: ' + err.message);
-                                }
-                                
-                                e.target.value = '';
-                              }}
-                            />
-                          </label>
-                        </div>
-                        {pageForm.primary_thumbnail_url && (
-                          <img 
-                            src={pageForm.primary_thumbnail_url} 
-                            alt="معاينة الكافر" 
-                            className="w-32 h-32 object-cover rounded-lg border border-gray-600"
-                          />
-                        )}
-                      </div>
+                      {/* كفر الفيديو الرئيسي - رفع مباشر من الجهاز */}
+                      <VideoCoverField
+                        label="صورة كفر الفيديو الرئيسي (اختياري)"
+                        sublabel="يُفضل صورة طولية بمقاس 9:16 كالريلز"
+                        coverUrl={pageForm.primary_thumbnail_url}
+                        onChange={url => setPageForm({ ...pageForm, primary_thumbnail_url: url })}
+                        idPrefix="page-primary-cover"
+                      />
                     </div>
 
                     {/* فيديوهات Google Drive إضافية */}
@@ -774,19 +728,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                               className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
                             />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="url"
-                              value={vid.thumbnail_url || ''}
-                              onChange={e => {
-                                const updated = [...(pageForm.additional_videos || [])];
-                                updated[idx] = { ...updated[idx], thumbnail_url: e.target.value };
-                                setPageForm({ ...pageForm, additional_videos: updated });
-                              }}
-                              placeholder="رابط صورة الغلاف (اختياري) https://..."
-                              className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
-                            />
-                          </div>
+                          {/* كفر الفيديو الإضافي - رفع مباشر من الجهاز */}
+                          <VideoCoverField
+                            label={`كفر الفيديو #${idx + 2} (اختياري)`}
+                            sublabel="يُفضل صورة طولية بمقاس 9:16"
+                            coverUrl={vid.thumbnail_url}
+                            onChange={url => {
+                              const updated = [...(pageForm.additional_videos || [])];
+                              updated[idx] = { ...updated[idx], thumbnail_url: url };
+                              setPageForm({ ...pageForm, additional_videos: updated });
+                            }}
+                            idPrefix={`page-add-cover-${idx}`}
+                          />
                           <div className="flex items-center justify-end gap-2">
                             {vid.url && (
                               <a
@@ -921,60 +874,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                     />
                     
-                    {/* كافر الفيديو - رابط أو رفع */}
-                    <div className="space-y-2">
-                      <label className="text-sm text-gray-400">صورة كافر الفيديو (اختياري):</label>
-                      <input
-                        type="url"
-                        value={specForm.primary_thumbnail_url}
-                        onChange={e => setSpecForm({ ...specForm, primary_thumbnail_url: e.target.value })}
-                        placeholder="رابط صورة الكافر https://..."
-                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                      />
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-sm sm:text-xs text-gray-400">
-                        <span>أو</span>
-                        <label className="cursor-pointer text-blue-500 hover:text-blue-400 underline font-medium">
-                          📤 ارفع صورة من جهازك
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              
-                              try {
-                                const fileName = `spec_thumbnail_${Date.now()}.${file.name.split('.').pop()}`;
-                                const { data, error } = await supabase.storage
-                                  .from('sections')
-                                  .upload(fileName, file);
-                                
-                                if (error) throw error;
-                                
-                                const { data: { publicUrl } } = supabase.storage
-                                  .from('sections')
-                                  .getPublicUrl(fileName);
-                                
-                                setSpecForm({ ...specForm, primary_thumbnail_url: publicUrl });
-                                toast.success('تم رفع الصورة بنجاح!');
-                              } catch (err: any) {
-                                console.error('Upload error:', err);
-                                toast.error('فشل رفع الصورة: ' + err.message);
-                              }
-                              
-                              e.target.value = '';
-                            }}
-                          />
-                        </label>
-                      </div>
-                      {specForm.primary_thumbnail_url && (
-                        <img 
-                          src={specForm.primary_thumbnail_url} 
-                          alt="معاينة الكافر" 
-                          className="w-32 h-32 object-cover rounded-lg border border-gray-600"
-                        />
-                      )}
-                    </div>
+                    {/* كفر الفيديو الرئيسي للتخصص - رفع مباشر من الجهاز */}
+                    <VideoCoverField
+                      label="صورة كفر الفيديو الرئيسي (اختياري)"
+                      sublabel="يُفضل صورة طولية بمقاس 9:16 كالريلز"
+                      coverUrl={specForm.primary_thumbnail_url}
+                      onChange={url => setSpecForm({ ...specForm, primary_thumbnail_url: url })}
+                      idPrefix="spec-primary-cover"
+                    />
 
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm text-gray-400">فيديوهات إضافية:</span>
@@ -1020,19 +927,18 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                             className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
                           />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="url"
-                            value={vid.thumbnail_url || ''}
-                            onChange={e => {
-                              const updated = [...(specForm.additional_videos || [])];
-                              updated[idx] = { ...updated[idx], thumbnail_url: e.target.value };
-                              setSpecForm({ ...specForm, additional_videos: updated });
-                            }}
-                            placeholder="رابط صورة الغلاف (اختياري) https://..."
-                            className="flex-1 rounded-lg bg-gray-900/80 border border-gray-700 p-2 text-xs text-white"
-                          />
-                        </div>
+                        {/* كفر الفيديو الإضافي للتخصص - رفع مباشر من الجهاز */}
+                        <VideoCoverField
+                          label={`كفر الفيديو #${idx + 2} (اختياري)`}
+                          sublabel="يُفضل صورة طولية بمقاس 9:16"
+                          coverUrl={vid.thumbnail_url}
+                          onChange={url => {
+                            const updated = [...(specForm.additional_videos || [])];
+                            updated[idx] = { ...updated[idx], thumbnail_url: url };
+                            setSpecForm({ ...specForm, additional_videos: updated });
+                          }}
+                          idPrefix={`spec-add-cover-${idx}`}
+                        />
                         <div className="flex items-center justify-end gap-2">
                           {vid.url && (
                             <a

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Play } from 'lucide-react';
 import type { Page, Specialization } from '../types/database';
-import { extractDriveVideos } from '../utils/pageLinks';
+import { extractDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
 
 interface ServiceDriveVideosProps {
   page: Page | Specialization | null;
@@ -23,7 +23,12 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
   const [thumbnailError, setThumbnailError] = useState(false);
 
   const title = video.title || `Video ${index + 1}`;
-  const showThumbnail = Boolean(video.thumbnail_url) && !thumbnailError && !isPlaying;
+  const normalizedThumb = normalizeThumbnailUrl(video.thumbnail_url) || video.thumbnail_url;
+  const showThumbnail = Boolean(normalizedThumb) && !thumbnailError && !isPlaying;
+
+  const embedSrc = isPlaying && video.embedUrl
+    ? (video.embedUrl.includes('?') ? `${video.embedUrl}&autoplay=1` : `${video.embedUrl}?autoplay=1`)
+    : video.embedUrl;
 
   return (
     <div
@@ -34,9 +39,10 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
       {showThumbnail ? (
         <div className="relative h-full w-full">
           <img
-            src={video.thumbnail_url!}
+            src={normalizedThumb!}
             alt={title}
             className="h-full w-full object-cover bg-black transition-transform duration-500 group-hover:scale-[1.03]"
+            referrerPolicy="no-referrer"
             onError={() => setThumbnailError(true)}
           />
           <button
@@ -52,7 +58,7 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
         </div>
       ) : (
         <iframe
-          src={video.embedUrl}
+          src={embedSrc}
           title={title}
           className="h-full w-full border-0"
           allow="autoplay; fullscreen"

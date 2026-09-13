@@ -108,10 +108,23 @@ export function isGoogleDriveUrl(url: string | null | undefined): boolean {
   return url.includes('drive.google.com') || url.includes('docs.google.com');
 }
 
+/**
+ * Normalizes any thumbnail URL - if it's a Google Drive link, converts to direct image URL
+ */
+export function normalizeThumbnailUrl(url: string | null | undefined): string | null {
+  if (!url || typeof url !== 'string' || !url.trim()) return null;
+  const clean = url.trim();
+  const fileId = getGoogleDriveFileId(clean);
+  if (fileId) {
+    return `https://lh3.googleusercontent.com/d/${fileId}=w1000`;
+  }
+  return clean;
+}
+
 function getPrimaryThumbnailUrl(page: Page | Specialization): string | null {
   // أولوية للـ video_thumbnail من الجدول
   if ('video_thumbnail' in page && page.video_thumbnail) {
-    return page.video_thumbnail;
+    return normalizeThumbnailUrl(page.video_thumbnail);
   }
 
   // Fallback للـ metadata في الوصف
@@ -121,7 +134,9 @@ function getPrimaryThumbnailUrl(page: Page | Specialization): string | null {
 
   try {
     const parsed = JSON.parse(match[1]);
-    return typeof parsed.primary_thumbnail_url === 'string' ? parsed.primary_thumbnail_url : null;
+    return typeof parsed.primary_thumbnail_url === 'string'
+      ? normalizeThumbnailUrl(parsed.primary_thumbnail_url)
+      : null;
   } catch {
     return null;
   }
@@ -146,12 +161,18 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
     if (!trimmed || seenUrls.has(trimmed)) return;
     seenUrls.add(trimmed);
     const embed = getGoogleDriveEmbedUrl(trimmed);
+    const rawThumb = normalizeThumbnailUrl(thumbnailUrl);
+    // If no explicit thumbnail provided, but it's a Google Drive video, use its Drive video thumbnail
+    const fileId = getGoogleDriveFileId(trimmed);
+    const fallbackThumb = fileId ? `https://lh3.googleusercontent.com/d/${fileId}=w1000` : null;
+    const resolvedThumb = rawThumb || fallbackThumb;
+
     result.videos.push({
       id: id || `drive_vid_${result.videos.length + 1}`,
       title: title || `فيديو ${result.videos.length + 1}`,
       url: trimmed,
       embedUrl: embed,
-      thumbnail_url: thumbnailUrl || null,
+      thumbnail_url: resolvedThumb,
     });
   };
 
@@ -199,14 +220,14 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
         addVideo(parsed.drive_url.trim(), undefined, undefined, parsed.primary_thumbnail_url || null);
       }
       if (Array.isArray(parsed.additional_videos)) {
-        parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
+        parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }) => {
           if (item && item.url) {
             addVideo(item.url, item.title, item.id, item.thumbnail_url || null);
           }
         });
       }
       if (Array.isArray(parsed.custom_links)) {
-        parsed.custom_links.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }, idx: number) => {
+        parsed.custom_links.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }) => {
           if (item && item.url) {
             addVideo(item.url, item.title, item.id, item.thumbnail_url || null);
           }
