@@ -1,23 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { ExternalLink, Play, Video } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play } from 'lucide-react';
 import type { Page, Specialization } from '../types/database';
 import { extractDriveVideos } from '../utils/pageLinks';
-import { useLanguage } from '../hooks/useLanguage';
 
 interface ServiceDriveVideosProps {
   page: Page | Specialization | null;
 }
 
+interface SingleDriveVideoProps {
+  video: {
+    id?: string;
+    title?: string;
+    url: string;
+    embedUrl: string;
+    thumbnail_url?: string | null;
+  };
+  index: number;
+}
+
+function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
+
+  const title = video.title || `Video ${index + 1}`;
+  const showThumbnail = Boolean(video.thumbnail_url) && !thumbnailError && !isPlaying;
+
+  return (
+    <div
+      id={`video-card-${video.id || index}`}
+      className="group relative aspect-[9/16] w-full max-w-[280px] sm:max-w-[300px] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_12px_36px_rgba(0,0,0,0.6)] transition-all duration-300 hover:border-white/20"
+      style={{ aspectRatio: '9 / 16' }}
+    >
+      {showThumbnail ? (
+        <div className="relative h-full w-full">
+          <img
+            src={video.thumbnail_url!}
+            alt={title}
+            className="h-full w-full object-cover bg-black transition-transform duration-500 group-hover:scale-[1.03]"
+            onError={() => setThumbnailError(true)}
+          />
+          <button
+            type="button"
+            onClick={() => setIsPlaying(true)}
+            aria-label={`تشغيل ${title}`}
+            className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px] transition-all duration-300 group-hover:bg-black/20 cursor-pointer"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-xl transition-all duration-300 group-hover:scale-110 group-active:scale-95">
+              <Play className="h-6 w-6 fill-current translate-x-0.5" />
+            </div>
+          </button>
+        </div>
+      ) : (
+        <iframe
+          src={video.embedUrl}
+          title={title}
+          className="h-full w-full border-0"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+        />
+      )}
+    </div>
+  );
+}
+
 export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
-  const { language, t } = useLanguage();
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-
-  // Reset video loaded state when switching videos
-  useEffect(() => {
-    setVideoLoaded(false);
-  }, [selectedIndex]);
-
   if (!page) return null;
 
   const { videos } = extractDriveVideos(page);
@@ -26,72 +72,16 @@ export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
     return null;
   }
 
-  const isAr = language === 'ar';
-  const activeVideo = videos[selectedIndex] || videos[0];
-
   return (
-    <div className="mt-8 mb-6">
-      {/* Tabs if there are multiple videos */}
-      {videos.length > 1 && (
-        <div className="mb-3 flex flex-wrap gap-2">
-          {videos.map((vid, idx) => {
-            const isActive = idx === selectedIndex;
-            return (
-              <button
-                key={vid.id || idx}
-                type="button"
-                onClick={() => setSelectedIndex(idx)}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
-                  isActive
-                    ? 'border border-accent bg-accent/20 text-accent shadow-sm'
-                    : 'border border-white/10 bg-[#0a1121]/80 text-gray-400 hover:border-white/20 hover:text-white'
-                }`}
-              >
-                <Play className={`h-3 w-3 ${isActive ? 'fill-current' : ''}`} />
-                <span>{vid.title || (isAr ? `فيديو ${idx + 1}` : `Video ${idx + 1}`)}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Embedded Google Drive Video Player Container */}
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-[#040810] shadow-[0_16px_48px_rgba(0,0,0,0.7)]">
-        {/* Video Frame */}
-        <div className="relative aspect-video w-full">
-          {activeVideo.thumbnail_url && !videoLoaded ? (
-            <>
-              {/* Thumbnail with play button overlay */}
-              <div className="relative h-full w-full bg-black">
-                <img
-                  src={activeVideo.thumbnail_url}
-                  alt={activeVideo.title || 'Video thumbnail'}
-                  className="h-full w-full object-contain"
-                  onError={(e) => {
-                    console.error('Failed to load thumbnail:', activeVideo.thumbnail_url);
-                    setVideoLoaded(true); // Load video if thumbnail fails
-                  }}
-                />
-                <button
-                  onClick={() => setVideoLoaded(true)}
-                  className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors cursor-pointer group"
-                >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm group-hover:bg-white/30 transition-all">
-                    <Play className="h-8 w-8 text-white fill-current" />
-                  </div>
-                </button>
-              </div>
-            </>
-          ) : (
-            <iframe
-              src={activeVideo.embedUrl}
-              title={activeVideo.title || 'Google Drive Video'}
-              className="h-full w-full border-0"
-              allow="autoplay; fullscreen"
-              allowFullScreen
-            />
-          )}
-        </div>
+    <div className="mt-8 mb-6 w-full">
+      <div className="flex flex-wrap items-center gap-5 sm:gap-6">
+        {videos.map((vid, idx) => (
+          <DriveVideoCard
+            key={vid.id || idx}
+            video={vid}
+            index={idx}
+          />
+        ))}
       </div>
     </div>
   );
@@ -99,3 +89,4 @@ export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
 
 // Named alias export for backward compatibility
 export { ServiceDriveVideos as ServicePageLinks };
+

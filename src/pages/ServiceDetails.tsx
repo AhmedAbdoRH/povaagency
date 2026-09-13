@@ -17,20 +17,18 @@ export default function ServiceDetails() {
   const [coreService, setCoreService] = useState<CoreServiceDefinition | null>(null);
   const [page, setPage] = useState<Page | null>(null);
   const [sections, setSections] = useState<SpecializationWithClients[]>([]);
-  const [directClients, setDirectClients] = useState<any[]>([]);
+  const [directClients, setDirectClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) {
-      setError('الخدمة المطلوبة غير موجودة.');
       setIsLoading(false);
       return;
     }
 
     const selectedCoreService = findCoreServiceBySlug(slug);
     if (!selectedCoreService) {
-      setError('الخدمة المطلوبة غير موجودة.');
+      setCoreService(null);
       setIsLoading(false);
       return;
     }
@@ -42,7 +40,6 @@ export default function ServiceDetails() {
   const fetchCoreServiceData = async (selectedCoreService: CoreServiceDefinition) => {
     try {
       setIsLoading(true);
-      setError(null);
 
       const { data: pagesData, error: pagesError } = await supabase
         .from('pages')
@@ -111,8 +108,9 @@ export default function ServiceDetails() {
         await fetchDirectClients(resolvedPage.id);
       }
     } catch (err: any) {
-      console.error('Error loading core service page:', err);
-      setError(err.message || 'تعذر تحميل بيانات الخدمة.');
+      console.warn('Could not load dynamic database content for core service:', err);
+      // Keep coreService visible even if database request fails
+      setSections([]);
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +163,10 @@ export default function ServiceDetails() {
     );
   }
 
-  if (error || !coreService) {
+  if (!coreService) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0c1426] px-4 pt-24 text-center text-white">
-        <div className="text-2xl font-bold">{error || 'الخدمة المطلوبة غير موجودة.'}</div>
+        <div className="text-2xl font-bold">الخدمة المطلوبة غير موجودة.</div>
       </div>
     );
   }
@@ -191,7 +189,12 @@ export default function ServiceDetails() {
         <meta name="twitter:image" content={metaImage} />
       </Helmet>
 
-      <CoreServicePageView coreService={coreService} page={page} sections={sections} />
+      <CoreServicePageView
+        coreService={coreService}
+        page={page}
+        sections={sections}
+        directClients={directClients}
+      />
     </>
   );
 }
