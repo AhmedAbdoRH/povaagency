@@ -65,13 +65,29 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
           </button>
         </div>
       ) : (
-        <iframe
-          src={embedSrc}
-          title={title}
-          className="h-full w-full border-0"
-          allow="autoplay; fullscreen"
-          allowFullScreen
-        />
+        <div className="relative h-full w-full overflow-hidden bg-black">
+          {/* Iframe cropped to hide Google Drive header and oversized controls */}
+          <div className="absolute -top-[54px] -bottom-[48px] -left-[1px] -right-[1px] overflow-hidden">
+            <iframe
+              src={embedSrc}
+              title={title}
+              className="h-full w-full border-0 pointer-events-auto"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          </div>
+
+          {/* زر إعادة إظهار الكفر / إيقاف الفيديو والعودة */}
+          <button
+            type="button"
+            onClick={() => setIsPlaying(false)}
+            aria-label="إغلاق أو إعادة تشغيل الفيديو"
+            className="absolute top-2.5 right-2.5 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white/80 backdrop-blur-md transition-all hover:bg-black/90 hover:text-white hover:scale-105"
+            title="الرجوع للكفر"
+          >
+            <span className="text-xs font-bold leading-none">✕</span>
+          </button>
+        </div>
       )}
     </div>
   );

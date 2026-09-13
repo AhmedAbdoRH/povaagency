@@ -97,10 +97,13 @@ export default function VideoItem({
             pointer-events: none !important;
           }
 
-          /* رفع شريط Google Drive السفلي خارج العرض */
+          /* إخفاء وقص شريط Google Drive العلوي والسفلي */
           .video-embed-container.drive-google-drive .drive-iframe-wrapper {
             position: absolute;
-            inset: 0;
+            top: -54px;
+            bottom: -46px;
+            left: -1px;
+            right: -1px;
             overflow: hidden;
           }
 
