@@ -45,6 +45,14 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
             referrerPolicy="no-referrer"
             onError={() => setThumbnailError(true)}
           />
+          {/* عنوان الفيديو على الكفر */}
+          {video.title && (
+            <div className="absolute top-0 inset-x-0 p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none">
+              <span className="text-xs font-semibold text-white drop-shadow-md line-clamp-1">
+                {video.title}
+              </span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setIsPlaying(true)}

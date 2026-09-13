@@ -9,6 +9,7 @@ export interface DriveVideoItem {
 
 export interface ExtractedDriveVideos {
   primary_url: string;
+  primary_title?: string;
   videos: {
     id: string;
     title: string;
@@ -35,19 +36,22 @@ export function encodeDescriptionWithDriveVideos(
   description: string | null | undefined,
   driveUrl: string | null | undefined,
   additionalVideos?: DriveVideoItem[] | null,
-  primaryThumbnailUrl?: string | null
+  primaryThumbnailUrl?: string | null,
+  primaryTitle?: string | null
 ): string {
   const baseDescription = cleanPageDescription(description);
   const cleanDriveUrl = driveUrl?.trim() || '';
   const cleanAdditional = (additionalVideos || []).filter(v => v.url && v.url.trim());
   const cleanPrimaryThumbnail = primaryThumbnailUrl?.trim() || '';
+  const cleanPrimaryTitle = primaryTitle?.trim() || '';
 
-  if (!cleanDriveUrl && cleanAdditional.length === 0 && !cleanPrimaryThumbnail) {
+  if (!cleanDriveUrl && cleanAdditional.length === 0 && !cleanPrimaryThumbnail && !cleanPrimaryTitle) {
     return baseDescription;
   }
 
   const dataToSave = {
     drive_url: cleanDriveUrl,
+    primary_title: cleanPrimaryTitle,
     additional_videos: cleanAdditional,
     primary_thumbnail_url: cleanPrimaryThumbnail,
   };
@@ -213,11 +217,14 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
   if (match && match[1]) {
     try {
       const parsed = JSON.parse(match[1]);
+      if (parsed.primary_title && typeof parsed.primary_title === 'string') {
+        result.primary_title = parsed.primary_title.trim();
+      }
       if (parsed.drive_url && typeof parsed.drive_url === 'string') {
         if (!result.primary_url) {
           result.primary_url = parsed.drive_url.trim();
         }
-        addVideo(parsed.drive_url.trim(), undefined, undefined, parsed.primary_thumbnail_url || null);
+        addVideo(parsed.drive_url.trim(), parsed.primary_title || undefined, undefined, parsed.primary_thumbnail_url || null);
       }
       if (Array.isArray(parsed.additional_videos)) {
         parsed.additional_videos.forEach((item: { url?: string; title?: string; id?: string; thumbnail_url?: string | null }) => {
@@ -236,6 +243,11 @@ export function extractDriveVideos(page: Page | Specialization | null | undefine
     } catch (e) {
       console.warn('Failed to parse drive videos metadata', e);
     }
+  }
+
+  // Update primary video's title if primary_title exists and first video had default title
+  if (result.primary_title && result.videos.length > 0) {
+    result.videos[0].title = result.primary_title;
   }
 
   return result;

@@ -23,10 +23,11 @@ const emptyPageForm = {
   description_en: '',
   image_url: '',
   drive_url: '',
+  primary_title: '',
   primary_thumbnail_url: '',
   additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[],
 };
-const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', drive_url: '', primary_thumbnail_url: '', additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[] };
+const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', drive_url: '', primary_title: '', primary_thumbnail_url: '', additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[] };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
 
@@ -189,7 +190,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     }));
 
     // Encode in description for fallback persistence
-    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, pageForm.primary_thumbnail_url);
+    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, pageForm.primary_thumbnail_url, pageForm.primary_title);
 
     const fullPayload: any = {
       name: pageForm.name,
@@ -243,7 +244,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     const additionalVideos = (specForm.additional_videos || []).filter(v => v.url && v.url.trim());
 
     // Encode in description for fallback persistence
-    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, specForm.primary_thumbnail_url);
+    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, specForm.primary_thumbnail_url, specForm.primary_title);
 
     const fullPayload: any = {
       service_id: serviceId,
@@ -352,6 +353,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         description_en: cleanPageDescription(linkedPage.description_en || ''),
         image_url: linkedPage.image_url || '',
         drive_url: extracted.primary_url || '',
+        primary_title: extracted.primary_title || (extracted.videos[0]?.title !== 'فيديو 1' ? extracted.videos[0]?.title : '') || '',
         primary_thumbnail_url: extracted.videos[0]?.thumbnail_url || '',
         additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url, thumbnail_url: v.thumbnail_url || '' })),
       });
@@ -364,6 +366,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         description_en: '',
         image_url: '',
         drive_url: '',
+        primary_title: '',
         primary_thumbnail_url: '',
         additional_videos: [],
       });
@@ -640,12 +643,12 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                       </div>
                     </div>
 
-                    {/* حقل رابط فيديو Google Drive الرئيسي */}
-                    <div className="space-y-1.5">
+                    {/* حقل رابط وعنوان فيديو Google Drive الرئيسي */}
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between text-xs">
                         <label className="font-semibold text-gray-200 flex items-center gap-1.5">
                           <Play className="h-3.5 w-3.5 text-blue-400 fill-current" />
-                          <span>رابط فيديو Google Drive الرئيسي:</span>
+                          <span>فيديو Google Drive الرئيسي:</span>
                         </label>
                         {pageForm.drive_url && (
                           <a
@@ -659,16 +662,37 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                           </a>
                         )}
                       </div>
-                      <input
-                        type="url"
-                        value={pageForm.drive_url}
-                        onChange={e => setPageForm({ ...pageForm, drive_url: e.target.value })}
-                        placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
-                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                      />
-                      <p className="text-[11px] text-gray-400 leading-relaxed">
-                        💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
-                      </p>
+
+                      {/* عنوان الفيديو الأول */}
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">
+                          عنوان الفيديو الأول (اختياري - يظهر على الكفر):
+                        </label>
+                        <input
+                          type="text"
+                          value={pageForm.primary_title}
+                          onChange={e => setPageForm({ ...pageForm, primary_title: e.target.value })}
+                          placeholder="مثلاً: جولة تعريفية بالخدمة"
+                          className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                        />
+                      </div>
+
+                      {/* رابط الفيديو في درايف */}
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1">
+                          رابط الفيديو في Google Drive:
+                        </label>
+                        <input
+                          type="url"
+                          value={pageForm.drive_url}
+                          onChange={e => setPageForm({ ...pageForm, drive_url: e.target.value })}
+                          placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
+                          className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                        />
+                        <p className="mt-1 text-[11px] text-gray-400 leading-relaxed">
+                          💡 انسخ رابط المشاركة للفيديو من Google Drive. تأكد من ضبط إعداد المشاركة في درايف على: <strong className="text-blue-300 font-semibold">أي شخص لديه الرابط (Anyone with the link)</strong> ليعمل المشغل لجميع زوار الموقع.
+                        </p>
+                      </div>
                       
                       {/* كفر الفيديو الرئيسي - رفع مباشر من الجهاز */}
                       <VideoCoverField
@@ -828,6 +852,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         description_en: spec.description_en || '', 
                         image_url: spec.image_url || '',
                         drive_url: extracted.primary_url || '',
+                        primary_title: extracted.primary_title || (extracted.videos[0]?.title !== 'فيديو 1' ? extracted.videos[0]?.title : '') || '',
                         primary_thumbnail_url: extracted.videos[0]?.thumbnail_url || '',
                         additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url, thumbnail_url: v.thumbnail_url || '' })),
                       }); 
@@ -853,26 +878,52 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />
                   
                   {/* فيديوهات Google Drive للقسم */}
-                  <div className="grid grid-cols-1 gap-2 rounded-xl bg-gray-800/30 p-4 border border-gray-700/50">
-                    <label className="text-sm text-gray-400">رابط فيديو Google Drive الرئيسي للقسم:</label>
-                    {specForm.drive_url && (
-                      <a
-                        href={specForm.drive_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-2 py-1 text-xs text-blue-300 hover:bg-blue-500/20 transition-colors"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        <span>معاينة الرابط الحالي</span>
-                      </a>
-                    )}
-                    <input
-                      type="url"
-                      value={specForm.drive_url}
-                      onChange={e => setSpecForm({ ...specForm, drive_url: e.target.value })}
-                      placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
-                      className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                    />
+                  <div className="grid grid-cols-1 gap-3 rounded-xl bg-gray-800/30 p-4 border border-gray-700/50">
+                    <div className="flex items-center justify-between text-xs">
+                      <label className="font-semibold text-gray-200 flex items-center gap-1.5">
+                        <Play className="h-3.5 w-3.5 text-pink-400 fill-current" />
+                        <span>فيديو Google Drive الرئيسي للقسم:</span>
+                      </label>
+                      {specForm.drive_url && (
+                        <a
+                          href={specForm.drive_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-2 py-1 text-xs text-blue-300 hover:bg-blue-500/20 transition-colors"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          <span>معاينة الرابط الحالي</span>
+                        </a>
+                      )}
+                    </div>
+
+                    {/* عنوان الفيديو الأول للقسم */}
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">
+                        عنوان الفيديو الأول (اختياري - يظهر على الكفر):
+                      </label>
+                      <input
+                        type="text"
+                        value={specForm.primary_title}
+                        onChange={e => setSpecForm({ ...specForm, primary_title: e.target.value })}
+                        placeholder="مثلاً: استعراض أعمال هذا القسم"
+                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3 text-sm text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none"
+                      />
+                    </div>
+
+                    {/* رابط الفيديو للقسم */}
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">
+                        رابط الفيديو في Google Drive:
+                      </label>
+                      <input
+                        type="url"
+                        value={specForm.drive_url}
+                        onChange={e => setSpecForm({ ...specForm, drive_url: e.target.value })}
+                        placeholder="https://drive.google.com/file/d/1.../view?usp=sharing"
+                        className="w-full rounded-xl bg-gray-800/80 border border-gray-700 p-3.5 text-sm text-white placeholder-gray-500 focus:border-pink-500 focus:outline-none"
+                      />
+                    </div>
                     
                     {/* كفر الفيديو الرئيسي للتخصص - رفع مباشر من الجهاز */}
                     <VideoCoverField
