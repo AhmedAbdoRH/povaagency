@@ -82,12 +82,10 @@ export default function CoreServicePageView({
 
   // Check if this is a section that should show works directly (flattened)
   const isDirectWorksView = coreService.slug === 'social-media-campaigns' || 
-                           coreService.slug === 'marketing-strategy' || 
-                           coreService.slug === 'content-creation';
+                           coreService.slug === 'marketing-strategy';
 
-  // Check if this is marketing-strategy, content-creation or social-media-campaigns page (hide section buttons)
+  // Check if this is marketing-strategy or social-media-campaigns page (hide section buttons)
   const hideSectionButtons = coreService.slug === 'marketing-strategy' || 
-                            coreService.slug === 'content-creation' ||
                             coreService.slug === 'social-media-campaigns';
 
   // تحديد المقاس حسب الخدمة

@@ -99,9 +99,9 @@ export default function ServiceDetails() {
       }));
 
       setSections(normalizedSections);
-      // For marketing-strategy and content-creation, if no sections, fetch direct clients
+      // For marketing-strategy only, if no sections, fetch direct clients
       if (
-        (selectedCoreService?.slug === 'marketing-strategy' || selectedCoreService?.slug === 'content-creation') && 
+        selectedCoreService?.slug === 'marketing-strategy' && 
         normalizedSections.length === 0 && 
         resolvedPage
       ) {
