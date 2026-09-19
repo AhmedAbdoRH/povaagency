@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Play } from 'lucide-react';
 import type { Page, Specialization } from '../types/database';
 import { extractDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
 
 interface ServiceDriveVideosProps {
   page: Page | Specialization | null;
+  /** If true, show only one random video. If false, show all videos. Default: true */
+  showRandomOnly?: boolean;
 }
 
 interface SingleDriveVideoProps {
@@ -93,7 +95,7 @@ function DriveVideoCard({ video, index }: SingleDriveVideoProps) {
   );
 }
 
-export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
+export default function ServiceDriveVideos({ page, showRandomOnly = true }: ServiceDriveVideosProps) {
   if (!page) return null;
 
   const { videos } = extractDriveVideos(page);
@@ -102,10 +104,19 @@ export default function ServiceDriveVideos({ page }: ServiceDriveVideosProps) {
     return null;
   }
 
+  // If showRandomOnly is true, display only one random video
+  const videosToDisplay = useMemo(() => {
+    if (showRandomOnly) {
+      const randomIndex = Math.floor(Math.random() * videos.length);
+      return [videos[randomIndex]];
+    }
+    return videos;
+  }, [videos, showRandomOnly]);
+
   return (
     <div className="mt-8 mb-6 w-full">
       <div className="flex flex-wrap items-center gap-5 sm:gap-6">
-        {videos.map((vid, idx) => (
+        {videosToDisplay.map((vid, idx) => (
           <DriveVideoCard
             key={vid.id || idx}
             video={vid}
