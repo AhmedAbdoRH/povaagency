@@ -152,6 +152,7 @@ export interface StoreSettings {
   twitter_url: string | null;
   snapchat_url: string | null;
   tiktok_url: string | null;
+  phone_video_url: string | null; // URL for the video inside the phone mockup
   theme_settings?: {
     primaryColor?: string;
     secondaryColor?: string;

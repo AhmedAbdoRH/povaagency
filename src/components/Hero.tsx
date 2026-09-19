@@ -2,6 +2,9 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
+import { supabase } from '../lib/supabase';
+import type { StoreSettings } from '../types/database';
+import { getGoogleDriveEmbedUrl } from '../utils/pageLinks';
 import {
   Play,
   Heart,
@@ -223,6 +226,34 @@ export default function Hero() {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(2847);
+  const [phoneVideoUrl, setPhoneVideoUrl] = useState<string | null>(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  // Fetch phone video URL from store_settings
+  useEffect(() => {
+    const fetchPhoneVideo = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('store_settings')
+          .select('phone_video_url')
+          .single();
+        
+        if (error) throw error;
+        
+        // Handle phone video (single URL) - convert Google Drive URL to embed URL
+        if (data?.phone_video_url) {
+          const embedUrl = getGoogleDriveEmbedUrl(data.phone_video_url);
+          setPhoneVideoUrl(embedUrl);
+        }
+      } catch (error) {
+        console.error('Error fetching phone video:', error);
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+
+    fetchPhoneVideo();
+  }, []);
 
   /* tilt on mouse move with initial entrance animation */
   const mx = useMotionValue(0);
@@ -281,7 +312,9 @@ export default function Hero() {
   return (
     <section
       className="relative min-h-screen overflow-hidden flex items-center pt-0"
-      style={{ background: 'linear-gradient(135deg, #ec533a 0%, #d4402a 25%, #c03320 50%, #d04228 75%, #b52e18 100%)' }}
+      style={{ 
+        background: 'linear-gradient(135deg, #ec533a 0%, #d4402a 25%, #c03320 50%, #d04228 75%, #b52e18 100%)'
+      }}
     >
       {/* ── inject keyframes ── */}
       <style>{heroStyles}</style>
@@ -411,13 +444,26 @@ export default function Hero() {
               >
                 {/* ── video area ── */}
                 <div className="relative overflow-hidden w-full group" style={{ aspectRatio: '9/16' }}>
-                  <video
-                    ref={videoRef}
-                    autoPlay={false} playsInline
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                  >
-                    <source src="/hero_video.mp4" type="video/mp4" />
-                  </video>
+                  {phoneVideoUrl && phoneVideoUrl.includes('drive.google.com') ? (
+                    // Google Drive video using iframe
+                    <div className="absolute inset-0 pointer-events-none">
+                      <iframe
+                        src={phoneVideoUrl}
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : (
+                    // Regular video
+                    <video
+                      ref={videoRef}
+                      autoPlay={false} playsInline
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
+                    >
+                      <source src={phoneVideoUrl || "/hero_video.mp4"} type="video/mp4" />
+                    </video>
+                  )}
 
                   {/* scrim */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20 pointer-events-none" />

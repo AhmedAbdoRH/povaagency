@@ -4,13 +4,13 @@ import { Edit, Trash2, Download, Users, X, ZoomIn, Plus, Play, ExternalLink, Vid
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
-import type { Client, ClientContent, Page, Service, Specialization } from '../types/database';
+import type { Client, ClientContent, Page, Service, Specialization, StoreSettings } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
-import { optimizeImage, isImageFile } from '../utils/imageOptimization';
+import { optimizeImage, isImageFile, autoConvertToWebp } from '../utils/imageOptimization';
 import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
 import VideoCoverField from '../components/VideoCoverField';
 
-type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | 'specContent' | null;
+type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | 'specContent' | 'settings' | null;
 
 interface AdminDashboardProps {
   onSettingsUpdate?: () => void;
@@ -42,6 +42,8 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [clients, setClients] = useState<Client[]>([]);
   const [contents, setContents] = useState<ClientContent[]>([]);
   const [customerRequests, setCustomerRequests] = useState<any[]>([]);
+  const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
+  const [settingsForm, setSettingsForm] = useState({ phone_video_url: '' });
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -66,13 +68,14 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [p, s, sp, c, cc, cr] = await Promise.all([
+      const [p, s, sp, c, cc, cr, settings] = await Promise.all([
         supabase.from('pages').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('services').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('specializations').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('clients').select('*, content:client_content(*)').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('client_content').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('collaboration_requests').select('*').order('created_at', { ascending: false }),
+        supabase.from('store_settings').select('*').single(),
       ]);
       if (p.error) throw p.error;
       if (s.error) throw s.error;
@@ -80,12 +83,19 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       if (c.error) throw c.error;
       if (cc.error) throw cc.error;
       if (cr.error) throw cr.error;
+      if (settings.error && settings.error.code !== 'PGRST116') throw settings.error; // PGRST116 means no rows, which is acceptable
       setPages(p.data || []);
       setServices(s.data || []);
       setSpecializations(sp.data || []);
       setClients(c.data || []);
       setContents(cc.data || []);
       setCustomerRequests(cr.data || []);
+      setStoreSettings(settings.data || null);
+      if (settings.data) {
+        setSettingsForm({ 
+          phone_video_url: settings.data.phone_video_url || ''
+        });
+      }
     } catch (error: any) {
       toast.error(`خطأ: ${error.message}`);
     } finally {
@@ -116,6 +126,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     setSpecForm({ ...emptySpecForm, service_id: selectedPage ? (primaryService(selectedPage)?.id || '') : '' });
     setClientForm({ ...emptyClientForm, specialization_id: selectedSpec || '' });
     setContentForm({ ...emptyContentForm, client_id: selectedClient || '' });
+    if (storeSettings) {
+      setSettingsForm({ 
+        phone_video_url: storeSettings.phone_video_url || ''
+      });
+    }
   };
 
   const scrollToForm = () => {
@@ -133,15 +148,16 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
       let optimizedFile = file;
       try {
-        toast.info('جاري تحسين الصورة...');
-        optimizedFile = await optimizeImage(file, {
-          maxWidth: 1280,
-          maxHeight: 1280,
-          quality: 0.65,
+        toast.info('جاري تحويل الصورة إلى WebP مضغوطة...');
+        // Use improved quality settings for better results while keeping file size small
+        optimizedFile = await autoConvertToWebp(file, {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.75,
           format: 'webp',
         });
       } catch (error) {
-        console.warn('Failed to optimize image, using original:', error);
+        console.warn('Failed to convert image to WebP, using original:', error);
       }
 
       const ext = optimizedFile.name.split('.').pop();
@@ -308,6 +324,27 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     toast.success(editingContent ? 'تم تحديث المحتوى.' : 'تمت إضافة المحتوى.');
     resetForms();
     await fetchData();
+  };
+
+  const saveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase
+        .from('store_settings')
+        .upsert({ 
+          id: storeSettings?.id || undefined, 
+          phone_video_url: settingsForm.phone_video_url || null,
+          updated_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      toast.success('تم تحديث إعدادات المتجر بنجاح.');
+      resetForms();
+      await fetchData();
+      if (onSettingsUpdate) onSettingsUpdate();
+    } catch (error: any) {
+      toast.error(`خطأ: ${error.message}`);
+    }
   };
 
   const removeItem = async (table: 'pages' | 'specializations' | 'clients' | 'client_content' | 'collaboration_requests', id: string) => {
@@ -1077,6 +1114,59 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
 
 
+        </div>
+
+        {/* إعدادات الموقع */}
+        <div className="mt-12">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-purple-300">إعدادات الموقع</h2>
+              <p className="mt-2 text-sm text-gray-400">إعدادات عامة للموقع مثل فيديوهات الهيرو الرئيسي.</p>
+            </div>
+            <button
+              onClick={() => { resetForms(); setActiveForm('settings'); scrollToForm(); }}
+              className="rounded-xl bg-purple-500/20 px-4 py-2 text-purple-200"
+            >
+              تعديل الإعدادات
+            </button>
+          </div>
+
+          {activeForm === 'settings' && (
+            <form onSubmit={saveSettings} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5">
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-300">فيديو الهاتف (Phone Video)</label>
+                <p className="mt-1 text-xs text-gray-400 mb-2">فيديو الهاتف الذي يظهر في قالب الهاتف في قسم الهيرو</p>
+                <input
+                  value={settingsForm.phone_video_url}
+                  onChange={e => setSettingsForm({ ...settingsForm, phone_video_url: e.target.value })}
+                  placeholder="https://example.com/phone-video.mp4"
+                  className="w-full rounded-xl bg-gray-800/50 p-4 text-white"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button type="submit" className="rounded-xl bg-purple-600 p-4">
+                  حفظ الإعدادات
+                </button>
+                <button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">
+                  إغلاق
+                </button>
+              </div>
+            </form>
+          )}
+
+          {storeSettings?.phone_video_url && (
+            <div className="mt-4 p-4 rounded-xl border border-gray-600/50 bg-gray-800/30">
+              <p className="text-sm text-gray-300 mb-2">فيديو الهاتف الحالي:</p>
+              <a 
+                href={storeSettings.phone_video_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-accent hover:underline text-xs"
+              >
+                {storeSettings.phone_video_url}
+              </a>
+            </div>
+          )}
         </div>
 
         {activeForm === 'customers' && (

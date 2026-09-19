@@ -11,9 +11,17 @@ export interface ImageOptimizationOptions {
 }
 
 const DEFAULT_OPTIONS: ImageOptimizationOptions = {
-  maxWidth: 1280,
-  maxHeight: 1280,
-  quality: 0.65,
+  maxWidth: 1920,
+  maxHeight: 1920,
+  quality: 0.75,
+  format: 'webp',
+};
+
+// خيارات محسنة لكوفر الفيديوهات (أصغر حجم لكن جودة أعلى)
+const THUMBNAIL_OPTIONS: ImageOptimizationOptions = {
+  maxWidth: 800,
+  maxHeight: 800,
+  quality: 0.8,
   format: 'webp',
 };
 
@@ -269,4 +277,26 @@ export async function fileToBase64(file: File): Promise<string> {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * تحويل كوفر الفيديو إلى webp مضغوطة تلقائياً
+ * @param file - ملف الصورة الأصلي
+ * @returns ملف الصورة المحول إلى webp
+ */
+export async function convertVideoThumbnailToWebp(file: File): Promise<File> {
+  return optimizeImage(file, THUMBNAIL_OPTIONS);
+}
+
+/**
+ * تحويل أي صورة مرفوعة إلى webp مضغوطة تلقائياً
+ * @param file - ملف الصورة الأصلي
+ * @param customOptions - خيارات مخصصة (اختياري)
+ * @returns ملف الصورة المحول إلى webp
+ */
+export async function autoConvertToWebp(
+  file: File,
+  customOptions?: Partial<ImageOptimizationOptions>
+): Promise<File> {
+  return optimizeImage(file, customOptions);
 }

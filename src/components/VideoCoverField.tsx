@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, Image as ImageIcon, Trash2, CheckCircle2, Loader2, Link2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { supabase } from '../lib/supabase';
-import { optimizeImage, isImageFile } from '../utils/imageOptimization';
+import { autoConvertToWebp, isImageFile } from '../utils/imageOptimization';
 import { normalizeThumbnailUrl } from '../utils/pageLinks';
 
 interface VideoCoverFieldProps {
@@ -36,18 +36,19 @@ export default function VideoCoverField({
 
     setUploading(true);
     try {
-      toast.info('جاري تحسين ورفع كفر الفيديو من جهازك...');
+      toast.info('جاري تحويل كفر الفيديو إلى WebP مضغوطة ورفعه...');
 
       let fileToUpload = file;
       try {
-        fileToUpload = await optimizeImage(file, {
+        // Use optimized settings for video thumbnails (better quality but smaller size)
+        fileToUpload = await autoConvertToWebp(file, {
           maxWidth: 1080,
           maxHeight: 1920,
-          quality: 0.82,
+          quality: 0.8,
           format: 'webp',
         });
       } catch (optErr) {
-        console.warn('Image optimization skipped:', optErr);
+        console.warn('Image conversion to WebP skipped:', optErr);
       }
 
       const ext = fileToUpload.name.split('.').pop() || 'webp';
@@ -70,7 +71,7 @@ export default function VideoCoverField({
 
       if (publicUrl) {
         onChange(publicUrl);
-        toast.success('تم رفع كفر الفيديو بنجاح من جهازك ✨');
+        toast.success('تم رفع كفر الفيديو كـ WebP مضغوطة بنجاح ✨');
       }
     } catch (err: any) {
       console.error('Error uploading video cover:', err);
@@ -200,7 +201,7 @@ export default function VideoCoverField({
                   : 'اضغط لرفع كفر الفيديو من جهازك'}
               </span>
               <span className="text-[11px] text-gray-400 block mt-0.5">
-                يمكنك أيضاً سحب الصورة وإفلاتها هنا (JPG, PNG, WebP)
+                سيتم تحويل الصورة تلقائياً إلى WebP مضغوطة (JPG, PNG, WebP, GIF)
               </span>
             </div>
           </div>
