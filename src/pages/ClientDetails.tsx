@@ -34,7 +34,7 @@ export default function ClientDetails() {
     if (id) {
       Promise.all([
         supabase.from('clients').select('id, name, name_en, description, description_en, image_url, logo_url, project_url, specialization_id, is_active, display_order, created_at, updated_at, specializations(id, name, name_en, service_id)').eq('id', id).single(),
-        supabase.from('client_content').select('*').eq('client_id', id).order('created_at', { ascending: true })
+        supabase.from('client_content').select('*').eq('client_id', id).order('display_order', { ascending: true }).order('created_at', { ascending: true })
       ]).then(([clientRes, contentRes]) => {
          if (!clientRes.error && clientRes.data) {
            const { specializations, ...clientData } = clientRes.data;

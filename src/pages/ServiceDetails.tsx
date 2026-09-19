@@ -79,7 +79,7 @@ export default function ServiceDetails() {
 
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('specializations')
-        .select('*, clients(*, client_content(*))')
+        .select('*, clients(*, content:client_content(*))')
         .in('service_id', serviceIds)
         .eq('is_active', true)
         .order('display_order', { ascending: true })
@@ -142,7 +142,7 @@ export default function ServiceDetails() {
       }
       const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
-        .select('*, client_content(*)')
+        .select('*, content:client_content(*)')
         .in('specialization_id', specIds)
         .eq('is_active', true)
         .order('display_order', { ascending: true })

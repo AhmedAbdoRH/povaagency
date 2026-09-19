@@ -70,7 +70,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
         supabase.from('pages').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('services').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('specializations').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
-        supabase.from('clients').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
+        supabase.from('clients').select('*, content:client_content(*)').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('client_content').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: true }),
         supabase.from('collaboration_requests').select('*').order('created_at', { ascending: false }),
       ]);

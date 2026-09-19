@@ -55,7 +55,7 @@ export interface Client {
   created_at: string;
   updated_at: string;
   specialization?: Specialization;
-  content?: ClientContent[];
+  content?: ClientContent[]; // Maps to client_content in database
 }
 
 export interface ClientContent {

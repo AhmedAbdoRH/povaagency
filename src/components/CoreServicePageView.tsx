@@ -139,23 +139,26 @@ export default function CoreServicePageView({
     
     const works: any[] = [];
     selectedSection.clients?.forEach(client => {
+      // Handle both naming conventions: client_content and content
       const clientContent = (client as any).client_content || (client as any).content || [];
-      clientContent.forEach((content: any) => {
-        works.push({
-          ...content,
-          clientName: client.name,
-          clientNameEn: client.name_en,
-          clientId: client.id,
-          // Use client data as fallback for content
-          id: content.id,
-          title: content.title || client.name,
-          description: content.description || client.description,
-          image_url: content.image_url || client.image_url,
-          video_url: content.video_url,
-          is_vertical_video: content.is_vertical_video,
-          project_url: client.project_url
+      if (Array.isArray(clientContent) && clientContent.length > 0) {
+        clientContent.forEach((content: any) => {
+          works.push({
+            ...content,
+            clientName: client.name,
+            clientNameEn: client.name_en,
+            clientId: client.id,
+            // Use client data as fallback for content
+            id: content.id,
+            title: content.title || client.name,
+            description: content.description || client.description,
+            image_url: content.image_url || client.image_url,
+            video_url: content.video_url,
+            is_vertical_video: content.is_vertical_video,
+            project_url: client.project_url
+          });
         });
-      });
+      }
     });
     
     // Sort works by display order if available, or by created_at
