@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { supabase } from '../lib/supabase';
 import { getGoogleDriveEmbedUrl, isGoogleDriveUrl } from '../utils/pageLinks';
+import type { PhoneVideoItem } from '../types/database';
 import {
   Play,
   Heart,
@@ -15,6 +16,9 @@ import {
   Sparkles,
   Briefcase,
   X,
+  Shuffle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 /* ─── CSS for hero background animations ─── */
@@ -226,8 +230,110 @@ export default function Hero() {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(2847);
-  const [phoneVideoUrl, setPhoneVideoUrl] = useState<string | null>(null);
-  const [phoneVideoCoverUrl, setPhoneVideoCoverUrl] = useState<string | null>(null);
+
+  // Multiple phone videos support with rotation on each visit
+  const [phoneVideos, setPhoneVideos] = useState<PhoneVideoItem[]>([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+
+  // Fetch phone videos from store_settings
+  useEffect(() => {
+    const fetchPhoneVideos = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('store_settings')
+          .select('*')
+          .single();
+        
+        if (error) throw error;
+
+        const defaultCover = (data as any)?.phone_video_cover_url ||
+          data?.theme_settings?.phone_video_cover_url ||
+          data?.theme_settings?.phone_video_cover ||
+          null;
+
+        const list: PhoneVideoItem[] = [];
+
+        // 1. Check theme_settings.phone_videos
+        if (Array.isArray(data?.theme_settings?.phone_videos) && data.theme_settings.phone_videos.length > 0) {
+          data.theme_settings.phone_videos.forEach((item, idx) => {
+            if (item?.video_url && item.video_url.trim() !== '') {
+              list.push({
+                id: item.id || `v-${idx}`,
+                video_url: item.video_url.trim(),
+                cover_url: item.cover_url || defaultCover,
+                title: item.title || `فيديو ${idx + 1}`
+              });
+            }
+          });
+        }
+
+        // 2. If empty, check hero_video_urls
+        if (list.length === 0 && Array.isArray(data?.hero_video_urls) && data.hero_video_urls.length > 0) {
+          data.hero_video_urls.forEach((url: string, idx: number) => {
+            if (url && url.trim() !== '') {
+              list.push({
+                id: `hero-${idx}`,
+                video_url: url.trim(),
+                cover_url: defaultCover,
+                title: `فيديو ${idx + 1}`
+              });
+            }
+          });
+        }
+
+        // 3. Fallback to single phone_video_url
+        if (list.length === 0 && data?.phone_video_url) {
+          list.push({
+            id: 'default',
+            video_url: data.phone_video_url.trim(),
+            cover_url: defaultCover,
+            title: 'فيديو الهاتف'
+          });
+        }
+
+        // 4. Default fallback if nothing in DB
+        if (list.length === 0) {
+          list.push({
+            id: 'fallback',
+            video_url: '/hero_video.mp4',
+            cover_url: defaultCover,
+            title: 'الفيديو الافتراضي'
+          });
+        }
+
+        setPhoneVideos(list);
+
+        // التدوير الذكي: اختيار فيديو مختلف في كل مرة يتم فيها فتح الصفحة أو إعادة تحميلها
+        if (list.length > 1) {
+          const lastIdxStr = sessionStorage.getItem('last_phone_video_idx');
+          let nextIdx = 0;
+          if (lastIdxStr !== null) {
+            const lastIdx = parseInt(lastIdxStr, 10);
+            nextIdx = (lastIdx + 1) % list.length;
+          } else {
+            // اختيار عشوائي ذكي في أول زيارة
+            nextIdx = Math.floor(Math.random() * list.length);
+          }
+          sessionStorage.setItem('last_phone_video_idx', nextIdx.toString());
+          setCurrentVideoIndex(nextIdx);
+        } else {
+          setCurrentVideoIndex(0);
+        }
+      } catch (error) {
+        console.error('Error fetching phone video:', error);
+      }
+    };
+
+    fetchPhoneVideos();
+  }, []);
+
+  // Compute active video URL and cover
+  const activeVideoItem = phoneVideos[currentVideoIndex] || phoneVideos[0] || null;
+  const rawVideoUrl = activeVideoItem?.video_url || null;
+  const phoneVideoUrl = rawVideoUrl
+    ? (isGoogleDriveUrl(rawVideoUrl) ? getGoogleDriveEmbedUrl(rawVideoUrl) : rawVideoUrl)
+    : null;
+  const phoneVideoCoverUrl = activeVideoItem?.cover_url || null;
 
   const isDrive = Boolean(phoneVideoUrl && isGoogleDriveUrl(phoneVideoUrl));
 
@@ -236,38 +342,17 @@ export default function Hero() {
     ? `${phoneVideoUrl}${phoneVideoUrl.includes('?') ? '&' : '?'}autoplay=${isPlaying ? '1' : '0'}`
     : '';
 
-  // Fetch phone video URL and cover from store_settings
-  useEffect(() => {
-    const fetchPhoneVideo = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('store_settings')
-          .select('*')
-          .single();
-        
-        if (error) throw error;
-        
-        // Handle phone video (single URL) - convert Google Drive URL to embed URL
-        if (data?.phone_video_url) {
-          const embedUrl = getGoogleDriveEmbedUrl(data.phone_video_url);
-          setPhoneVideoUrl(embedUrl);
-        }
-
-        // Cover from direct column or theme_settings JSON
-        const cover = (data as any)?.phone_video_cover_url ||
-          data?.theme_settings?.phone_video_cover_url ||
-          data?.theme_settings?.phone_video_cover ||
-          null;
-        if (cover) {
-          setPhoneVideoCoverUrl(cover);
-        }
-      } catch (error) {
-        console.error('Error fetching phone video:', error);
-      }
-    };
-
-    fetchPhoneVideo();
-  }, []);
+  // Switch video manually
+  const switchVideo = (step: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (phoneVideos.length <= 1) return;
+    setIsPlaying(false);
+    setCurrentVideoIndex(prev => {
+      const next = (prev + step + phoneVideos.length) % phoneVideos.length;
+      sessionStorage.setItem('last_phone_video_idx', next.toString());
+      return next;
+    });
+  };
 
   /* tilt on mouse move with initial entrance animation */
   const mx = useMotionValue(0);
@@ -464,13 +549,13 @@ export default function Hero() {
                 {/* ── video area ── */}
                 <div className="relative overflow-hidden w-full group bg-black" style={{ aspectRatio: '9/16' }}>
                   {isDrive ? (
-                    // Google Drive video using iframe cropped to hide header controls
+                    // Google Drive video using iframe cropped to hide header controls, showing bottom controls when playing
                     <div className="absolute inset-0 overflow-hidden">
-                      <div className="absolute -top-[54px] -bottom-[48px] -left-[1px] -right-[1px]">
+                      <div className={`absolute -top-[52px] -left-[1px] -right-[1px] ${isPlaying ? 'bottom-0' : '-bottom-[48px]'}`}>
                         <iframe
                           src={isPlaying ? driveEmbedSrc : phoneVideoUrl || ''}
                           className="w-full h-full border-0 pointer-events-auto"
-                          allow="autoplay; fullscreen"
+                          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                           allowFullScreen
                         />
                       </div>
@@ -480,6 +565,7 @@ export default function Hero() {
                     <video
                       ref={videoRef}
                       autoPlay={false} playsInline
+                      controls={isPlaying}
                       poster={phoneVideoCoverUrl || undefined}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                     >
@@ -505,6 +591,48 @@ export default function Hero() {
                       isPlaying ? 'opacity-0 z-0' : 'opacity-100 z-10'
                     }`}
                   />
+
+                  {/* Multi-video indicator badge and quick switch button */}
+                  {phoneVideos.length > 1 && (
+                    <div className={`absolute top-4 left-4 z-20 transition-all duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                      <button
+                        type="button"
+                        onClick={(e) => switchVideo(1, e)}
+                        className="px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 shadow-lg transition-all active:scale-95 group"
+                        title="انقر للتبديل للفيديو التالي"
+                      >
+                        <Shuffle className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-180 transition-transform duration-300" />
+                        <span>{activeVideoItem?.title || `فيديو ${currentVideoIndex + 1}`}</span>
+                        <span className="text-[10px] text-gray-300 px-1.5 py-0.5 rounded-full bg-white/10">
+                          {currentVideoIndex + 1}/{phoneVideos.length}
+                        </span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Navigation arrows for switching between videos */}
+                  {!isPlaying && phoneVideos.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => switchVideo(-1, e)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                        aria-label="الفيديو السابق"
+                        title="الفيديو السابق"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => switchVideo(1, e)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                        aria-label="الفيديو التالي"
+                        title="الفيديو التالي"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
 
                   {/* play/pause tap zone (only active when not playing) */}
                   {!isPlaying && (

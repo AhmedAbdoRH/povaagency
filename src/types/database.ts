@@ -137,6 +137,13 @@ export interface Banner {
   page?: Page;
 }
 
+export interface PhoneVideoItem {
+  id: string;
+  video_url: string;
+  cover_url?: string | null;
+  title?: string;
+}
+
 export interface StoreSettings {
   id: string;
   store_name: string | null;
@@ -154,6 +161,7 @@ export interface StoreSettings {
   tiktok_url: string | null;
   phone_video_url: string | null; // URL for the video inside the phone mockup
   phone_video_cover_url?: string | null; // Cover/poster image URL for the phone video
+  hero_video_urls?: string[] | null;
   theme_settings?: {
     primaryColor?: string;
     secondaryColor?: string;
@@ -162,6 +170,7 @@ export interface StoreSettings {
     fontFamily?: string;
     phone_video_cover_url?: string;
     phone_video_cover?: string;
+    phone_videos?: PhoneVideoItem[];
   } | null;
   updated_at: string;
 }

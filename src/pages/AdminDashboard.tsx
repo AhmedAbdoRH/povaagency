@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Download, Users, X, ZoomIn, Plus, Play, ExternalLink, Video } from 'lucide-react';
+import { Edit, Trash2, Download, Users, X, ZoomIn, Plus, Play, ExternalLink, Video, Sparkles } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from '../lib/supabase';
-import type { Client, ClientContent, Page, Service, Specialization, StoreSettings } from '../types/database';
+import type { Client, ClientContent, Page, Service, Specialization, StoreSettings, PhoneVideoItem } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { optimizeImage, isImageFile, autoConvertToWebp } from '../utils/imageOptimization';
 import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
@@ -43,10 +43,63 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [contents, setContents] = useState<ClientContent[]>([]);
   const [customerRequests, setCustomerRequests] = useState<any[]>([]);
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
-  const [settingsForm, setSettingsForm] = useState({ 
+  const [settingsForm, setSettingsForm] = useState<{ 
+    phone_video_url: string;
+    phone_video_cover_url: string;
+    phone_videos: PhoneVideoItem[];
+  }>({ 
     phone_video_url: '',
-    phone_video_cover_url: '' 
+    phone_video_cover_url: '',
+    phone_videos: []
   });
+
+  const parseStoreSettingsToForm = (data: StoreSettings | null) => {
+    if (!data) return { phone_video_url: '', phone_video_cover_url: '', phone_videos: [] };
+
+    const cover = (data as any)?.phone_video_cover_url ||
+      data?.theme_settings?.phone_video_cover_url ||
+      data?.theme_settings?.phone_video_cover ||
+      '';
+
+    let videos: PhoneVideoItem[] = [];
+    if (Array.isArray(data.theme_settings?.phone_videos) && data.theme_settings.phone_videos.length > 0) {
+      videos = data.theme_settings.phone_videos.map((v, i) => ({
+        id: v.id || `v-${i}-${Date.now()}`,
+        video_url: v.video_url || '',
+        cover_url: v.cover_url || '',
+        title: v.title || `فيديو ${i + 1}`
+      }));
+    } else if (Array.isArray(data.hero_video_urls) && data.hero_video_urls.length > 0) {
+      videos = data.hero_video_urls.map((url, i) => ({
+        id: `hero-${i}-${Date.now()}`,
+        video_url: url,
+        cover_url: i === 0 ? cover : '',
+        title: `فيديو ${i + 1}`
+      }));
+    } else if (data.phone_video_url) {
+      videos = [{
+        id: `v-1-${Date.now()}`,
+        video_url: data.phone_video_url,
+        cover_url: cover,
+        title: 'فيديو 1'
+      }];
+    }
+
+    if (videos.length === 0) {
+      videos = [{
+        id: `v-new-${Date.now()}`,
+        video_url: '',
+        cover_url: '',
+        title: 'فيديو 1'
+      }];
+    }
+
+    return {
+      phone_video_url: videos[0]?.video_url || data.phone_video_url || '',
+      phone_video_cover_url: videos[0]?.cover_url || cover,
+      phone_videos: videos
+    };
+  };
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -95,14 +148,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       setCustomerRequests(cr.data || []);
       setStoreSettings(settings.data || null);
       if (settings.data) {
-        const cover = (settings.data as any).phone_video_cover_url ||
-          settings.data.theme_settings?.phone_video_cover_url ||
-          settings.data.theme_settings?.phone_video_cover ||
-          '';
-        setSettingsForm({ 
-          phone_video_url: settings.data.phone_video_url || '',
-          phone_video_cover_url: cover
-        });
+        setSettingsForm(parseStoreSettingsToForm(settings.data));
       }
     } catch (error: any) {
       toast.error(`خطأ: ${error.message}`);
@@ -135,14 +181,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     setClientForm({ ...emptyClientForm, specialization_id: selectedSpec || '' });
     setContentForm({ ...emptyContentForm, client_id: selectedClient || '' });
     if (storeSettings) {
-      const cover = (storeSettings as any).phone_video_cover_url ||
-        storeSettings.theme_settings?.phone_video_cover_url ||
-        storeSettings.theme_settings?.phone_video_cover ||
-        '';
-      setSettingsForm({ 
-        phone_video_url: storeSettings.phone_video_url || '',
-        phone_video_cover_url: cover
-      });
+      setSettingsForm(parseStoreSettingsToForm(storeSettings));
     }
   };
 
@@ -342,18 +381,34 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const coverUrl = settingsForm.phone_video_cover_url?.trim() || null;
+      // Clean up phone_videos list
+      const cleanVideos: PhoneVideoItem[] = settingsForm.phone_videos
+        .filter(v => v.video_url && v.video_url.trim() !== '')
+        .map((v, i) => ({
+          id: v.id || `v-${i}-${Date.now()}`,
+          video_url: v.video_url.trim(),
+          cover_url: v.cover_url ? v.cover_url.trim() : null,
+          title: v.title ? v.title.trim() : `فيديو ${i + 1}`
+        }));
+
+      const primaryVideo = cleanVideos[0] || null;
+      const primaryVideoUrl = primaryVideo ? primaryVideo.video_url : (settingsForm.phone_video_url?.trim() || null);
+      const primaryCoverUrl = primaryVideo ? primaryVideo.cover_url : (settingsForm.phone_video_cover_url?.trim() || null);
+      const allVideoUrls = cleanVideos.map(v => v.video_url);
+
       const updatedThemeSettings = {
         ...(storeSettings?.theme_settings || {}),
-        phone_video_cover_url: coverUrl || undefined,
-        phone_video_cover: coverUrl || undefined,
+        phone_videos: cleanVideos,
+        phone_video_cover_url: primaryCoverUrl || undefined,
+        phone_video_cover: primaryCoverUrl || undefined,
       };
 
       // Try saving with phone_video_cover_url column if it exists, otherwise fall back to theme_settings
       const basePayload: any = {
         id: storeSettings?.id || undefined, 
-        phone_video_url: settingsForm.phone_video_url?.trim() || null,
-        phone_video_cover_url: coverUrl,
+        phone_video_url: primaryVideoUrl,
+        phone_video_cover_url: primaryCoverUrl,
+        hero_video_urls: allVideoUrls.length > 0 ? allVideoUrls : null,
         theme_settings: updatedThemeSettings,
         updated_at: new Date().toISOString()
       };
@@ -372,7 +427,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       }
       
       if (error) throw error;
-      toast.success('تم تحديث إعدادات الفيديو والكفر بنجاح ✨');
+      toast.success(
+        cleanVideos.length > 1
+          ? `تم حفظ ${cleanVideos.length} فيديوهات بنجاح! سيتم التبديل بينها في كل زيارة للموقع ✨`
+          : 'تم تحديث إعدادات الفيديو والكفر بنجاح ✨'
+      );
       resetForms();
       await fetchData();
       if (onSettingsUpdate) onSettingsUpdate();
@@ -1167,31 +1226,128 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
           {activeForm === 'settings' && (
             <form onSubmit={saveSettings} className="mt-6 grid gap-5 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5">
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-300">فيديو الهاتف (Phone Video)</label>
-                <p className="mt-1 text-xs text-gray-400 mb-2">رابط فيديو الهاتف (Google Drive أو MP4) الذي يظهر في قالب الهاتف في قسم الهيرو</p>
-                <input
-                  value={settingsForm.phone_video_url}
-                  onChange={e => setSettingsForm({ ...settingsForm, phone_video_url: e.target.value })}
-                  placeholder="https://drive.google.com/file/d/... أو https://example.com/video.mp4"
-                  className="w-full rounded-xl bg-gray-800/50 p-4 text-white border border-gray-600 focus:border-purple-500 focus:outline-none"
-                />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-600/50 pb-3">
+                <div>
+                  <h3 className="text-lg font-bold text-purple-200">فيديوهات قالب الهاتف في قسم الهيرو</h3>
+                  <p className="mt-1 text-xs text-gray-300">
+                    أضف فيديو أو أكثر مع كفر مخصص لكل فيديو. عند إضافة أكثر من فيديو، <strong className="text-emerald-400">سيظهر للزائر فيديو مختلف في كل مرة</strong> يفتح فيها الصفحة تلقائياً!
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">
+                    {settingsForm.phone_videos.length} {settingsForm.phone_videos.length > 1 ? 'فيديوهات' : 'فيديو'}
+                  </span>
+                </div>
               </div>
 
-              {/* حقل كفر الفيديو مع ضغط وتحويل تلقائي لـ WebP عند الرفع من الجهاز */}
-              <div>
-                <VideoCoverField
-                  label="كفر الفيديو في الهاتف (Poster Cover)"
-                  sublabel="يتم رفعه من جهازك وضغطه وتحويله فوراً إلى WebP خفيفة وسريعة (مقاس 9:16)"
-                  coverUrl={settingsForm.phone_video_cover_url}
-                  onChange={(url) => setSettingsForm(prev => ({ ...prev, phone_video_cover_url: url }))}
-                  idPrefix="settings-phone-cover"
-                />
+              {/* قائمة الفيديوهات */}
+              <div className="space-y-4">
+                {settingsForm.phone_videos.map((videoItem, idx) => (
+                  <div key={videoItem.id || idx} className="p-4 rounded-xl bg-gray-800/70 border border-gray-600/70 space-y-4">
+                    <div className="flex items-center justify-between border-b border-gray-700 pb-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-600 text-white text-xs font-bold shadow">
+                          {idx + 1}
+                        </span>
+                        <input
+                          type="text"
+                          value={videoItem.title || ''}
+                          onChange={(e) => {
+                            const newVideos = [...settingsForm.phone_videos];
+                            newVideos[idx] = { ...newVideos[idx], title: e.target.value };
+                            setSettingsForm({ ...settingsForm, phone_videos: newVideos });
+                          }}
+                          placeholder={`عنوان اختياري (مثال: فيديو ${idx + 1})`}
+                          className="bg-gray-900/50 text-sm font-semibold text-gray-100 placeholder-gray-500 rounded-lg px-3 py-1 border border-gray-700 focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      {settingsForm.phone_videos.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newVideos = settingsForm.phone_videos.filter((_, i) => i !== idx);
+                            setSettingsForm({ ...settingsForm, phone_videos: newVideos });
+                          }}
+                          className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/20 px-2.5 py-1.5 rounded-lg transition-colors"
+                          title="حذف هذا الفيديو"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>حذف الفيديو</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* رابط الفيديو */}
+                    <div>
+                      <label className="block mb-1.5 text-xs font-medium text-gray-300">
+                        رابط الفيديو #{idx + 1} (Google Drive أو MP4 مباشر)
+                      </label>
+                      <input
+                        value={videoItem.video_url}
+                        onChange={(e) => {
+                          const newVideos = [...settingsForm.phone_videos];
+                          newVideos[idx] = { ...newVideos[idx], video_url: e.target.value };
+                          setSettingsForm({ ...settingsForm, phone_videos: newVideos });
+                        }}
+                        placeholder="https://drive.google.com/file/d/... أو https://example.com/video.mp4"
+                        className="w-full rounded-xl bg-gray-900/60 p-3.5 text-white text-sm border border-gray-600 focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    {/* كفر الفيديو مع التحويل لـ WebP */}
+                    <div>
+                      <VideoCoverField
+                        label={`كفر مخصص للفيديو #${idx + 1} (Poster Cover)`}
+                        sublabel="يتم رفعه وضغطه تلقائياً لصيغة WebP خفيفة وفائقة السرعة بمقاس 9:16"
+                        coverUrl={videoItem.cover_url || ''}
+                        onChange={(url) => {
+                          const newVideos = [...settingsForm.phone_videos];
+                          newVideos[idx] = { ...newVideos[idx], cover_url: url };
+                          setSettingsForm({ ...settingsForm, phone_videos: newVideos });
+                        }}
+                        idPrefix={`settings-phone-cover-${idx}`}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              {/* زر إضافة فيديو آخر */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSettingsForm(prev => ({
+                    ...prev,
+                    phone_videos: [
+                      ...prev.phone_videos,
+                      {
+                        id: `v-${Date.now()}-${prev.phone_videos.length}`,
+                        video_url: '',
+                        cover_url: '',
+                        title: `فيديو ${prev.phone_videos.length + 1}`
+                      }
+                    ]
+                  }));
+                }}
+                className="flex items-center justify-center gap-2 w-full py-3.5 px-4 rounded-xl border-2 border-dashed border-purple-500/50 bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 text-sm font-bold transition-all hover:scale-[1.005]"
+              >
+                <Plus className="w-5 h-5" />
+                <span>+ إضافة فيديو آخر لقالب الهاتف (لتغيير الفيديو في كل زيارة)</span>
+              </button>
+
+              {settingsForm.phone_videos.length > 1 && (
+                <div className="p-3.5 bg-purple-950/40 border border-purple-800/60 rounded-xl text-xs text-purple-200 flex items-start sm:items-center gap-2.5">
+                  <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+                  <span>
+                    <strong>نظام التدوير الذكي مفعّل:</strong> عند وجود {settingsForm.phone_videos.length} فيديوهات، سيتم التبديل بينها بشكل تلقائي بحيث يرى كل زائر أو عند كل إعادة تحميل فيديو مختلفاً وجذاباً!
+                  </span>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <button type="submit" className="rounded-xl bg-purple-600 hover:bg-purple-500 p-4 font-bold text-white transition-colors">
-                  حفظ الإعدادات
+                <button type="submit" className="rounded-xl bg-purple-600 hover:bg-purple-500 p-4 font-bold text-white transition-colors shadow-lg shadow-purple-600/30">
+                  حفظ جميع الفيديوهات
                 </button>
                 <button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 hover:bg-gray-600 p-4 font-medium text-gray-200 transition-colors">
                   إغلاق
@@ -1200,37 +1356,70 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
             </form>
           )}
 
-          {(storeSettings?.phone_video_url || storeSettings?.theme_settings?.phone_video_cover_url || (storeSettings as any)?.phone_video_cover_url) && (
-            <div className="mt-4 p-4 rounded-xl border border-gray-600/50 bg-gray-800/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-gray-200">فيديو الهاتف الحالي:</p>
-                {storeSettings?.phone_video_url ? (
-                  <a 
-                    href={storeSettings.phone_video_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-accent hover:underline text-xs break-all block"
-                  >
-                    {storeSettings.phone_video_url}
-                  </a>
-                ) : (
-                  <span className="text-xs text-gray-400">لم يتم إدخال رابط فيديو</span>
-                )}
+          {/* المعاينة الحالية للفيديوهات */}
+          {((storeSettings?.theme_settings?.phone_videos && storeSettings.theme_settings.phone_videos.length > 0) || storeSettings?.phone_video_url) && (
+            <div className="mt-4 p-5 rounded-xl border border-gray-600/50 bg-gray-800/30 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-gray-200">فيديوهات الهاتف المعتمدة حالياً:</p>
+                  <p className="text-xs text-gray-400">
+                    {Array.isArray(storeSettings?.theme_settings?.phone_videos) && storeSettings.theme_settings.phone_videos.length > 1
+                      ? `✨ مفعّل تدوير تلقائي بين ${storeSettings.theme_settings.phone_videos.length} فيديوهات (يظهر فيديو مختلف في كل مرة)`
+                      : 'فيديو واحد مفعّل'}
+                  </p>
+                </div>
               </div>
 
-              {/* معاينة الكفر الحالي إن وُجد */}
-              {(storeSettings?.theme_settings?.phone_video_cover_url || storeSettings?.theme_settings?.phone_video_cover || (storeSettings as any)?.phone_video_cover_url) && (
-                <div className="flex items-center gap-3 bg-gray-900/60 p-2.5 rounded-xl border border-gray-700">
-                  <img
-                    src={storeSettings?.theme_settings?.phone_video_cover_url || storeSettings?.theme_settings?.phone_video_cover || (storeSettings as any)?.phone_video_cover_url}
-                    alt="كفر فيديو الهاتف"
-                    className="w-12 h-20 object-cover rounded-lg border border-gray-600"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="text-xs">
-                    <span className="text-emerald-400 font-medium block">كفر مخصص مفعّل ✨</span>
-                    <span className="text-[11px] text-gray-400">يظهر قبل بدء التشغيل</span>
-                  </div>
+              {Array.isArray(storeSettings?.theme_settings?.phone_videos) && storeSettings.theme_settings.phone_videos.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {storeSettings.theme_settings.phone_videos.map((vid, i) => (
+                    <div key={vid.id || i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-900/60 border border-gray-700">
+                      {vid.cover_url ? (
+                        <img
+                          src={vid.cover_url}
+                          alt={vid.title || `فيديو ${i + 1}`}
+                          className="w-12 h-20 object-cover rounded-lg border border-gray-600 shrink-0"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-12 h-20 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 shrink-0">
+                          <Play className="w-4 h-4 text-gray-500" />
+                        </div>
+                      )}
+                      <div className="overflow-hidden space-y-1">
+                        <span className="text-xs font-bold text-purple-300 block truncate">
+                          {vid.title || `فيديو #${i + 1}`}
+                        </span>
+                        <a
+                          href={vid.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-accent hover:underline break-all line-clamp-2 block"
+                        >
+                          {vid.video_url}
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-4">
+                  <a
+                    href={storeSettings?.phone_video_url || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline text-xs break-all"
+                  >
+                    {storeSettings?.phone_video_url}
+                  </a>
+                  {(storeSettings?.theme_settings?.phone_video_cover_url || (storeSettings as any)?.phone_video_cover_url) && (
+                    <img
+                      src={storeSettings?.theme_settings?.phone_video_cover_url || (storeSettings as any)?.phone_video_cover_url}
+                      alt="كفر"
+                      className="w-12 h-20 object-cover rounded-lg border border-gray-600"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                 </div>
               )}
             </div>
