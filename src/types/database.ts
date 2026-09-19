@@ -153,12 +153,15 @@ export interface StoreSettings {
   snapchat_url: string | null;
   tiktok_url: string | null;
   phone_video_url: string | null; // URL for the video inside the phone mockup
+  phone_video_cover_url?: string | null; // Cover/poster image URL for the phone video
   theme_settings?: {
     primaryColor?: string;
     secondaryColor?: string;
     backgroundColor?: string;
     backgroundGradient?: string;
     fontFamily?: string;
+    phone_video_cover_url?: string;
+    phone_video_cover?: string;
   } | null;
   updated_at: string;
 }

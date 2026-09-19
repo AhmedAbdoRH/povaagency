@@ -3,8 +3,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { supabase } from '../lib/supabase';
-import type { StoreSettings } from '../types/database';
-import { getGoogleDriveEmbedUrl } from '../utils/pageLinks';
+import { getGoogleDriveEmbedUrl, isGoogleDriveUrl } from '../utils/pageLinks';
 import {
   Play,
   Heart,
@@ -15,6 +14,7 @@ import {
   ArrowRight,
   Sparkles,
   Briefcase,
+  X,
 } from 'lucide-react';
 
 /* ─── CSS for hero background animations ─── */
@@ -227,15 +227,22 @@ export default function Hero() {
   const [saved, setSaved] = useState(false);
   const [likeCount, setLikeCount] = useState(2847);
   const [phoneVideoUrl, setPhoneVideoUrl] = useState<string | null>(null);
-  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [phoneVideoCoverUrl, setPhoneVideoCoverUrl] = useState<string | null>(null);
 
-  // Fetch phone video URL from store_settings
+  const isDrive = Boolean(phoneVideoUrl && isGoogleDriveUrl(phoneVideoUrl));
+
+  // Compute embed URL with autoplay parameter when isPlaying is true
+  const driveEmbedSrc = phoneVideoUrl
+    ? `${phoneVideoUrl}${phoneVideoUrl.includes('?') ? '&' : '?'}autoplay=${isPlaying ? '1' : '0'}`
+    : '';
+
+  // Fetch phone video URL and cover from store_settings
   useEffect(() => {
     const fetchPhoneVideo = async () => {
       try {
         const { data, error } = await supabase
           .from('store_settings')
-          .select('phone_video_url')
+          .select('*')
           .single();
         
         if (error) throw error;
@@ -245,10 +252,17 @@ export default function Hero() {
           const embedUrl = getGoogleDriveEmbedUrl(data.phone_video_url);
           setPhoneVideoUrl(embedUrl);
         }
+
+        // Cover from direct column or theme_settings JSON
+        const cover = (data as any)?.phone_video_cover_url ||
+          data?.theme_settings?.phone_video_cover_url ||
+          data?.theme_settings?.phone_video_cover ||
+          null;
+        if (cover) {
+          setPhoneVideoCoverUrl(cover);
+        }
       } catch (error) {
         console.error('Error fetching phone video:', error);
-      } finally {
-        setLoadingSettings(false);
       }
     };
 
@@ -283,6 +297,11 @@ export default function Hero() {
   const handleMouseLeave = () => { mx.set(0); my.set(0); };
 
   const togglePlay = () => {
+    if (isDrive) {
+      setIsPlaying(prev => !prev);
+      return;
+    }
+
     if (!videoRef.current) return;
     if (isPlaying) {
       videoRef.current.pause();
@@ -443,50 +462,88 @@ export default function Hero() {
                 }}
               >
                 {/* ── video area ── */}
-                <div className="relative overflow-hidden w-full group" style={{ aspectRatio: '9/16' }}>
-                  {phoneVideoUrl && phoneVideoUrl.includes('drive.google.com') ? (
-                    // Google Drive video using iframe
-                    <div className="absolute inset-0 pointer-events-none">
-                      <iframe
-                        src={phoneVideoUrl}
-                        className="w-full h-full border-0"
-                        allow="autoplay; fullscreen"
-                        allowFullScreen
-                      />
+                <div className="relative overflow-hidden w-full group bg-black" style={{ aspectRatio: '9/16' }}>
+                  {isDrive ? (
+                    // Google Drive video using iframe cropped to hide header controls
+                    <div className="absolute inset-0 overflow-hidden">
+                      <div className="absolute -top-[54px] -bottom-[48px] -left-[1px] -right-[1px]">
+                        <iframe
+                          src={isPlaying ? driveEmbedSrc : phoneVideoUrl || ''}
+                          className="w-full h-full border-0 pointer-events-auto"
+                          allow="autoplay; fullscreen"
+                          allowFullScreen
+                        />
+                      </div>
                     </div>
                   ) : (
                     // Regular video
                     <video
                       ref={videoRef}
                       autoPlay={false} playsInline
+                      poster={phoneVideoCoverUrl || undefined}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
                     >
                       <source src={phoneVideoUrl || "/hero_video.mp4"} type="video/mp4" />
                     </video>
                   )}
 
-                  {/* scrim */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20 pointer-events-none" />
+                  {/* Custom Poster Cover for Google Drive / regular video when not playing */}
+                  {phoneVideoCoverUrl && !isPlaying && (
+                    <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden transition-opacity duration-300">
+                      <img
+                        src={phoneVideoCoverUrl}
+                        alt="كفر الفيديو"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  )}
 
-                  {/* play/pause tap zone */}
-                  <button
-                    onClick={togglePlay}
-                    className="absolute inset-0 flex items-center justify-center z-10"
-                    aria-label="تشغيل/إيقاف"
-                  >
-                    {!isPlaying && (
+                  {/* scrim */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20 pointer-events-none transition-opacity duration-300 ${
+                      isPlaying ? 'opacity-0 z-0' : 'opacity-100 z-10'
+                    }`}
+                  />
+
+                  {/* play/pause tap zone (only active when not playing) */}
+                  {!isPlaying && (
+                    <button
+                      onClick={togglePlay}
+                      className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
+                      aria-label="تشغيل الفيديو"
+                    >
                       <motion.div
                         initial={{ scale: 0.6, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-20 h-20 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-2xl transition-all"
                       >
-                        <Play className="w-9 h-9 text-white fill-white ms-1" />
+                        <Play className="w-9 h-9 text-white fill-white ms-1 drop-shadow" />
                       </motion.div>
-                    )}
-                  </button>
+                    </button>
+                  )}
+
+                  {/* Close / Return button when playing */}
+                  {isPlaying && (
+                    <button
+                      type="button"
+                      onClick={togglePlay}
+                      aria-label="إيقاف الفيديو"
+                      className="absolute top-3 right-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white/90 backdrop-blur-md transition-all hover:bg-black hover:text-white hover:scale-110 shadow-lg border border-white/20"
+                      title="إيقاف الفيديو"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
 
                   {/* ── right-side action bar ── */}
-                  <div className="absolute bottom-24 right-4 flex flex-col items-center gap-5 z-20">
+                  <div
+                    className={`absolute bottom-24 right-4 flex flex-col items-center gap-5 z-20 transition-all duration-300 ${
+                      isPlaying ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100'
+                    }`}
+                  >
                     <motion.button
                       whileTap={{ scale: 0.85 }}
                       onClick={handleLike}
@@ -528,7 +585,11 @@ export default function Hero() {
                   </div>
 
                   {/* ── bottom info ── */}
-                  <div className="absolute bottom-5 left-4 right-16 z-20">
+                  <div
+                    className={`absolute bottom-5 left-4 right-16 z-20 transition-all duration-300 ${
+                      isPlaying ? 'opacity-0 pointer-events-none translate-y-3' : 'opacity-100'
+                    }`}
+                  >
                     <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                       <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden border-2 border-white/30 shadow-lg bg-white flex items-center justify-center p-1">
                         <img src="/agency-logo.png" alt="Pova Logo" className="w-full h-full object-contain" />

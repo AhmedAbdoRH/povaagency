@@ -43,7 +43,10 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const [contents, setContents] = useState<ClientContent[]>([]);
   const [customerRequests, setCustomerRequests] = useState<any[]>([]);
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
-  const [settingsForm, setSettingsForm] = useState({ phone_video_url: '' });
+  const [settingsForm, setSettingsForm] = useState({ 
+    phone_video_url: '',
+    phone_video_cover_url: '' 
+  });
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
   const [selectedSpec, setSelectedSpec] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -92,8 +95,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       setCustomerRequests(cr.data || []);
       setStoreSettings(settings.data || null);
       if (settings.data) {
+        const cover = (settings.data as any).phone_video_cover_url ||
+          settings.data.theme_settings?.phone_video_cover_url ||
+          settings.data.theme_settings?.phone_video_cover ||
+          '';
         setSettingsForm({ 
-          phone_video_url: settings.data.phone_video_url || ''
+          phone_video_url: settings.data.phone_video_url || '',
+          phone_video_cover_url: cover
         });
       }
     } catch (error: any) {
@@ -127,8 +135,13 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     setClientForm({ ...emptyClientForm, specialization_id: selectedSpec || '' });
     setContentForm({ ...emptyContentForm, client_id: selectedClient || '' });
     if (storeSettings) {
+      const cover = (storeSettings as any).phone_video_cover_url ||
+        storeSettings.theme_settings?.phone_video_cover_url ||
+        storeSettings.theme_settings?.phone_video_cover ||
+        '';
       setSettingsForm({ 
-        phone_video_url: storeSettings.phone_video_url || ''
+        phone_video_url: storeSettings.phone_video_url || '',
+        phone_video_cover_url: cover
       });
     }
   };
@@ -329,16 +342,37 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
   const saveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
+      const coverUrl = settingsForm.phone_video_cover_url?.trim() || null;
+      const updatedThemeSettings = {
+        ...(storeSettings?.theme_settings || {}),
+        phone_video_cover_url: coverUrl || undefined,
+        phone_video_cover: coverUrl || undefined,
+      };
+
+      // Try saving with phone_video_cover_url column if it exists, otherwise fall back to theme_settings
+      const basePayload: any = {
+        id: storeSettings?.id || undefined, 
+        phone_video_url: settingsForm.phone_video_url?.trim() || null,
+        phone_video_cover_url: coverUrl,
+        theme_settings: updatedThemeSettings,
+        updated_at: new Date().toISOString()
+      };
+
+      let { error } = await supabase
         .from('store_settings')
-        .upsert({ 
-          id: storeSettings?.id || undefined, 
-          phone_video_url: settingsForm.phone_video_url || null,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(basePayload);
+      
+      if (error && (error.message.includes('column') || error.message.includes('phone_video_cover_url'))) {
+        // Fallback without the phone_video_cover_url column, safely stored in theme_settings JSON
+        delete basePayload.phone_video_cover_url;
+        const fallbackRes = await supabase
+          .from('store_settings')
+          .upsert(basePayload);
+        error = fallbackRes.error;
+      }
       
       if (error) throw error;
-      toast.success('تم تحديث إعدادات المتجر بنجاح.');
+      toast.success('تم تحديث إعدادات الفيديو والكفر بنجاح ✨');
       resetForms();
       await fetchData();
       if (onSettingsUpdate) onSettingsUpdate();
@@ -1132,39 +1166,73 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
           </div>
 
           {activeForm === 'settings' && (
-            <form onSubmit={saveSettings} className="mt-6 grid gap-4 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5">
+            <form onSubmit={saveSettings} className="mt-6 grid gap-5 rounded-2xl border border-gray-600/50 bg-gray-700/30 p-5">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-300">فيديو الهاتف (Phone Video)</label>
-                <p className="mt-1 text-xs text-gray-400 mb-2">فيديو الهاتف الذي يظهر في قالب الهاتف في قسم الهيرو</p>
+                <p className="mt-1 text-xs text-gray-400 mb-2">رابط فيديو الهاتف (Google Drive أو MP4) الذي يظهر في قالب الهاتف في قسم الهيرو</p>
                 <input
                   value={settingsForm.phone_video_url}
                   onChange={e => setSettingsForm({ ...settingsForm, phone_video_url: e.target.value })}
-                  placeholder="https://example.com/phone-video.mp4"
-                  className="w-full rounded-xl bg-gray-800/50 p-4 text-white"
+                  placeholder="https://drive.google.com/file/d/... أو https://example.com/video.mp4"
+                  className="w-full rounded-xl bg-gray-800/50 p-4 text-white border border-gray-600 focus:border-purple-500 focus:outline-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button type="submit" className="rounded-xl bg-purple-600 p-4">
+
+              {/* حقل كفر الفيديو مع ضغط وتحويل تلقائي لـ WebP عند الرفع من الجهاز */}
+              <div>
+                <VideoCoverField
+                  label="كفر الفيديو في الهاتف (Poster Cover)"
+                  sublabel="يتم رفعه من جهازك وضغطه وتحويله فوراً إلى WebP خفيفة وسريعة (مقاس 9:16)"
+                  coverUrl={settingsForm.phone_video_cover_url}
+                  onChange={(url) => setSettingsForm(prev => ({ ...prev, phone_video_cover_url: url }))}
+                  idPrefix="settings-phone-cover"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button type="submit" className="rounded-xl bg-purple-600 hover:bg-purple-500 p-4 font-bold text-white transition-colors">
                   حفظ الإعدادات
                 </button>
-                <button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 p-4">
+                <button type="button" onClick={resetForms} className="rounded-xl bg-gray-700 hover:bg-gray-600 p-4 font-medium text-gray-200 transition-colors">
                   إغلاق
                 </button>
               </div>
             </form>
           )}
 
-          {storeSettings?.phone_video_url && (
-            <div className="mt-4 p-4 rounded-xl border border-gray-600/50 bg-gray-800/30">
-              <p className="text-sm text-gray-300 mb-2">فيديو الهاتف الحالي:</p>
-              <a 
-                href={storeSettings.phone_video_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-accent hover:underline text-xs"
-              >
-                {storeSettings.phone_video_url}
-              </a>
+          {(storeSettings?.phone_video_url || storeSettings?.theme_settings?.phone_video_cover_url || (storeSettings as any)?.phone_video_cover_url) && (
+            <div className="mt-4 p-4 rounded-xl border border-gray-600/50 bg-gray-800/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-gray-200">فيديو الهاتف الحالي:</p>
+                {storeSettings?.phone_video_url ? (
+                  <a 
+                    href={storeSettings.phone_video_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline text-xs break-all block"
+                  >
+                    {storeSettings.phone_video_url}
+                  </a>
+                ) : (
+                  <span className="text-xs text-gray-400">لم يتم إدخال رابط فيديو</span>
+                )}
+              </div>
+
+              {/* معاينة الكفر الحالي إن وُجد */}
+              {(storeSettings?.theme_settings?.phone_video_cover_url || storeSettings?.theme_settings?.phone_video_cover || (storeSettings as any)?.phone_video_cover_url) && (
+                <div className="flex items-center gap-3 bg-gray-900/60 p-2.5 rounded-xl border border-gray-700">
+                  <img
+                    src={storeSettings?.theme_settings?.phone_video_cover_url || storeSettings?.theme_settings?.phone_video_cover || (storeSettings as any)?.phone_video_cover_url}
+                    alt="كفر فيديو الهاتف"
+                    className="w-12 h-20 object-cover rounded-lg border border-gray-600"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="text-xs">
+                    <span className="text-emerald-400 font-medium block">كفر مخصص مفعّل ✨</span>
+                    <span className="text-[11px] text-gray-400">يظهر قبل بدء التشغيل</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
