@@ -594,7 +594,7 @@ export default function Hero() {
 
                   {/* Multi-video indicator badge and quick switch button */}
                   {phoneVideos.length > 1 && (
-                    <div className={`absolute top-4 left-4 z-20 transition-all duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                    <div className={`absolute top-4 left-4 z-20 transition-all duration-300 hidden lg:block ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                       <button
                         type="button"
                         onClick={(e) => switchVideo(1, e)}
@@ -616,7 +616,7 @@ export default function Hero() {
                       <button
                         type="button"
                         onClick={(e) => switchVideo(-1, e)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 hidden lg:flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
                         aria-label="الفيديو السابق"
                         title="الفيديو السابق"
                       >
@@ -625,7 +625,7 @@ export default function Hero() {
                       <button
                         type="button"
                         onClick={(e) => switchVideo(1, e)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 hidden lg:flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
                         aria-label="الفيديو التالي"
                         title="الفيديو التالي"
                       >
