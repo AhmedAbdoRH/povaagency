@@ -653,18 +653,7 @@ export default function Hero() {
                     </button>
                   )}
 
-                  {/* Close / Return button when playing */}
-                  {isPlaying && (
-                    <button
-                      type="button"
-                      onClick={togglePlay}
-                      aria-label="إيقاف الفيديو"
-                      className="absolute top-3 right-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white/90 backdrop-blur-md transition-all hover:bg-black hover:text-white hover:scale-110 shadow-lg border border-white/20"
-                      title="إيقاف الفيديو"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+
 
                   {/* ── right-side action bar ── */}
                   <div
