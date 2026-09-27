@@ -224,7 +224,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
 
       if (target === 'page-image') setPageForm(v => ({ ...v, image_url: data.publicUrl }));
       if (target === 'spec') setSpecForm(v => ({ ...v, image_url: data.publicUrl }));
-      if (target === 'client') setClientForm(v => ({ ...v, image_url: data.publicUrl }));
+      if (target === 'client') setClientForm(v => ({ ...v, image_url: data.publicUrl, logo_url: v.logo_url || data.publicUrl }));
       if (target === 'content') setContentForm(v => ({ ...v, image_url: data.publicUrl }));
 
       toast.success('تم رفع الصورة بنجاح ✨');

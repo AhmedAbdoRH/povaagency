@@ -88,9 +88,17 @@ export default function CoreServicePageView({
   const hideSectionButtons = coreService.slug === 'marketing-strategy' || 
                             coreService.slug === 'social-media-campaigns';
 
+  // التحقق مما إذا كان القسم هو قسم إنتاج الفيديوهات لعرض لوجو العميل بدلاً من الفيديو
+  const isVideoProductions = 
+    coreService.slug === 'video-productions' || 
+    coreService.title.includes('إنتاج الفيديوهات') ||
+    coreService.title.includes('إنتاج الفيديو') ||
+    Boolean(coreService.aliases?.some(a => a.includes('فيديو') || a.includes('إنتاج')));
+
   // تحديد المقاس حسب الخدمة
   const cardAspectRatio = coreService.slug === 'website-design' ? '16 / 9' : 
-                         isDirectWorksView ? '3 / 4' : undefined;
+                         isDirectWorksView ? '3 / 4' : 
+                         isVideoProductions ? '4 / 3' : undefined;
 
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
@@ -311,18 +319,20 @@ export default function CoreServicePageView({
                         <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">
                           {selectedClients.map(client => {
                             const videoContent = (client as any).content?.find((c: any) => c.content_type === 'video');
+                            const clientLogo = client.logo_url || client.image_url || '';
                             return (
                               <ClientCard
                                 key={client.id}
                                 id={client.id}
                                 name={language === 'en' ? (client.name_en || client.name) : client.name}
                                 description={language === 'en' ? (client.description_en || client.description || '') : (client.description || '')}
-                                logoUrl={client.logo_url || ''}
-                                imageUrl={client.image_url || ''}
-                                videoUrl={videoContent?.video_url || ''}
+                                logoUrl={clientLogo}
+                                imageUrl={isVideoProductions ? '' : (client.image_url || '')}
+                                videoUrl={isVideoProductions ? undefined : (videoContent?.video_url || '')}
                                 isVerticalVideo={videoContent?.is_vertical_video}
                                 aspectRatioOverride={cardAspectRatio}
                                 projectUrl={client.project_url || ''}
+                                preferLogo={isVideoProductions}
                               />
                             );
                           })}

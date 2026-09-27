@@ -16,12 +16,13 @@ interface ClientCardProps {
   aspectRatioOverride?: string; // مقاس مخصص (مثل '3 / 4')
   projectUrl?: string; // رابط المشروع
   hideText?: boolean; // إخفاء النصوص تحت الكارت
+  preferLogo?: boolean; // عرض شعار العميل فقط بدلاً من الفيديو
 }
 
-export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl, hideText }: ClientCardProps) {
+export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl, hideText, preferLogo }: ClientCardProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const aspectRatio = useVideoAspectRatio(videoUrl, imageUrl);
+  const aspectRatio = useVideoAspectRatio(preferLogo ? undefined : videoUrl, imageUrl);
 
   const getExternalLink = (text: string): string | null => {
     // التحقق من وجود رابط كامل يبدأ بـ http أو https
@@ -48,7 +49,7 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
   // أولوية للـ projectUrl، ثم للـ name parsing
   const externalUrl = projectUrl || getExternalLink(name);
   const isExternal = Boolean(externalUrl);
-  const hasVideo = Boolean(videoUrl);
+  const hasVideo = !preferLogo && Boolean(videoUrl);
   const showVideoAtNaturalRatio = hasVideo && aspectRatio !== null;
   const isVideoEmbed = hasVideo && isEmbeddable(videoUrl!);
 
@@ -80,6 +81,8 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
     }
   };
 
+  const displayLogo = logoUrl || imageUrl;
+
   return (
     <div
       onClick={handleCardClick}
@@ -90,7 +93,27 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
         className="relative bg-black flex items-center justify-center overflow-hidden w-full"
         style={mediaStyle}
       >
-        {hasVideo ? (
+        {preferLogo ? (
+          displayLogo ? (
+            <div className="relative w-full h-full flex items-center justify-center p-6 md:p-8 bg-gradient-to-b from-[#0b1324] to-[#060b14]">
+              <img
+                src={displayLogo}
+                alt={name}
+                className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0c1527] to-[#060b14] p-6 text-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-2xl font-black text-[#ec533a]">
+                  {name.trim().charAt(0) || 'P'}
+                </div>
+                <span className="text-sm font-semibold text-gray-300 line-clamp-1">{name}</span>
+              </div>
+            </div>
+          )
+        ) : hasVideo ? (
           isVideoEmbed ? (
             <iframe
               src={getEmbedUrl(videoUrl!, { autoplay: true, mute: true, loop: true, controls: false }) || ''}
@@ -119,11 +142,12 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
               />
             )
           )
-        ) : logoUrl || imageUrl ? (
+        ) : displayLogo ? (
           <img
-            src={logoUrl || imageUrl!}
+            src={displayLogo}
             alt={name}
-            className={`w-full h-full ${logoUrl && !imageUrl ? 'object-contain p-8' : 'object-cover'} transition-transform duration-700 group-hover:scale-110`}
+            className={`w-full h-full ${logoUrl ? 'object-contain p-8' : 'object-cover'} transition-transform duration-700 group-hover:scale-110`}
+            loading="lazy"
           />
         ) : (
           <div className="text-gray-600 font-bold text-2xl aspect-square flex items-center justify-center">{name}</div>

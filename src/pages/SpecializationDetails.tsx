@@ -152,16 +152,27 @@ export default function SpecializationDetails() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {clients.map(client => {
                   const videoContent = client.content?.find(c => c.content_type === 'video');
+                  const isVideoProductions = Boolean(
+                    specialization?.service?.page?.name?.includes('فيديو') ||
+                    specialization?.service?.page?.name?.includes('إنتاج') ||
+                    specialization?.service?.name?.includes('فيديو') ||
+                    specialization?.service?.name?.includes('إنتاج') ||
+                    specialization?.name?.includes('فيديو') ||
+                    specialization?.name?.includes('إنتاج')
+                  );
+                  const clientLogo = client.logo_url || client.image_url || '';
                   return (
                     <ClientCard
                       key={client.id}
                       id={client.id}
                       name={language === 'en' ? (client.name_en || client.name) : client.name}
                       description={language === 'en' ? (client.description_en || client.description || '') : (client.description || '')}
-                      logoUrl={client.logo_url || ''}
-                      imageUrl={client.image_url || ''}
-                      videoUrl={videoContent?.video_url || ''}
+                      logoUrl={clientLogo}
+                      imageUrl={isVideoProductions ? '' : (client.image_url || '')}
+                      videoUrl={isVideoProductions ? undefined : (videoContent?.video_url || '')}
                       isVerticalVideo={videoContent?.is_vertical_video}
+                      preferLogo={isVideoProductions}
+                      aspectRatioOverride={isVideoProductions ? '4 / 3' : undefined}
                     />
                   );
                 })}
