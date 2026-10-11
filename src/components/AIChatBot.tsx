@@ -297,7 +297,7 @@ export default function AIChatBot() {
 
                                                 {!message.isUser && message.id !== '1' && (
                                                     <a
-                                                        href="https://wa.me/201503600455"
+                                                        href="https://wa.me/201550014345"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="mt-3 flex items-center justify-center gap-2 text-xs bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-semibold py-2 px-3 rounded-lg transition-all border border-[#25D366]/30"

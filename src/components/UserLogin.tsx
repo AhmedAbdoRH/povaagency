@@ -81,7 +81,7 @@ export default function UserLogin() {
 
   const handleRegister = () => {
     // يمكن إضافة صفحة تسجيل لاحقاً
-    window.open('https://wa.me/201503600455?text=أريد إنشاء حساب جديد', '_blank');
+    window.open('https://wa.me/201550014345?text=أريد إنشاء حساب جديد', '_blank');
   };
 
   if (loading) {

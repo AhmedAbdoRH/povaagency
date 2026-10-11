@@ -16,9 +16,6 @@ import {
   Sparkles,
   Briefcase,
   X,
-  Shuffle,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 
 /* ─── CSS for hero background animations ─── */
@@ -342,18 +339,6 @@ export default function Hero() {
     ? `${phoneVideoUrl}${phoneVideoUrl.includes('?') ? '&' : '?'}autoplay=${isPlaying ? '1' : '0'}`
     : '';
 
-  // Switch video manually
-  const switchVideo = (step: number, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (phoneVideos.length <= 1) return;
-    setIsPlaying(false);
-    setCurrentVideoIndex(prev => {
-      const next = (prev + step + phoneVideos.length) % phoneVideos.length;
-      sessionStorage.setItem('last_phone_video_idx', next.toString());
-      return next;
-    });
-  };
-
   /* tilt on mouse move with initial entrance animation */
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -591,48 +576,6 @@ export default function Hero() {
                       isPlaying ? 'opacity-0 z-0' : 'opacity-100 z-10'
                     }`}
                   />
-
-                  {/* Multi-video indicator badge and quick switch button */}
-                  {phoneVideos.length > 1 && (
-                    <div className={`absolute top-4 left-4 z-20 transition-all duration-300 hidden lg:block ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                      <button
-                        type="button"
-                        onClick={(e) => switchVideo(1, e)}
-                        className="px-3 py-1.5 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 shadow-lg transition-all active:scale-95 group"
-                        title="انقر للتبديل للفيديو التالي"
-                      >
-                        <Shuffle className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-180 transition-transform duration-300" />
-                        <span>{activeVideoItem?.title || `فيديو ${currentVideoIndex + 1}`}</span>
-                        <span className="text-[10px] text-gray-300 px-1.5 py-0.5 rounded-full bg-white/10">
-                          {currentVideoIndex + 1}/{phoneVideos.length}
-                        </span>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Navigation arrows for switching between videos */}
-                  {!isPlaying && phoneVideos.length > 1 && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={(e) => switchVideo(-1, e)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 hidden lg:flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
-                        aria-label="الفيديو السابق"
-                        title="الفيديو السابق"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => switchVideo(1, e)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 hidden lg:flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-110 active:scale-95 transition-all shadow-lg"
-                        aria-label="الفيديو التالي"
-                        title="الفيديو التالي"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
 
                   {/* play/pause tap zone (only active when not playing) */}
                   {!isPlaying && (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle2, Sparkles, Phone, User } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Send, CheckCircle2, Sparkles, User } from 'lucide-react';
+import { supabase, supabaseAdmin } from '../lib/supabase';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import { toast } from 'react-toastify';
@@ -11,7 +11,6 @@ export default function CollaborationForm() {
   const [pages, setPages] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: '',
-    phone: '',
   });
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,38 +38,45 @@ export default function CollaborationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone) {
-      toast.error(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
+    if (!formData.name.trim()) {
+      toast.error(language === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // 1. Save to Supabase
-      const { error } = await supabase.from('collaboration_requests').insert([
-        {
-          name: formData.name,
-          phone: formData.phone,
-          selected_services: selectedServices.map(slug => {
-            const service = services.find(s => s.slug === slug);
-            return language === 'ar' ? service?.title : (service?.page?.name_en || service?.title);
-          }),
-        },
-      ]);
-
-      if (error) throw error;
-
-      // 2. Format WhatsApp Message
       const selectedServiceTitles = selectedServices.map(slug => {
         const service = services.find(s => s.slug === slug);
         return language === 'ar' ? service?.title : (service?.page?.name_en || service?.title);
       }).join(', ');
 
-      const message = language === 'ar' 
-        ? `مرحباً، أنا ${formData.name}. مهتم بالتعاون في الخدمات التالية: ${selectedServiceTitles}. رقم هاتفي: ${formData.phone}`
-        : `Hello, I'm ${formData.name}. I'm interested in collaborating on: ${selectedServiceTitles}. My phone: ${formData.phone}`;
+      // 1. Save to Supabase (best-effort)
+      try {
+        await supabaseAdmin.from('collaboration_requests').insert([
+          {
+            name: formData.name.trim(),
+            email: 'whatsapp@contact.local',
+            phone: '',
+            message: selectedServiceTitles,
+          },
+        ]);
+      } catch (dbErr) {
+        console.warn('Could not save collaboration request to DB:', dbErr);
+      }
 
-      const whatsappUrl = `https://wa.me/201503600455?text=${encodeURIComponent(message)}`;
+      // 2. Format WhatsApp Message
+      const servicesText = selectedServiceTitles 
+        ? ` في الخدمات التالية: ${selectedServiceTitles}` 
+        : '';
+      const servicesTextEn = selectedServiceTitles 
+        ? ` on: ${selectedServiceTitles}` 
+        : '';
+
+      const message = language === 'ar' 
+        ? `مرحباً، أنا ${formData.name.trim()}. مهتم بالتعاون معكم${servicesText}.`
+        : `Hello, I'm ${formData.name.trim()}. I'm interested in collaborating with you${servicesTextEn}.`;
+
+      const whatsappUrl = `https://wa.me/201550014345?text=${encodeURIComponent(message)}`;
 
       // 3. Success Feedback
       toast.success(language === 'ar' ? 'تم إرسال طلبك بنجاح!' : 'Your request has been sent successfully!');
@@ -79,7 +85,7 @@ export default function CollaborationForm() {
       window.open(whatsappUrl, '_blank');
 
       // Reset form
-      setFormData({ name: '', phone: '' });
+      setFormData({ name: '' });
       setSelectedServices([]);
     } catch (error: any) {
       console.error('Error submitting form:', error);
@@ -138,7 +144,7 @@ export default function CollaborationForm() {
             className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
           >
             <form onSubmit={handleSubmit} className="space-y-10">
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="max-w-xl mx-auto w-full">
                 {/* Name Field */}
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-white/80 text-sm font-bold px-1">
@@ -151,23 +157,6 @@ export default function CollaborationForm() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={language === 'ar' ? 'أدخل اسمك هنا...' : 'Enter your name...'}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/5 transition-all placeholder:text-white/20"
-                    required
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div className="space-y-3">
-                  <label className="flex items-center gap-2 text-white/80 text-sm font-bold px-1">
-                    <Phone className="w-4 h-4 text-accent" />
-                    {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder={language === 'ar' ? '01xxxxxxxxx' : '01xxxxxxxxx'}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/5 transition-all placeholder:text-white/20 text-left"
-                    dir="ltr"
                     required
                   />
                 </div>
