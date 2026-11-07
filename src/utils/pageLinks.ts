@@ -19,14 +19,17 @@ export interface ExtractedDriveVideos {
   }[];
 }
 
-const META_TAG_REGEX = /<!--(?:PAGE_LINKS|DRIVE_VIDEOS):(.*?)-->/;
+const META_TAG_REGEX = /<!--(?:PAGE_LINKS|DRIVE_VIDEOS):([\s\S]*?)-->/;
 
 /**
  * Strips hidden metadata tags from a description string
  */
 export function cleanPageDescription(description: string | null | undefined): string {
   if (!description) return '';
-  return description.replace(/<!--(?:PAGE_LINKS|DRIVE_VIDEOS):(.*?)-->/g, '').trim();
+  return description
+    .replace(/<!--(?:PAGE_LINKS|DRIVE_VIDEOS):[\s\S]*?-->/g, '')
+    .replace(/&lt;!--(?:PAGE_LINKS|DRIVE_VIDEOS):[\s\S]*?--&gt;/g, '')
+    .trim();
 }
 
 /**

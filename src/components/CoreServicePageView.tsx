@@ -30,6 +30,9 @@ export interface SpecializationWithClients {
   display_order: number;
   created_at: string;
   updated_at: string;
+  drive_url?: string | null;
+  custom_links?: any;
+  video_thumbnail?: string | null;
   clients?: Client[];
   service?: {
     id: string;
@@ -48,7 +51,11 @@ interface CoreServicePageViewProps {
 type SectionLike = Pick<
   SpecializationWithClients,
   'id' | 'name' | 'name_en' | 'description' | 'description_en' | 'clients'
->;
+> & {
+  drive_url?: string | null;
+  custom_links?: any;
+  video_thumbnail?: string | null;
+};
 
 const ALL_SECTION_ID = '__all__';
 
@@ -285,13 +292,24 @@ export default function CoreServicePageView({
                                 ? (selectedSection.name_en || selectedSection.name)
                                 : selectedSection.name}
                           </h3>
-                          {selectedSection.description && (
-                            <p className="mt-3 max-w-3xl leading-8 text-gray-300">
-                              {language === 'en' ? (selectedSection.description_en || selectedSection.description) : selectedSection.description}
-                            </p>
-                          )}
+                          {(() => {
+                            const rawSectionDesc = language === 'en'
+                              ? (selectedSection.description_en || selectedSection.description)
+                              : selectedSection.description;
+                            const cleanSectionDesc = cleanPageDescription(rawSectionDesc);
+                            return cleanSectionDesc ? (
+                              <p className="mt-3 max-w-3xl leading-8 text-gray-300">
+                                {cleanSectionDesc}
+                              </p>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
+
+                      {/* فيديوهات Google Drive التوضيحية الخاصة بالتخصص/القسم إن وجدت */}
+                      {selectedSection.id !== ALL_SECTION_ID && (
+                        <ServiceDriveVideos page={selectedSection as any} />
+                      )}
 
                       {isDirectWorksView ? (
                         <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">

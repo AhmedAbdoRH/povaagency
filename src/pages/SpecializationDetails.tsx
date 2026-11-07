@@ -8,6 +8,7 @@ import ServiceDriveVideos from '../components/ServicePageLinks';
 import { findCoreServiceByPageId } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import ContentProtection from '../components/ContentProtection';
+import { cleanPageDescription } from '../utils/pageLinks';
 
 export default function SpecializationDetails() {
   const { id } = useParams<{ id: string }>();
@@ -91,7 +92,8 @@ export default function SpecializationDetails() {
     : (linkedCoreService?.title || specialization.service?.page?.name || t('specDetails.defaultServiceLabel'));
 
   const specName = language === 'en' ? (specialization.name_en || specialization.name) : specialization.name;
-  const specDesc = language === 'en' ? (specialization.description_en || specialization.description) : specialization.description;
+  const rawSpecDesc = language === 'en' ? (specialization.description_en || specialization.description) : specialization.description;
+  const specDesc = cleanPageDescription(rawSpecDesc);
 
   return (
     <div className="min-h-screen bg-[#162341] pb-16 pt-24 text-white font-[Cairo]">

@@ -61,7 +61,7 @@ export default function PageDetails() {
 
       const { data: sectionsData, error: sectionsError } = await supabase
         .from('specializations')
-        .select('id, name, name_en, description, description_en, image_url, service_id, is_active, display_order, created_at, updated_at, clients(id, name, name_en, description, description_en, image_url, logo_url, project_url, specialization_id, is_active, display_order, created_at, updated_at)')
+        .select('*, clients(id, name, name_en, description, description_en, image_url, logo_url, project_url, specialization_id, is_active, display_order, created_at, updated_at)')
         .in('service_id', serviceIds)
         .eq('is_active', true)
         .order('display_order', { ascending: true })
