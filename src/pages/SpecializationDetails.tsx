@@ -147,11 +147,11 @@ export default function SpecializationDetails() {
         ) : (
           <ContentProtection>
             <div>
-              <h2 className="mb-8 flex items-center gap-3 border-b border-white/10 pb-4 text-2xl font-bold">
-                <span className="block h-8 w-2 rounded-full bg-[#ec533a]" />
+              <h2 className="mb-6 flex items-center gap-3 border-b border-white/10 pb-3 text-lg sm:text-xl font-bold">
+                <span className="block h-6 w-1.5 rounded-full bg-[#ec533a]" />
                 {t('specDetails.worksInSection')}
               </h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                 {clients.map(client => {
                   const videoContent = client.content?.find(c => c.content_type === 'video');
                   const isVideoProductions = Boolean(
@@ -161,6 +161,12 @@ export default function SpecializationDetails() {
                     specialization?.service?.name?.includes('إنتاج') ||
                     specialization?.name?.includes('فيديو') ||
                     specialization?.name?.includes('إنتاج')
+                  );
+                  const isWebsiteDesign = Boolean(
+                    specialization?.service?.page?.name?.includes('مواقع') ||
+                    specialization?.service?.name?.includes('مواقع') ||
+                    specialization?.name?.includes('مواقع') ||
+                    specialization?.name?.includes('المواقع')
                   );
                   const clientLogo = client.logo_url || client.image_url || '';
                   return (
@@ -174,7 +180,9 @@ export default function SpecializationDetails() {
                       videoUrl={isVideoProductions ? undefined : (videoContent?.video_url || '')}
                       isVerticalVideo={videoContent?.is_vertical_video}
                       preferLogo={isVideoProductions}
-                      aspectRatioOverride={isVideoProductions ? '4 / 3' : undefined}
+                      aspectRatioOverride={isVideoProductions ? '4 / 3' : isWebsiteDesign ? '4 / 3' : undefined}
+                      objectFitOverride={isWebsiteDesign ? 'contain' : undefined}
+                      hideDescription={isWebsiteDesign}
                     />
                   );
                 })}

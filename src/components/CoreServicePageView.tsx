@@ -5,7 +5,7 @@ import type { CoreServiceDefinition } from '../data/coreServices';
 import { useLanguage } from '../hooks/useLanguage';
 import ClientCard from './ClientCard';
 import ServiceDriveVideos from './ServicePageLinks';
-import { cleanPageDescription } from '../utils/pageLinks';
+import { cleanPageDescription, isSectionPriority } from '../utils/pageLinks';
 
 // Default translations fallback
 const defaultTranslations: Record<string, string> = {
@@ -102,16 +102,30 @@ export default function CoreServicePageView({
     coreService.title.includes('إنتاج الفيديو') ||
     Boolean(coreService.aliases?.some(a => a.includes('فيديو') || a.includes('إنتاج')));
 
-  // تحديد المقاس حسب الخدمة
-  const cardAspectRatio = coreService.slug === 'website-design' ? '16 / 9' : 
+  // التحقق مما إذا كان القسم هو قسم تصميم المواقع
+  const isWebsiteDesign = 
+    coreService.slug === 'website-design' || 
+    coreService.title.includes('المواقع') || 
+    Boolean(coreService.aliases?.some(a => a.includes('مواقع')));
+
+  // تحديد المقاس حسب الخدمة (جعل كروت المواقع أكثر تربيعاً 4:3 لتملأ الكارت بشكل ممتاز)
+  const cardAspectRatio = isWebsiteDesign ? '4 / 3' : 
                          isDirectWorksView ? '3 / 4' : 
                          isVideoProductions ? '4 / 3' : undefined;
 
   const sectionsWithAll = useMemo<SectionLike[]>(() => {
     if (sections.length === 0) return [];
 
+    // Sort sections: priority sections first, then by display_order
+    const sortedSections = [...sections].sort((a, b) => {
+      const aPriority = isSectionPriority(a) || (a as any).display_order === -1 ? 1 : 0;
+      const bPriority = isSectionPriority(b) || (b as any).display_order === -1 ? 1 : 0;
+      if (aPriority !== bPriority) return bPriority - aPriority;
+      return (a.display_order ?? 0) - (b.display_order ?? 0);
+    });
+
     const uniqueClientsById = new Map<string, Client>();
-    sections.forEach(section => {
+    sortedSections.forEach(section => {
       section.clients?.forEach(client => {
         if (!uniqueClientsById.has(client.id)) uniqueClientsById.set(client.id, client);
       });
@@ -126,7 +140,7 @@ export default function CoreServicePageView({
       clients: Array.from(uniqueClientsById.values()),
     };
 
-    return [allSection, ...sections];
+    return [allSection, ...sortedSections];
   }, [sections, t]);
 
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(
@@ -187,10 +201,26 @@ export default function CoreServicePageView({
     if (isDirectWorksView) return []; // Use directWorks instead
     const clients = selectedSection?.clients || [];
     if (selectedSection?.id === ALL_SECTION_ID) {
+      // Find IDs of clients belonging to priority sections
+      const prioritySpecIds = new Set(
+        sections
+          .filter(s => isSectionPriority(s) || (s as any).display_order === -1)
+          .map(s => s.id)
+      );
+
+      if (prioritySpecIds.size > 0) {
+        const priorityClients = clients.filter(c => prioritySpecIds.has(c.specialization_id));
+        const otherClients = clients.filter(c => !prioritySpecIds.has(c.specialization_id));
+        return [
+          ...shuffleWithSeed(priorityClients, shuffleSeed),
+          ...shuffleWithSeed(otherClients, shuffleSeed),
+        ];
+      }
+
       return shuffleWithSeed(clients, shuffleSeed);
     }
     return [...clients].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
-  }, [selectedSection, shuffleSeed, isDirectWorksView]);
+  }, [selectedSection, sections, shuffleSeed, isDirectWorksView]);
 
   const HeroIcon = coreService.icon;
   const heroImage = page?.banner_url || page?.image_url || null;
@@ -232,11 +262,11 @@ export default function CoreServicePageView({
                 <span>{t('coreServicePage.mainService')}</span>
               </div>
 
-              <h1 className="mb-5 text-4xl font-extrabold leading-[1.3] md:text-5xl">
+              <h1 className="mb-4 text-2xl font-extrabold leading-[1.3] md:text-3xl lg:text-4xl">
                 {pageTitle}
               </h1>
 
-              <p className="max-w-3xl text-lg leading-8 text-gray-200">
+              <p className="max-w-3xl text-sm sm:text-base leading-7 text-gray-300">
                 {summary}
               </p>
 
@@ -257,19 +287,19 @@ export default function CoreServicePageView({
                 <>
                   {/* Hide section buttons for marketing-strategy and content-creation */}
                   {!hideSectionButtons && (
-                    <div className="mb-8 flex flex-wrap gap-2">
+                    <div className="mb-6 flex flex-wrap gap-1.5 sm:gap-2">
                       {sectionsWithAll.map(section => (
                         <button
                           key={section.id}
                           type="button"
                           onClick={() => setSelectedSectionId(section.id)}
-                          className={`rounded-xl border px-3 py-2 text-sm text-right transition-all backdrop-blur-md ${
+                          className={`rounded-lg border px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-xs text-right transition-all backdrop-blur-md ${
                             selectedSectionId === section.id
-                              ? 'border-accent bg-accent text-white shadow-lg shadow-accent/20'
-                              : 'border-white/10 bg-[#060b14]/80 text-gray-200 hover:border-white/20 hover:bg-[#0a1121]'
+                              ? 'border-accent bg-accent text-white shadow-md shadow-accent/20 font-bold'
+                              : 'border-white/10 bg-[#060b14]/80 text-gray-300 hover:border-white/20 hover:bg-[#0a1121] font-medium'
                           }`}
                         >
-                          <div className="font-bold">
+                          <div>
                             {section.id === ALL_SECTION_ID
                               ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
                               : language === 'en'
@@ -283,9 +313,9 @@ export default function CoreServicePageView({
 
                   {selectedSection && (
                     <>
-                      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+                      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                         <div>
-                          <h3 className="text-2xl font-bold text-white">
+                          <h3 className="text-lg sm:text-xl font-bold text-white">
                             {selectedSection.id === ALL_SECTION_ID
                               ? t('coreServicePage.all') || defaultTranslations['coreServicePage.all'] || 'الكل'
                               : language === 'en'
@@ -298,7 +328,7 @@ export default function CoreServicePageView({
                               : selectedSection.description;
                             const cleanSectionDesc = cleanPageDescription(rawSectionDesc);
                             return cleanSectionDesc ? (
-                              <p className="mt-3 max-w-3xl leading-8 text-gray-300">
+                              <p className="mt-2 max-w-3xl text-xs sm:text-sm leading-6 text-gray-300">
                                 {cleanSectionDesc}
                               </p>
                             ) : null;
@@ -312,7 +342,7 @@ export default function CoreServicePageView({
                       )}
 
                       {isDirectWorksView ? (
-                        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                           {directWorks.map(work => (
                             <ClientCard
                                 key={work.id}
@@ -334,7 +364,11 @@ export default function CoreServicePageView({
                           {t('coreServicePage.noWorksInSection')}
                         </div>
                       ) : (
-                        <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 xl:grid-cols-3">
+                        <div className={`grid gap-5 sm:gap-6 ${
+                          isWebsiteDesign 
+                            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3' 
+                            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                        }`}>
                           {selectedClients.map(client => {
                             const videoContent = (client as any).content?.find((c: any) => c.content_type === 'video');
                             const clientLogo = client.logo_url || client.image_url || '';
@@ -351,6 +385,8 @@ export default function CoreServicePageView({
                                 aspectRatioOverride={cardAspectRatio}
                                 projectUrl={client.project_url || ''}
                                 preferLogo={isVideoProductions}
+                                objectFitOverride={isWebsiteDesign ? 'contain' : undefined}
+                                hideDescription={isWebsiteDesign}
                               />
                             );
                           })}

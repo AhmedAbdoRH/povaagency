@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import type { Client, ClientContent, Page, Service, Specialization, StoreSettings, PhoneVideoItem } from '../types/database';
 import { resolveCoreServicesWithPages } from '../data/coreServices';
 import { optimizeImage, isImageFile, autoConvertToWebp } from '../utils/imageOptimization';
-import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos, normalizeThumbnailUrl } from '../utils/pageLinks';
+import { extractDriveVideos, cleanPageDescription, encodeDescriptionWithDriveVideos, normalizeThumbnailUrl, isSectionPriority } from '../utils/pageLinks';
 import VideoCoverField from '../components/VideoCoverField';
 
 type FormMode = 'page' | 'spec' | 'client' | 'content' | 'customers' | 'specContent' | 'settings' | null;
@@ -27,7 +27,7 @@ const emptyPageForm = {
   primary_thumbnail_url: '',
   additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[],
 };
-const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', drive_url: '', primary_title: '', primary_thumbnail_url: '', additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[] };
+const emptySpecForm = { service_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', drive_url: '', primary_title: '', primary_thumbnail_url: '', is_priority: false, additional_videos: [] as { id: string; title: string; url: string; thumbnail_url?: string }[] };
 const emptyClientForm = { specialization_id: '', name: '', name_en: '', description: '', description_en: '', image_url: '', project_url: '', logo_url: '' };
 const emptyContentForm = { client_id: '', title: '', description: '', image_url: '', video_url: '', is_vertical_video: true, content_type: 'image' as 'image' | 'video' | 'text' };
 
@@ -311,8 +311,15 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
     const driveUrl = specForm.drive_url?.trim() || null;
     const additionalVideos = (specForm.additional_videos || []).filter(v => v.url && v.url.trim());
 
-    // Encode in description for fallback persistence
-    const encodedDesc = encodeDescriptionWithDriveVideos(cleanDesc, driveUrl, additionalVideos, specForm.primary_thumbnail_url, specForm.primary_title);
+    // Encode in description for fallback persistence including is_priority
+    const encodedDesc = encodeDescriptionWithDriveVideos(
+      cleanDesc,
+      driveUrl,
+      additionalVideos,
+      specForm.primary_thumbnail_url,
+      specForm.primary_title,
+      specForm.is_priority
+    );
 
     const fullPayload: any = {
       service_id: serviceId,
@@ -323,6 +330,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
       image_url: specForm.image_url || null,
       drive_url: driveUrl,
       custom_links: additionalVideos.length > 0 ? additionalVideos : null,
+      display_order: specForm.is_priority ? -1 : 0,
     };
 
     let op = editingSpec 
@@ -966,6 +974,11 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                     <div className="relative aspect-square">
                       {spec.image_url ? <img src={spec.image_url} alt={spec.name} className="h-full w-full object-cover" /> : <div className="h-full w-full bg-gray-800/50" />}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                      {isSectionPriority(spec) && (
+                        <div className="absolute top-2 right-2 rounded-full bg-amber-500/90 text-black px-2.5 py-0.5 text-[11px] font-black shadow-lg flex items-center gap-1 backdrop-blur-sm">
+                          <span>⭐ أولوية ظهور</span>
+                        </div>
+                      )}
                       <div className="absolute bottom-0 left-0 right-0 p-3"><h3 className="line-clamp-2 font-bold">{spec.name}</h3></div>
                     </div>
                   </button>
@@ -973,6 +986,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                     <button onClick={() => { 
                       const specData = specializations.find(s => s.id === spec.id);
                       const extracted = specData ? extractDriveVideos(specData as any) : { primary_url: '', videos: [] };
+                      const priority = isSectionPriority(spec);
                       setEditingSpec(spec.id); 
                       setSpecForm({ 
                         service_id: spec.service_id, 
@@ -984,6 +998,7 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                         drive_url: extracted.primary_url || '',
                         primary_title: extracted.primary_title || (extracted.videos[0]?.title !== 'فيديو 1' ? extracted.videos[0]?.title : '') || '',
                         primary_thumbnail_url: extracted.videos[0]?.thumbnail_url || '',
+                        is_priority: priority,
                         additional_videos: extracted.videos.slice(1).map(v => ({ id: v.id, title: v.title, url: v.url, thumbnail_url: v.thumbnail_url || '' })),
                       }); 
                       setActiveForm('spec'); 
@@ -1005,6 +1020,33 @@ export default function AdminDashboard({ onSettingsUpdate }: AdminDashboardProps
                   <input value={specForm.name_en} onChange={e => setSpecForm({ ...specForm, name_en: e.target.value })} placeholder="اسم القسم (إنجليزي)" className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={specForm.description} onChange={e => setSpecForm({ ...specForm, description: e.target.value })} placeholder="وصف القسم" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
                   <textarea value={specForm.description_en} onChange={e => setSpecForm({ ...specForm, description_en: e.target.value })} placeholder="وصف القسم (إنجليزي)" rows={3} className="rounded-xl bg-gray-800/50 p-4" />
+                  {/* خيار أولوية الظهور في القسم الرئيسي */}
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+                    <label className="flex items-start sm:items-center gap-3 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(specForm.is_priority)}
+                        onChange={e => setSpecForm({ ...specForm, is_priority: e.target.checked })}
+                        className="mt-1 sm:mt-0 h-5 w-5 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-400 focus:ring-offset-gray-900 cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-amber-200 text-sm">
+                            ⭐ إعطاء أولوية لظهور عناصر هذا القسم في الواجهة الرئيسية
+                          </span>
+                          {specForm.is_priority && (
+                            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-extrabold text-amber-300 border border-amber-500/40">
+                              مفعّل
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-300 mt-1">
+                          عند تفعيل هذا الخيار، ستظهر أعمال ومشاريع هذا القسم في بداية القسم الرئيسي وقائمة (الكل) قبل باقي الأقسام.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
                   <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && uploadImage(e.target.files[0], 'spec')} className="rounded-xl bg-gray-800/50 p-3" />
                   
                   {/* فيديوهات Google Drive للقسم */}

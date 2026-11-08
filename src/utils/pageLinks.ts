@@ -33,14 +33,15 @@ export function cleanPageDescription(description: string | null | undefined): st
 }
 
 /**
- * Encodes Drive videos into a description string for fallback persistence
+ * Encodes Drive videos and section metadata into a description string for fallback persistence
  */
 export function encodeDescriptionWithDriveVideos(
   description: string | null | undefined,
   driveUrl: string | null | undefined,
   additionalVideos?: DriveVideoItem[] | null,
   primaryThumbnailUrl?: string | null,
-  primaryTitle?: string | null
+  primaryTitle?: string | null,
+  isPriority?: boolean
 ): string {
   const baseDescription = cleanPageDescription(description);
   const cleanDriveUrl = driveUrl?.trim() || '';
@@ -48,19 +49,39 @@ export function encodeDescriptionWithDriveVideos(
   const cleanPrimaryThumbnail = primaryThumbnailUrl?.trim() || '';
   const cleanPrimaryTitle = primaryTitle?.trim() || '';
 
-  if (!cleanDriveUrl && cleanAdditional.length === 0 && !cleanPrimaryThumbnail && !cleanPrimaryTitle) {
+  if (!cleanDriveUrl && cleanAdditional.length === 0 && !cleanPrimaryThumbnail && !cleanPrimaryTitle && !isPriority) {
     return baseDescription;
   }
 
-  const dataToSave = {
+  const dataToSave: Record<string, any> = {
     drive_url: cleanDriveUrl,
     primary_title: cleanPrimaryTitle,
     additional_videos: cleanAdditional,
     primary_thumbnail_url: cleanPrimaryThumbnail,
   };
 
+  if (isPriority) {
+    dataToSave.is_priority = true;
+  }
+
   const tag = `<!--DRIVE_VIDEOS:${JSON.stringify(dataToSave)}-->`;
   return baseDescription ? `${baseDescription}\n\n${tag}` : tag;
+}
+
+/**
+ * Checks if a section or page has priority flag enabled in description metadata
+ */
+export function isSectionPriority(item: { description?: string | null; description_en?: string | null } | null | undefined): boolean {
+  if (!item) return false;
+  const desc = item.description || item.description_en || '';
+  const match = desc.match(META_TAG_REGEX);
+  if (!match?.[1]) return false;
+  try {
+    const parsed = JSON.parse(match[1]);
+    return Boolean(parsed.is_priority);
+  } catch {
+    return false;
+  }
 }
 
 /**

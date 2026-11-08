@@ -16,10 +16,12 @@ interface ClientCardProps {
   aspectRatioOverride?: string; // مقاس مخصص (مثل '3 / 4')
   projectUrl?: string; // رابط المشروع
   hideText?: boolean; // إخفاء النصوص تحت الكارت
+  hideDescription?: boolean; // إخفاء وصف العمل فقط
   preferLogo?: boolean; // عرض شعار العميل فقط بدلاً من الفيديو
+  objectFitOverride?: 'contain' | 'cover'; // للتحكم في كيفية ملاءمة الصورة داخل الكارت
 }
 
-export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl, hideText, preferLogo }: ClientCardProps) {
+export default function ClientCard({ id, name, description, logoUrl, imageUrl, videoUrl, isVerticalVideo, aspectRatioOverride, projectUrl, hideText, hideDescription, preferLogo, objectFitOverride }: ClientCardProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const aspectRatio = useVideoAspectRatio(preferLogo ? undefined : videoUrl, imageUrl);
@@ -146,7 +148,15 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
           <img
             src={displayLogo}
             alt={name}
-            className={`w-full h-full ${logoUrl ? 'object-contain p-8' : 'object-cover'} transition-transform duration-700 group-hover:scale-110`}
+            className={`w-full h-full ${
+              objectFitOverride === 'contain'
+                ? 'object-contain'
+                : objectFitOverride === 'cover'
+                ? 'object-cover'
+                : logoUrl
+                ? 'object-contain p-8'
+                : 'object-cover'
+            } transition-transform duration-700 group-hover:scale-105`}
             loading="lazy"
           />
         ) : (
@@ -156,9 +166,9 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
 
       {/* Text Content - تحت الميديا */}
       {!hideText && (
-        <div className="relative p-6 bg-[#060b14] flex flex-col">
+        <div className="relative p-3.5 sm:p-4 bg-[#060b14] flex flex-col">
           {/* اسم العمل */}
-          <h3 className="text-base md:text-lg font-bold text-white mb-1 group-hover:text-[#ec533a] transition-colors duration-300">
+          <h3 className="text-sm md:text-base font-bold text-white mb-1 group-hover:text-[#ec533a] transition-colors duration-300 line-clamp-1">
             {name}
           </h3>
 
@@ -177,7 +187,7 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
 
           {isExternal ? (
             <div className="mt-2">
-              {description && (
+              {!hideDescription && description && (
                 <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
                   {linkifyText(description)}
                 </p>
@@ -193,9 +203,11 @@ export default function ClientCard({ id, name, description, logoUrl, imageUrl, v
             /* الوصف - يظهر عند hover للعملاء العاديين */
             <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-out">
               <div className="overflow-hidden">
-                <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
-                  {description ? linkifyText(description) : t('clientCard.clickForDetails')}
-                </p>
+                {!hideDescription && (
+                  <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+                    {description ? linkifyText(description) : t('clientCard.clickForDetails')}
+                  </p>
+                )}
                 <div
                   onClick={handleCardClick}
                   className="w-full text-center bg-white/10 backdrop-blur-md hover:bg-[#ec533a] text-white py-2 rounded-lg transition-all duration-300 font-semibold border border-white/20 hover:border-[#ec533a] shadow-lg text-sm"
